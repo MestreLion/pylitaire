@@ -159,11 +159,9 @@ def load_svg(path, size=(), keep_aspect=True):
 if __name__ == '__main__':
 
     def pause():
-        if AUTO:
-            return
         pygame.display.update()
         done = False
-        exit = False
+        exit = AUTO
         pygame.event.clear()
         while not (done or exit):
             for event in pygame.event.get():
