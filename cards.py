@@ -23,7 +23,7 @@ import logging
 import pygame
 
 import g
-import theme
+import themes
 
 log = logging.getLogger(__name__)
 
@@ -114,14 +114,18 @@ class Card(pygame.sprite.Sprite):
         else:
             self.color = COLORS.RED
 
-        self.theme = theme
 
-        self.rect = pygame.Rect((0, 0), (self.theme.get_rect().width  / 13.,
-                                         self.theme.get_rect().height /  5.))
+        if isinstance(theme, themes.Theme):
+            self.theme = theme
+        else:
+            self.theme = themes.themes[theme]
+
+        self.rect = pygame.Rect((0, 0), (self.theme.surface.get_rect().width  / 13.,
+                                         self.theme.surface.get_rect().height /  5.))
         imgrect = pygame.Rect(((self.value - 1) * self.rect.width,
                                (self.suit  - 1) * self.rect.height),
                               (self.rect.width, self.rect.height))
-        self.image = self.theme.subsurface(imgrect)
+        self.image = self.theme.surface.subsurface(imgrect)
 
 
 

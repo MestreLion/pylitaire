@@ -37,8 +37,8 @@ import g
 log = logging.getLogger(__name__)
 
 THEMEDIRS = [
-    os.path.join(g.CONFIGDIR, 'cards'),
-    os.path.join(g.GAMEDIR, 'themes'),
+    os.path.join(g.CONFIGDIR, 'themes'),
+    os.path.join(g.GAMEDIR, 'images', 'themes'),
     '/usr/share/aisleriot/cards',
 ]
 
@@ -179,7 +179,7 @@ if __name__ == '__main__':
     AUTO = '--auto' in sys.argv[1:]
     SCREEN_SIZE = (1280, 720)
     BGCOLOR = (0, 64, 0)
-    TESTTHEME = os.path.join(g.GAMEDIR, 'themes', 'anglo.svg')
+    TESTTHEME = os.path.join(g.GAMEDIR, 'images', 'themes', 'anglo.svg')
 
     # setup
     logging.basicConfig(level=logging.DEBUG)
