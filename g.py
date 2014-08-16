@@ -38,3 +38,4 @@ CONFIGDIR = xdg.BaseDirectory.save_config_path(GAMENAME)
 FPS = 30
 fullscreen = False
 screen_size = (1280, 720)
+theme = "anglo"

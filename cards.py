@@ -119,7 +119,14 @@ class Card(pygame.sprite.Sprite):
         if isinstance(theme, themes.Theme):
             self.theme = theme
         else:
-            self.theme = themes.themes[theme]
+            theme = theme or g.theme
+            self.theme = themes.themes.get(theme, None)
+
+        if not self.theme:
+            log.warn("Theme '%s' not found. Card will not be drawable", theme)
+            self.rect = pygame.Rect(0, 0, 0, 0)
+            self.image = pygame.Surface((0, 0))
+            return
 
         self.rect = pygame.Rect((0, 0), (self.theme.surface.get_rect().width  / 13.,
                                          self.theme.surface.get_rect().height /  5.))
@@ -144,8 +151,12 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode(SCREEN_SIZE)
     screen.fill(BGCOLOR)
-    mytheme = themes.init_themes()['anglo']
+    pygame.display.update()
+    themes.init_themes()
 
     # Card
-    card = Card(RANKS.QUEEN, SUITS.HEARTS, theme=mytheme)
+    card = Card(RANKS.QUEEN, SUITS.HEARTS)
     print card.name
+
+    screen.blit(card.image, (0, 0))
+    pygame.display.update()
