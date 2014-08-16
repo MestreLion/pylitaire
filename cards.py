@@ -19,6 +19,7 @@
 # Card handling
 
 import logging
+import random
 
 import pygame
 
@@ -93,11 +94,24 @@ class COLORS(Enum):
 class Deck(object):
     ''' A collection of cards '''
 
-    def __init__(self, theme):
+    def __init__(self, theme=None):
         self.cards = []
-        for rank in RANKS:
-            for suit in SUITS:
-                self.cards.append(Card(rank=rank, suit=suit, theme=theme))
+        self.cardsdict = {}
+        for suit in SUITS:
+            for rank in RANKS:
+                card = Card(rank=rank, suit=suit, theme=theme)
+                self.cards.append(card)
+                self.cardsdict[(rank, suit)] = card
+
+    def card(self, rank=0, suit=0):
+        ''' Return a Card of the given rank and suit '''
+        return self.cardsdict[(rank, suit)]
+
+    def shuffle(self):
+        ''' Shuffles the deck cards in-place. Return None '''
+        random.shuffle(self.cards)
+
+
 
 
 class Card(pygame.sprite.Sprite):
@@ -114,7 +128,15 @@ class Card(pygame.sprite.Sprite):
         else:
             self.color = COLORS.RED
 
-        self.name = "%s of %s" % (RANKS.name(self.rank), SUITS.name(self.suit))
+        rankname = RANKS.name(self.rank)
+        suitname = SUITS.name(self.suit)
+        self.name = "%s of %s" % (rankname, suitname)
+
+        if self.rank <= 10:
+            shortrank = str(self.rank)
+        else:
+            shortrank = rankname[:1].upper()
+        self.shortname = shortrank + suitname[:1].lower()
 
         if isinstance(theme, themes.Theme):
             self.theme = theme
@@ -136,7 +158,7 @@ class Card(pygame.sprite.Sprite):
         self.image = self.theme.surface.subsurface(imgrect)
 
     def __repr__(self):
-        return "<%s(rank=%r, suit=%r)>" % (
+        return "<%s(rank=%2d, suit=%r)>" % (
             self.__class__.__name__, self.rank, self.suit)
 
 
@@ -160,6 +182,14 @@ if __name__ == '__main__':
 
     # Card
     card = Card(RANKS.QUEEN, SUITS.HEARTS)
-    print card, card.name
+    print card, card.shortname, card.name
     screen.blit(card.image, (0, 0))
     pygame.display.update()
+
+    # Deck
+    deck = Deck()
+    print len(deck.cards)
+    print deck.card(RANKS.ACE, SUITS.SPADES)
+    print deck.cards[:5]
+    deck.shuffle()
+    print deck.cards[:5]
