@@ -109,7 +109,7 @@ class Card(pygame.sprite.Sprite):
         self.rank = rank
         self.suit = suit
 
-        if self.value in [SUITS.CLUBS, SUITS.SPADES]:
+        if self.rank in [SUITS.CLUBS, SUITS.SPADES]:
             self.color = COLORS.BLACK
         else:
             self.color = COLORS.RED
@@ -122,8 +122,8 @@ class Card(pygame.sprite.Sprite):
 
         self.rect = pygame.Rect((0, 0), (self.theme.surface.get_rect().width  / 13.,
                                          self.theme.surface.get_rect().height /  5.))
-        imgrect = pygame.Rect(((self.value - 1) * self.rect.width,
-                               (self.suit  - 1) * self.rect.height),
+        imgrect = pygame.Rect(((self.rank - 1) * self.rect.width,
+                               (self.suit - 1) * self.rect.height),
                               (self.rect.width, self.rect.height))
         self.image = self.theme.surface.subsurface(imgrect)
 
