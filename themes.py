@@ -38,7 +38,7 @@ log = logging.getLogger(__name__)
 
 THEMEDIRS = [
     os.path.join(g.CONFIGDIR, 'themes'),
-    os.path.join(g.GAMEDIR, 'images', 'themes'),
+    os.path.join(g.DATADIR, 'themes'),
     '/usr/share/aisleriot/cards',
 ]
 
@@ -172,26 +172,24 @@ if __name__ == '__main__':
                 if event.type in [pygame.KEYDOWN, pygame.MOUSEBUTTONDOWN]:
                     done = True
             clock.tick(10)
-        screen.fill(BGCOLOR)
+        screen.fill(g.BGCOLOR)
         return exit
 
     # unit tests
 
     # constants
     AUTO = '--auto' in sys.argv[1:]
-    SCREEN_SIZE = (1280, 720)
-    BGCOLOR = (0, 64, 0)
-    TESTTHEME = os.path.join(g.GAMEDIR, 'images', 'themes', 'anglo.svg')
+    TESTTHEME = os.path.join(g.DATADIR, 'themes', 'anglo.svg')
 
     # setup
     logging.basicConfig(level=logging.DEBUG)
     pygame.init()
     clock = pygame.time.Clock()
-    screen = pygame.display.set_mode(SCREEN_SIZE)
-    screen.fill(BGCOLOR)
+    screen = pygame.display.set_mode(g.screen_size)
+    screen.fill(g.BGCOLOR)
 
     # load_svg()
-    screen.blit(load_svg(TESTTHEME, SCREEN_SIZE), (0,0))
+    screen.blit(load_svg(TESTTHEME, g.screen_size), (0,0))
     pause()
 
     # Theme()

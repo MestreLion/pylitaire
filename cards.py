@@ -167,16 +167,12 @@ class Card(pygame.sprite.Sprite):
 if __name__ == '__main__':
     # unit tests
 
-    # constants
-    SCREEN_SIZE = (1280, 720)
-    BGCOLOR = (0, 64, 0)
-
     # setup
     logging.basicConfig(level=logging.DEBUG)
     pygame.init()
     clock = pygame.time.Clock()
-    screen = pygame.display.set_mode(SCREEN_SIZE)
-    screen.fill(BGCOLOR)
+    screen = pygame.display.set_mode(g.screen_size)
+    screen.fill(g.BGCOLOR)
     pygame.display.update()
     themes.init_themes()
 

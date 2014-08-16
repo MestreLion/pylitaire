@@ -32,10 +32,18 @@ GAMENAME = 'pylitaire'
 
 # Paths
 GAMEDIR = os.path.abspath(os.path.dirname(__file__) or '.')
+DATADIR = os.path.join(GAMEDIR, 'data')
 CONFIGDIR = xdg.BaseDirectory.save_config_path(GAMENAME)
 
 # Graphics
 FPS = 30
+BGCOLOR = (0, 64, 0)  # Dark green
+screen = None  # surface created by pygame.dsplay.set_mode()
+background = None  # background surface
+
+
+# Options
 fullscreen = False
 screen_size = (1280, 720)
 theme = "anglo"
+debug = False
