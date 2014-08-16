@@ -45,11 +45,11 @@ class Enum(object):
         # value not handled in subclass name()
         for k, v in cls.__dict__.items():
             if v == value:
-                return k.lower().replace('_', ' ')
+                return k.replace('_', ' ').title()
 
         # value not found
         raise KeyError("Value '%s' not found in enum '%s'" %
-                       (value, cls.__class__.__name__))
+                       (value, cls.__name__))
 
     class _meta(type):
         def __iter__(self):  # "self" for a metaclass refers to classes, not instances
@@ -114,6 +114,7 @@ class Card(pygame.sprite.Sprite):
         else:
             self.color = COLORS.RED
 
+        self.name = "%s of %s" % (RANKS.name(self.rank), SUITS.name(self.suit))
 
         if isinstance(theme, themes.Theme):
             self.theme = theme
@@ -131,4 +132,20 @@ class Card(pygame.sprite.Sprite):
 
 
 if __name__ == '__main__':
-    pass
+    # unit tests
+
+    # constants
+    SCREEN_SIZE = (1280, 720)
+    BGCOLOR = (0, 64, 0)
+
+    # setup
+    logging.basicConfig(level=logging.DEBUG)
+    pygame.init()
+    clock = pygame.time.Clock()
+    screen = pygame.display.set_mode(SCREEN_SIZE)
+    screen.fill(BGCOLOR)
+    mytheme = themes.init_themes()['anglo']
+
+    # Card
+    card = Card(RANKS.QUEEN, SUITS.HEARTS, theme=mytheme)
+    print card.name

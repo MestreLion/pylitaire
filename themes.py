@@ -94,6 +94,8 @@ def init_themes(cardsize=(), keep_aspect=True):
             else:
                 raise
 
+    return themes
+
 
 def load_svg(path, size=(), keep_aspect=True):
     ''' Load an SVG file and return a pygame.image surface with the specified size
