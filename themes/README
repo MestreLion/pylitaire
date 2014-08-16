@@ -1,0 +1,18 @@
+Themes for Pylitaire
+=====================
+
+Anglo
+------
+
+Made by Aike Reyer, taken from Gnome Games' Aisleriot package, version 3.12.1
+
+Source:
+	https://git.gnome.org/browse/aisleriot/snapshot/aisleriot-3.12.1.zip
+	https://git.gnome.org/browse/aisleriot/plain/cards/anglo.svg
+
+Copyright:
+	2007, 2008  Aike Reyer <aike@users.sourceforge.net>
+
+License:
+	GPL-3+ <http://www.gnu.org/licenses/gpl.html>
+	Originally GPL2+, see https://bugzilla.gnome.org/show_bug.cgi?id=461267#c8
