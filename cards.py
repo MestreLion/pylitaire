@@ -135,6 +135,10 @@ class Card(pygame.sprite.Sprite):
                               (self.rect.width, self.rect.height))
         self.image = self.theme.surface.subsurface(imgrect)
 
+    def __repr__(self):
+        return "<%s(rank=%r, suit=%r)>" % (
+            self.__class__.__name__, self.rank, self.suit)
+
 
 
 
@@ -156,7 +160,6 @@ if __name__ == '__main__':
 
     # Card
     card = Card(RANKS.QUEEN, SUITS.HEARTS)
-    print card.name
-
+    print card, card.name
     screen.blit(card.image, (0, 0))
     pygame.display.update()
