@@ -1,0 +1,23 @@
+Icons for Pylitaire
+===================
+
+Main Icon
+---------
+
+Made by Alessandro Roncone, taken from FlatWoken icon theme
+
+Files:
+	icon.svg, icon-{16,24,32,48,64,128,512}.png
+
+Source:
+	https://github.com/alecive/FlatWoken/blob/master/FlatWoken/scalable/apps/game-cards.svg
+	http://www.iconarchive.com/show/flatwoken-icons-by-alecive/Apps-Game-Cards-icon.html
+
+Website:
+	https://github.com/alecive/FlatWoken
+
+Copyright:
+	2014  Alessandro Roncone <alecive87@gmail.com>
+
+License:
+	CC-BY-SA 4 <http://creativecommons.org/licenses/by-sa/4.0/>
