@@ -39,7 +39,7 @@ CONFIGDIR = xdg.BaseDirectory.save_config_path(GAMENAME)
 FPS = 30
 BGCOLOR = (0, 80, 16)  # Dark green
 window = None  # surface created by pygame.dsplay.set_mode()
-background = None  # background surface
+background = None  # graphics.Background() instance
 
 
 # Options
@@ -47,3 +47,4 @@ fullscreen = False
 window_size = (1000, 700)
 theme = "anglo"
 debug = False
+baize = "baize-ubuntu"
