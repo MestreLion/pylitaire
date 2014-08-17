@@ -58,8 +58,8 @@ class Theme(object):
         self.surface = load_svg(self.path, size, keep_aspect)
 
         self.size = self.surface.get_size()
-        self.cardsize = (self.size[0] / 13.,
-                         self.size[1] /  5.)
+        self.cardsize = (self.size[0] / 13,
+                         self.size[1] /  5)
         self.aspect = self.cardsize[1] / self.cardsize[0]
 
 
@@ -124,12 +124,16 @@ def load_svg(path, size=(), keep_aspect=True):
             width, height = result.width, result.height
         else:
             width, height = size
-        scale = (float(width)/svg.props.width, float(height)/svg.props.height)
     else:
         width, height = (svg.props.width, svg.props.height)
-        scale = None
 
-    log.debug("Loading SVG size (%4d,%4d)->(%4d,%4d): %s",
+    # Make sure size is a multiple of (13, 5), so all cards have integer sizes
+    width, height = int(width / 13) * 13, int(height / 5) * 5
+
+    # If a size was requested, calculate the scale factor
+    scale = size and (float(width)/svg.props.width, float(height)/svg.props.height)
+
+    log.debug("Loading SVG size (%4g,%4g)->(%4g,%4g): %s",
               svg.props.width, svg.props.height, width, height, path)
 
     # Create a Cairo surface. Archtecture endianess determines if cairo surface
