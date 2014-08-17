@@ -82,6 +82,11 @@ def init_themes(cardsize=(), keep_aspect=True):
                 if id in themes:
                     continue
 
+                # For now, load only the default theme
+                # No in-game switching yet, and pre-loading all is *very* expensive
+                if not id == g.theme:
+                    continue
+
                 # Create the theme and add it to the dict
                 log.debug("New card theme found: %s", id)
                 themes[id] = Theme(id, os.path.join(path, basename), name="",
@@ -93,8 +98,6 @@ def init_themes(cardsize=(), keep_aspect=True):
                 continue
             else:
                 raise
-
-    return themes
 
 
 def load_svg(path, size=(), keep_aspect=True):
