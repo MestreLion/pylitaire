@@ -40,6 +40,9 @@ def main(*argv):
     if "--fullscreen" in argv: g.fullscreen = True
     if "--debug"      in argv: g.debug = True
 
+    if g.debug:
+        logging.root.level = logging.DEBUG
+
     pygame.init()
     graphics.init_graphics()
 
@@ -105,5 +108,6 @@ def main(*argv):
 
 
 if __name__ == "__main__":
+    logging.basicConfig()
     log = logging.getLogger(g.GAMENAME)
     sys.exit(0 if main(*sys.argv[1:]) else 1)
