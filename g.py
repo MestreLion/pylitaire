@@ -37,7 +37,7 @@ CONFIGDIR = xdg.BaseDirectory.save_config_path(GAMENAME)
 
 # Graphics
 FPS = 30
-BGCOLOR = (0, 64, 0)  # Dark green
+BGCOLOR = (0, 80, 16)  # Dark green
 window = None  # surface created by pygame.dsplay.set_mode()
 background = None  # background surface
 
