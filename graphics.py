@@ -36,7 +36,7 @@ def init_graphics():
 
     # Set caption and icon
     pygame.display.set_caption("Pylitaire")
-    pygame.display.set_icon(pygame.image.load(os.path.join(g.DATADIR, 'icons', 'icon-48.png')))
+    pygame.display.set_icon(pygame.image.load(os.path.join(g.DATADIR, 'icons', 'icon-32.png')))
 
     # Set the screen
     flags = 0
