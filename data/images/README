@@ -1,0 +1,45 @@
+Images for Pylitaire
+====================
+
+
+Gnome Baize (Background)
+------------------------
+
+From Gnome Games' Aisleriot package, version 3.6.2.
+
+This was the last version of Aisleriot containing the the original, green baize
+before it was replaced by a gray-ish white noise texture from a different artist.
+Original artist is unknown, so here I credited the commit author that first
+added the original file to Aisleriot's repository in 1998-09-06
+
+Files:
+	baize-gnome.png
+
+Source:
+	https://git.gnome.org/browse/aisleriot/snapshot/aisleriot-3.6.2.zip
+	https://git.gnome.org/browse/aisleriot/plain/data/baize.png?id=47a1a11fe305ca34dbf128bff90832dc9c094d39
+
+Copyright:
+	1998  Felix Bellaby <felix@src.gnome.org>
+
+License:
+	GPL-3+ <http://www.gnu.org/licenses/gpl.html>
+
+
+Ubuntu Branding
+---------------
+
+From branding-ubuntu package, version 0.8. A very nice looking tiled baize
+
+Files:
+	baize-ubuntu.png
+
+Source:
+	http://archive.ubuntu.com/ubuntu/pool/main/b/branding-ubuntu/branding-ubuntu_0.8.tar.gz
+	http://packages.ubuntu.com/trusty/branding-ubuntu
+
+Copyright:
+	Mads Rosendahl Hansen <madsrh@gmail.com>
+
+License:
+	GPL-3+ (GPL-2.0+ in source)
