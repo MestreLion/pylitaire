@@ -38,12 +38,12 @@ CONFIGDIR = xdg.BaseDirectory.save_config_path(GAMENAME)
 # Graphics
 FPS = 30
 BGCOLOR = (0, 64, 0)  # Dark green
-screen = None  # surface created by pygame.dsplay.set_mode()
+window = None  # surface created by pygame.dsplay.set_mode()
 background = None  # background surface
 
 
 # Options
 fullscreen = False
-screen_size = (1280, 720)
+window_size = (1000, 700)
 theme = "anglo"
 debug = False

@@ -27,7 +27,7 @@ import sys
 import logging
 import array
 
-import pygame  # debian: python-pygame
+import pygame
 import rsvg  # debian: python-rsvg
 import cairo  # debian: python-cairo
 import PIL.Image  # debian: python-imaging
@@ -185,11 +185,11 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     pygame.init()
     clock = pygame.time.Clock()
-    screen = pygame.display.set_mode(g.screen_size)
+    screen = pygame.display.set_mode(g.window_size)
     screen.fill(g.BGCOLOR)
 
     # load_svg()
-    screen.blit(load_svg(TESTTHEME, g.screen_size), (0,0))
+    screen.blit(load_svg(TESTTHEME, g.window_size), (0,0))
     pause()
 
     # Theme()

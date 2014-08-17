@@ -150,8 +150,7 @@ class Card(pygame.sprite.Sprite):
             self.image = pygame.Surface((0, 0))
             return
 
-        self.rect = pygame.Rect((0, 0), (self.theme.surface.get_rect().width  / 13.,
-                                         self.theme.surface.get_rect().height /  5.))
+        self.rect = pygame.Rect((0, 0), self.theme.cardsize)
         imgrect = pygame.Rect(((self.rank - 1) * self.rect.width,
                                (self.suit - 1) * self.rect.height),
                               (self.rect.width, self.rect.height))
@@ -171,15 +170,15 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     pygame.init()
     clock = pygame.time.Clock()
-    screen = pygame.display.set_mode(g.screen_size)
-    screen.fill(g.BGCOLOR)
+    window = pygame.display.set_mode(g.window_size)
+    window.fill(g.BGCOLOR)
     pygame.display.update()
     themes.init_themes()
 
     # Card
     card = Card(RANKS.QUEEN, SUITS.HEARTS)
     print card, card.shortname, card.name
-    screen.blit(card.image, (0, 0))
+    window.blit(card.image, (0, 0))
     pygame.display.update()
 
     # Deck
