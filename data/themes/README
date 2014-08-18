@@ -6,6 +6,9 @@ Anglo
 
 Made by Aike Reyer, taken from Gnome Games' Aisleriot package, version 3.12.1
 
+Files:
+	anglo.svg
+
 Source:
 	https://git.gnome.org/browse/aisleriot/snapshot/aisleriot-3.12.1.zip
 	https://git.gnome.org/browse/aisleriot/plain/cards/anglo.svg
@@ -16,3 +19,45 @@ Copyright:
 License:
 	GPL-3+ <http://www.gnu.org/licenses/gpl.html>
 	Originally GPL2+, see https://bugzilla.gnome.org/show_bug.cgi?id=461267#c8
+
+
+Ubuntu Gnomangelo
+-----------------
+
+From branding-ubuntu package, version 0.8, as a replacement for Gnome Aisleriot's
+Gnomangelo Bitmap theme. Originally named 'gnomangelo_bitmap.svg'
+
+Files:
+	ubuntu_gnomangelo.svg
+
+Source:
+	http://archive.ubuntu.com/ubuntu/pool/main/b/branding-ubuntu/branding-ubuntu_0.8.tar.gz
+	http://packages.ubuntu.com/trusty/branding-ubuntu
+
+Copyright:
+	Mads Rosendahl Hansen <madsrh@gmail.com>
+
+License:
+	GPL-3+ (GPL-2.0+ in source)
+
+
+Life and Smooth
+---------------
+
+Found on Gnome Look website, based on Ubuntu Gnomangelo theme. Author claims
+work is a composition of several other work available at http://gnome-look.org
+
+Files:
+	life_and_smooth.svg
+
+Source:
+	http://gnome-look.org/content/show.php?content=109140
+	http://gnome-look.org/content/download.php?content=109140&id=1&tan=6890900
+
+Copyright:
+	jess96 ("Jess from Brussels")
+	http://gnome-look.org/usermanager/search.php?username=jess96
+	Derived work, see source website for details
+
+License:
+	GPL-3+ (GPL in source, version not specified)

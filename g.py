@@ -45,6 +45,6 @@ background = None  # graphics.Background() instance
 # Options
 fullscreen = False
 window_size = (1000, 700)
-theme = "anglo"
 debug = False
 baize = "baize-ubuntu"
+theme = "life_and_smooth"
