@@ -1,0 +1,64 @@
+Brainstorm of new features and code ideas
+Loosely ordered from "hanging fruits easy to do" to "deep stuff"
+
+- graphics.load_image() wrapper to pygame.image.load(), handling svg. move load_svg() code to graphics.py
+
+- Background mode: create a MODE Enum, values AUTO, FILLCOLOR, TILE, SCALE, ORIGINAL
+	FILLCOLOR = ignores file and use solid color fill
+	TILE = repeats the image horizontally and vertically
+	SCALE = resizes the image to fit the window
+	ORIGINAL = just blit the original image at (0, 0).
+	CENTER = same as ORIGINAL, but centered
+	AUTO = SCALE if file is at least (800, 600), TILE otherwise
+
+	center and original also fill the background first
+	all file-based modes fallback to FILLCOLOR if file is not found
+
+- Themes
+	do no pre-render themes, rsvg.Handle() is *very* expensive. always cache its returned svg object
+	maybe move all surface/image-related code to Deck(), leave Theme() with name, id, file
+	deck.surface is the rendered theme surface, Card() subsurface it
+	allows fast-switching: new theme of same card size "just" re-render svg. if same ratio subsurfaces are intact
+
+- Resize
+	main loop triggers graphics.resize(size, *objects). objects = initially, deck instances only
+	graphics.resize() do:
+		new playarea and card sizes
+		g.window resize
+		g.background.resize()
+		g.slot resize
+		all known elements (menu, etc)
+		for each object, object.resize()
+	Deck.resize() - re-render svg and update each card rect
+
+- Config file
+	have a template at data/, use  it for factory defaults, copy to CONFIGDIR if not there
+	window_size should be a separate file, so INI is never written (preserve comments)
+
+	[background]
+	basename (no extension. 'baize' in g)
+	fillcolor (fillcolor. BGCOLOR in g)
+	mode
+
+	[theme]
+	name (no extension, must be svg)
+
+	[slot]
+	basename
+
+	[graphics]
+	fullscreen (boolean)
+	fullscreen_resolution (tuple, empty for desktop)
+
+- Card Z order
+	choose a suitable pygame sprite group: Layered, Updates, Dirty, Ordered, and its combinations
+
+- Find a way to set all modules logging level without messing with root logger if main was imported
+
+- Playarea. 4x3 ratio, the rest is GUI: statusbar (bottom), menu+info (at right side, a la arkanoid)
+
+- Game module, handles all logic. receives events from main loop, keeps game state
+
+- Cards "falling/bouncing" when win, a la Windows 3.1 Solitaire
+
+- Make a working game :)
