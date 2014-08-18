@@ -57,15 +57,17 @@ def main(*argv):
     sprites = pygame.sprite.OrderedUpdates()
     sprites.add(deck.cards[:10])
 
-    def find_card(cardlist, x, y):
+    def find_card(cardlist, pos):
+        # This should probably be in Deck()
         reversedlist = reversed([card for card in cardlist])
         for card in reversedlist:
-            if card.rect.collidepoint(x, y):
+            if card.rect.collidepoint(pos):
                 return card
 
     clock = pygame.time.Clock()
 
     dragged_card = None
+    drag_button = 0
     clear = False
     done = False
     while not done:
@@ -85,12 +87,22 @@ def main(*argv):
                     print "Draw card"
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                dragged_card = find_card(sprites, *pygame.mouse.get_pos())
+                if not dragged_card:
+                    dragged_card = find_card(sprites, event.pos)
+                    if dragged_card:
+                        dragged_card.drag_start(event.pos)
+                        drag_button = event.button
             if event.type == pygame.MOUSEBUTTONUP:
-                dragged_card = None
+                if dragged_card and event.button == drag_button:
+                    if drag_button == 1:
+                        dragged_card.drag_stop()
+                    else:
+                        dragged_card.drag_abort()
+                    dragged_card = None
+                    drag_button = 0
 
         if dragged_card:
-            dragged_card.rect.center = pygame.mouse.get_pos()
+            dragged_card.drag(pygame.mouse.get_pos())
 
         # Update
         sprites.update()

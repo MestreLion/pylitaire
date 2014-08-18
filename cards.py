@@ -156,9 +156,33 @@ class Card(pygame.sprite.Sprite):
                               (self.rect.width, self.rect.height))
         self.image = self.theme.surface.subsurface(imgrect)
 
+        self._drag_offset = self._drag_start_pos = ()
+
     def __repr__(self):
         return "<%s(rank=%2d, suit=%r)>" % (
             self.__class__.__name__, self.rank, self.suit)
+
+    def drag_start(self, mouse_pos):
+        assert not self._drag_offset, "drag_start() called during an ongoing drag."
+        self._drag_start_pos = self.rect.topleft
+        self._drag_offset = (mouse_pos[0] - self.rect[0],
+                             mouse_pos[1] - self.rect[1])
+
+    def drag(self, mouse_pos):
+        assert self._drag_offset, "drag() without previous drag_start()"
+        self.rect.topleft = (mouse_pos[0] - self._drag_offset[0],
+                             mouse_pos[1] - self._drag_offset[1])
+
+    def drag_abort(self, *args):
+        assert self._drag_offset, "drag_abort() without previous drag_start()"
+        self.rect.topleft = self._drag_start_pos
+        self.drag_stop()
+
+    def drag_stop(self, *args):
+        assert self._drag_offset, "drag_stop() without previous drag_start()"
+        self._drag_offset = self._drag_start_pos = ()
+
+    drop = drag_stop
 
 
 
