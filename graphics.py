@@ -50,7 +50,7 @@ class Background():
         '''
         self.path = path or self.find_background_file()
         if self.path:
-            self.original = pygame.image.load(self.path).convert()
+            self.original = load_image(self.path).convert()
         else:
             self.original = None
         self.color = color or g.BGCOLOR
@@ -148,6 +148,34 @@ def render(sprites, clear=False):
     pygame.display.update(dirty)
 
 
+def scale_keep_aspect(size, maxsize):
+    ''' Enlarge or shrink <size> so it fits <maxsize>, keeping its proportions
+        <size>, <maxsize> and return value are 2-tuple (width, height)
+    '''
+    original = pygame.Rect((0,0), size)
+    result = original.fit(pygame.Rect((0,0), maxsize))
+    return result.width, result.height
+
+
+def load_image(path, size=(), keep_aspect=True):
+    ''' Wrapper for pygame.image.load, adding support for SVG images
+        If <keep_aspect> is True, rescaled images will maintain the original
+        width and height proportions. For regular images, requesting a <size>
+        will use pygame.transform.smoothscale()
+    '''
+    if os.path.splitext(path.lower())[1] == ".svg":
+        return load_svg(path, size, keep_aspect)
+
+    image = pygame.image.load(path)
+    if not size or size == image.get_size():
+        return image
+
+    if keep_aspect:
+            size = scale_keep_aspect(image.get_size(), size)
+
+    return pygame.transform.smoothscale(image, size)
+
+
 def load_svg(path, size=(), keep_aspect=True):
     ''' Load an SVG file and return a pygame.image surface with the specified size
         - size: a (width, height) tuple. If None, uses the SVG declared size
@@ -168,24 +196,23 @@ def load_svg(path, size=(), keep_aspect=True):
     svg = rsvg.Handle(path)
 
     # Calculate new size based on original size, requested size, and aspect ratio
+    svgsize = (svg.props.width, svg.props.height)
     if size:
         if keep_aspect:
-            original = pygame.Rect((0,0), (svg.props.width, svg.props.height))
-            result = original.fit(pygame.Rect((0,0), size))
-            width, height = result.width, result.height
+            width, height = scale_keep_aspect(svgsize, size)
         else:
             width, height = size
     else:
-        width, height = (svg.props.width, svg.props.height)
+        width, height = svgsize
 
     # Make sure size is a multiple of (13, 5), so all cards have integer sizes
     width, height = int(width / 13) * 13, int(height / 5) * 5
 
     # If a size was requested, calculate the scale factor
-    scale = size and (float(width)/svg.props.width, float(height)/svg.props.height)
+    scale = size and (float(width)/svgsize[0], float(height)/svgsize[1])
 
     log.debug("Loading SVG size (%4g,%4g)->(%4g,%4g): %s",
-              svg.props.width, svg.props.height, width, height, path)
+              svgsize[0], svgsize[1], width, height, path)
 
     # Create a Cairo surface. Archtecture endianess determines if cairo surface
     # pixel format will be RGBA or BGRA
