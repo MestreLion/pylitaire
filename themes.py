@@ -28,9 +28,9 @@ import logging
 import array
 
 import pygame
-import rsvg  # debian: python-rsvg
-import cairo  # debian: python-cairo
-import PIL.Image  # debian: python-imaging
+import rsvg
+import cairo
+import PIL.Image
 
 import g
 

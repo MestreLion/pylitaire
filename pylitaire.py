@@ -23,7 +23,7 @@
 import sys
 import logging
 
-import pygame  # Debian: python-pygame
+import pygame
 
 import g
 import graphics

@@ -41,7 +41,6 @@ BGCOLOR = (0, 80, 16)  # Dark green
 window = None  # surface created by pygame.dsplay.set_mode()
 background = None  # graphics.Background() instance
 
-
 # Options
 fullscreen = False
 window_size = (1000, 700)
