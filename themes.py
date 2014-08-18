@@ -25,14 +25,11 @@
 import os
 import sys
 import logging
-import array
 
 import pygame
-import rsvg
-import cairo
-import PIL.Image
 
 import g
+import graphics
 
 log = logging.getLogger(__name__)
 
@@ -55,7 +52,7 @@ class Theme(object):
 
         size = cardsize and (cardsize[0] * 13,
                              cardsize[1] *  5)
-        self.surface = load_svg(self.path, size, keep_aspect)
+        self.surface = graphics.load_svg(self.path, size, keep_aspect)
 
         self.size = self.surface.get_size()
         self.cardsize = (self.size[0] / 13,
@@ -100,69 +97,6 @@ def init_themes(cardsize=(), keep_aspect=True):
                 raise
 
 
-def load_svg(path, size=(), keep_aspect=True):
-    ''' Load an SVG file and return a pygame.image surface with the specified size
-        - size: a (width, height) tuple. If None, uses the SVG declared size
-        - keep_aspect: if scaling should keep original width and height proportions,
-          but resulting size may be smaller than requested in either width or height
-    '''
-
-    def bgra_to_rgba(surface):
-        ''' Convert a Cairo surface in BGRA format to a RBGA string
-            Only needed for little-endian architectures.
-        '''
-        img = PIL.Image.frombuffer(
-            'RGBA', (surface.get_width(), surface.get_height()),
-            surface.get_data(), 'raw', 'BGRA', 0, 1)
-        return img.tostring('raw', 'RGBA', 0, 1)
-
-    # Load the SVG
-    svg = rsvg.Handle(path)
-
-    # Calculate new size based on original size, requested size, and aspect ratio
-    if size:
-        if keep_aspect:
-            original = pygame.Rect((0,0), (svg.props.width, svg.props.height))
-            result = original.fit(pygame.Rect((0,0), size))
-            width, height = result.width, result.height
-        else:
-            width, height = size
-    else:
-        width, height = (svg.props.width, svg.props.height)
-
-    # Make sure size is a multiple of (13, 5), so all cards have integer sizes
-    width, height = int(width / 13) * 13, int(height / 5) * 5
-
-    # If a size was requested, calculate the scale factor
-    scale = size and (float(width)/svg.props.width, float(height)/svg.props.height)
-
-    log.debug("Loading SVG size (%4g,%4g)->(%4g,%4g): %s",
-              svg.props.width, svg.props.height, width, height, path)
-
-    # Create a Cairo surface. Archtecture endianess determines if cairo surface
-    # pixel format will be RGBA or BGRA
-    if sys.byteorder == 'little':
-        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
-    else:
-        dataarray = array.array('c', chr(0) * width * height * 4)
-        surface= cairo.ImageSurface.create_for_data(dataarray,
-            cairo.FORMAT_ARGB32, width, height, width * 4)
-
-    # Create a context, scale it, and render the SVG
-    context = cairo.Context(surface)
-    if scale:
-        context.scale(*scale)
-    svg.render_cairo(context)
-
-    # Get image data string
-    if sys.byteorder == 'little':
-        data = bgra_to_rgba(surface)
-    else:
-        data = dataarray.tostring()
-
-    return pygame.image.frombuffer(data, (width, height), "RGBA").convert_alpha()
-
-
 
 
 if __name__ == '__main__':
@@ -196,7 +130,7 @@ if __name__ == '__main__':
     screen.fill(g.BGCOLOR)
 
     # load_svg()
-    screen.blit(load_svg(TESTTHEME, g.window_size), (0,0))
+    screen.blit(graphics.load_svg(TESTTHEME, g.window_size), (0,0))
     pause()
 
     # Theme()
