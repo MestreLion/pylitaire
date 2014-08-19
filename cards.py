@@ -167,6 +167,7 @@ class Card(pygame.sprite.Sprite):
         self._drag_start_pos = self.rect.topleft
         self._drag_offset = (mouse_pos[0] - self.rect[0],
                              mouse_pos[1] - self.rect[1])
+        pygame.mouse.set_cursor(*g.cursors['drag'])
 
     def drag(self, mouse_pos):
         assert self._drag_offset, "drag() without previous drag_start()"
@@ -181,8 +182,14 @@ class Card(pygame.sprite.Sprite):
     def drag_stop(self, *args):
         assert self._drag_offset, "drag_stop() without previous drag_start()"
         self._drag_offset = self._drag_start_pos = ()
+        pygame.mouse.set_cursor(*g.cursors['draggable'])
 
     drop = drag_stop
+
+    @property
+    def drag_allowed(self, *args):
+        return True
+
 
 
 

@@ -190,6 +190,15 @@ def load_cursor(triplet):
     return size, hot, data, mask
 
 
+def load_json(path):
+    ''' Convenience wrapper for load_cursor() that reads triplet from a JSON-
+        formatted file and return a cursor compatible for use as input to
+        pygame.mouse.set_cursor(*cursor)
+    '''
+    with open(path) as fp:
+        return load_cursor(json.load(fp))
+
+
 
 
 if __name__ == "__main__":

@@ -86,6 +86,14 @@ def main(*argv):
                     # draw card
                     print "Draw card"
 
+            if event.type == pygame.MOUSEMOTION:
+                if not dragged_card:
+                    mouseover_card = find_card(sprites, event.pos)
+                    if mouseover_card and mouseover_card.drag_allowed:
+                        pygame.mouse.set_cursor(*g.cursors['draggable'])
+                    else:
+                        pygame.mouse.set_cursor(*g.cursors['default'])
+
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if not dragged_card:
                     dragged_card = find_card(sprites, event.pos)

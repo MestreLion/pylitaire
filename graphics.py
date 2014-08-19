@@ -31,6 +31,7 @@ import cairo
 import PIL.Image
 
 import g
+import cursors
 
 log = logging.getLogger(__name__)
 
@@ -117,6 +118,12 @@ def init_graphics():
     # Set caption and icon
     pygame.display.set_caption("Pylitaire")
     pygame.display.set_icon(pygame.image.load(os.path.join(g.DATADIR, 'icons', 'icon-32.png')))
+
+    # Set the cursors
+    for cursor in g.cursors.keys():
+        g.cursors[cursor] = cursors.load_json(os.path.join(g.DATADIR,
+                                                           'cursors', "%s.json" % cursor))
+    pygame.mouse.set_cursor(*g.cursors['default'])
 
     # Set the screen
     flags = 0

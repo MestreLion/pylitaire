@@ -40,6 +40,10 @@ FPS = 30
 BGCOLOR = (0, 80, 16)  # Dark green
 window = None  # surface created by pygame.dsplay.set_mode()
 background = None  # graphics.Background() instance
+cursors = {'default': None,
+           'drag': None,
+           'draggable': None,
+           }
 
 # Options
 fullscreen = False
