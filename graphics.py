@@ -182,30 +182,52 @@ def render(spritegroups, clear=False):
     pygame.display.update(dirty)
 
 
-def scale_keep_aspect(size, maxsize):
-    ''' Enlarge or shrink <size> so it fits <maxsize>, keeping its proportions
-        <size>, <maxsize> and return value are 2-tuple (width, height)
+def scale_size(original, requested=(), proportional=True, multiple=(1, 1)):
+    ''' Enlarge or shrink <original> size so it fits a <requested>
+
+        If <proportional>, rescaled size will maintain the original width and
+        height proportions, so resulting size may be smaller than requested in
+        either dimension.
+
+        <multiple> rounds down size to be a multiple of given integers. It
+        allow themes to ensure cards have integer size, but may slightly change
+        image aspect ratio.
+
+        <original>, <requested>, <multiple> and the return value are 2-tuple
+        (width, height). Returned width and height are rounded to integers
     '''
-    original = pygame.Rect((0,0), size)
-    result = original.fit(pygame.Rect((0,0), maxsize))
-    return result.width, result.height
+    def round_to_multiple(size, multiple):
+        return (int(size[0] / multiple[0]) * multiple[0],
+                int(size[1] / multiple[1]) * multiple[1])
+
+    if not requested or requested == original:
+        return round_to_multiple(original, multiple)
+
+    if not proportional:
+        return round_to_multiple(requested, multiple)
+
+    rect = pygame.Rect((0,0), original)
+    result = rect.fit(pygame.Rect((0,0), requested))
+    return round_to_multiple((result.width, result.height), multiple)
 
 
-def load_image(path, size=(), keep_aspect=True, multiple=(1, 1)):
+def load_image(path, size=(), proportional=True, multiple=(1, 1)):
     ''' Wrapper for pygame.image.load, adding support for SVG images
-        If <keep_aspect> is True, rescaled images will maintain the original
-        width and height proportions. For regular images, requesting a <size>
+
+        See scale_size() for documentation on arguments.
+
+        For regular images, requesting a <size> different than the
+        original (after processing aspect, multiple and roundings)
         will use pygame.transform.smoothscale()
     '''
     if os.path.splitext(path.lower())[1] == ".svg":
-        return load_svg(path, size, keep_aspect, multiple)
+        return load_svg(path, size, proportional, multiple)
 
     image = pygame.image.load(path)
-    if not size or size == image.get_size():
-        return image
 
-    if keep_aspect:
-            size = scale_keep_aspect(image.get_size(), size)
+    size = scale_size(image.get_size(), size, proportional, multiple)
+    if size == image.get_size():
+        return image
 
     # transform.smoothscale() requires a 24 or 32-bit image, so...
     if image.get_bitsize() not in [24, 32]:
@@ -214,11 +236,10 @@ def load_image(path, size=(), keep_aspect=True, multiple=(1, 1)):
     return pygame.transform.smoothscale(image, size)
 
 
-def load_svg(path, size=(), keep_aspect=True, multiple=(1, 1)):
-    ''' Load an SVG file and return a pygame.image surface with the specified size
-        - size: a (width, height) tuple. If None, uses the SVG declared size
-        - keep_aspect: if scaling should keep original width and height proportions,
-          but resulting size may be smaller than requested in either width or height
+def load_svg(path, size=(), proportional=True, multiple=(1, 1)):
+    ''' Load an SVG file and return a pygame.image surface of requested <size>
+
+        See scale_size() for documentation on arguments.
     '''
 
     def bgra_to_rgba(surface):
@@ -233,22 +254,14 @@ def load_svg(path, size=(), keep_aspect=True, multiple=(1, 1)):
     # Load the SVG
     svg = rsvg.Handle(path)
 
-    # Calculate new size based on original size, requested size, and aspect ratio
+    # Calculate size
     svgsize = (svg.props.width, svg.props.height)
-    if size:
-        if keep_aspect:
-            width, height = scale_keep_aspect(svgsize, size)
-        else:
-            width, height = size
-    else:
-        width, height = svgsize
+    width, height = scale_size(svgsize, size, proportional, multiple)
 
-    # Force size to be multiple of given integers. Allows themes to have cards of integer size
-    width, height = (int(width  / multiple[0]) * multiple[0],
-                     int(height / multiple[1]) * multiple[1])
-
-    # If a size was requested, calculate the scale factor
-    scale = size and (float(width)/svgsize[0], float(height)/svgsize[1])
+    # If new size is different than original, calculate the scale factor
+    scale = (1, 1)
+    if not (width, height) == svgsize:
+        scale = (float(width)/svgsize[0], float(height)/svgsize[1])
 
     log.debug("Loading SVG size (%4g,%4g)->(%4g,%4g): %s",
               svgsize[0], svgsize[1], width, height, path)
@@ -264,7 +277,7 @@ def load_svg(path, size=(), keep_aspect=True, multiple=(1, 1)):
 
     # Create a context, scale it, and render the SVG
     context = cairo.Context(surface)
-    if scale:
+    if not scale == (1, 1):
         context.scale(*scale)
     svg.render_cairo(context)
 
