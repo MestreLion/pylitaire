@@ -144,6 +144,9 @@ def init_graphics():
     g.background = Background()
     g.background.draw()
 
+    # Show it as soon as possible, as other elements may take a while
+    pygame.display.update()
+
     # Init the themes
     # Card height is fixed: 4 cards + margins (top, bottom, 3 between)
     # Card width is free to adjust itself proportionally, according to theme aspect ratio
@@ -246,7 +249,7 @@ def load_svg(path, size=(), keep_aspect=True, multiple=(1, 1)):
     log.debug("Loading SVG size (%4g,%4g)->(%4g,%4g): %s",
               svgsize[0], svgsize[1], width, height, path)
 
-    # Create a Cairo surface. Archtecture endianess determines if cairo surface
+    # Create a Cairo surface. Architecture endianess determines if cairo surface
     # pixel format will be RGBA or BGRA
     if sys.byteorder == 'little':
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
