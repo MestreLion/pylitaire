@@ -1,7 +1,10 @@
 Brainstorm of new features and code ideas
 Loosely ordered from "hanging fruits easy to do" to "deep stuff"
 
-- graphics.load_image() wrapper to pygame.image.load(), handling svg. move load_svg() code to graphics.py
+- "blue mask" highlight when dragging card over a droppable area
+
+- Slots should perhaps be special cards handled by Deck: they resize the same, also need collision detection
+  with cards, have a highlight, etc
 
 - Background mode: create a MODE Enum, values AUTO, FILLCOLOR, TILE, SCALE, ORIGINAL
 	FILLCOLOR = ignores file and use solid color fill
@@ -19,6 +22,8 @@ Loosely ordered from "hanging fruits easy to do" to "deep stuff"
 	maybe move all surface/image-related code to Deck(), leave Theme() with name, id, file
 	deck.surface is the rendered theme surface, Card() subsurface it
 	allows fast-switching: new theme of same card size "just" re-render svg. if same ratio subsurfaces are intact
+
+- SPACE to load next theme. Show off, I know :)
 
 - Resize
 	main loop triggers graphics.resize(size, *objects). objects = initially, deck instances only
@@ -60,14 +65,17 @@ Loosely ordered from "hanging fruits easy to do" to "deep stuff"
 		convert <input> -alpha extract -negate <output>.mask.xbm
 	hotspot must be set manually
 
-- Card Z order
-	choose a suitable pygame sprite group: Layered, Updates, Dirty, Ordered, and its combinations
-
 - Find a way to set all modules logging level without messing with root logger if main was imported
 
 - Playarea. 4x3 ratio, the rest is GUI: statusbar (bottom), menu+info (at right side, a la arkanoid)
 
-- Game module, handles all logic. receives events from main loop, keeps game state
+- gui module, controls the above elements, also receives and dispatches events. maybe also a simple
+  singleton class EventHandler/Dispatcher where generic objects (deck, buttons, etc) register callbacks
+  for certain events
+
+- Game module, handles all logic. receives events from main loop (or gui module), keeps game state
+
+- Keep track of cards movements, and BACKSPACE to undo
 
 - Cards "falling/bouncing" when win, a la Windows 3.1 Solitaire
 
