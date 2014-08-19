@@ -54,13 +54,6 @@ def main(*argv):
     spritegroups = []
     spritegroups.append(deck)
 
-    def find_card(cardlist, pos):
-        # This should probably be in Deck()
-        reversedlist = reversed([card for card in cardlist])
-        for card in reversedlist:
-            if card.rect.collidepoint(pos):
-                return card
-
     clock = pygame.time.Clock()
 
     dragged_card = None
@@ -83,18 +76,20 @@ def main(*argv):
                 if event.key == pygame.K_SPACE:
                     pass
 
+            if event.type in [pygame.MOUSEMOTION, pygame.MOUSEBUTTONDOWN]:
+                topcard = deck.get_top_card(event.pos)
+
             if event.type == pygame.MOUSEMOTION:
                 if not dragged_card:
-                    mouseover_card = find_card(deck, event.pos)
-                    if mouseover_card and mouseover_card.drag_allowed:
+                    if topcard and topcard.drag_allowed:
                         pygame.mouse.set_cursor(*g.cursors['draggable'])
                     else:
                         pygame.mouse.set_cursor(*g.cursors['default'])
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if not dragged_card:
-                    dragged_card = find_card(deck, event.pos)
-                    if dragged_card:
+                    if topcard:
+                        dragged_card = topcard
                         dragged_card.drag_start(event.pos)
                         drag_button = event.button
             if event.type == pygame.MOUSEBUTTONUP:

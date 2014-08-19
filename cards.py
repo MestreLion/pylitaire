@@ -112,7 +112,10 @@ class Deck(pygame.sprite.LayeredDirty):
         ''' Shuffles the deck cards in-place. Return None '''
         random.shuffle(self.cards)
 
-
+    def get_top_card(self, pos):
+        cards = self.get_sprites_at(pos)
+        if cards:
+            return cards[-1]
 
 
 class Card(pygame.sprite.DirtySprite):
@@ -194,7 +197,6 @@ class Card(pygame.sprite.DirtySprite):
     @property
     def drag_allowed(self, *args):
         return True
-
 
 
 
