@@ -207,6 +207,10 @@ def load_image(path, size=(), keep_aspect=True, multiple=(1, 1)):
     if keep_aspect:
             size = scale_keep_aspect(image.get_size(), size)
 
+    # transform.smoothscale() requires a 24 or 32-bit image, so...
+    if image.get_bitsize() not in [24, 32]:
+        image = image.convert_alpha()
+
     return pygame.transform.smoothscale(image, size)
 
 
