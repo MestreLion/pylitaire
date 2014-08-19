@@ -67,14 +67,19 @@ def main(*argv):
                 done = True
 
             if event.type == pygame.KEYDOWN:
-                if event.key in [pygame.K_RETURN, pygame.K_KP_ENTER]:
-                    # New game
-                    print "New game"
+
+                def restart():
                     for card in deck.cards:
-                        card.rect.topleft = (0, 0)
-                        card.dirty = 1
+                        card.move(g.MARGIN)
+                        deck.move_to_back(card)
+
+                if event.key in [pygame.K_RETURN, pygame.K_KP_ENTER]:
+                    print "New game"
+                    deck.shuffle()
+                    restart()
                 if event.key == pygame.K_SPACE:
-                    pass
+                    print "Restart game"
+                    restart()
 
             if event.type in [pygame.MOUSEMOTION, pygame.MOUSEBUTTONDOWN]:
                 topcard = deck.get_top_card(event.pos)

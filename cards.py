@@ -110,12 +110,14 @@ class Deck(pygame.sprite.LayeredDirty):
 
     def shuffle(self):
         ''' Shuffles the deck cards in-place. Return None '''
+        self.empty()
         random.shuffle(self.cards)
+        self.add(*self.cards)
 
     def get_top_card(self, pos):
         cards = self.get_sprites_at(pos)
         if cards:
-            return cards[-1]
+            return cards[-1]  # last card is top card
 
 
 class Card(pygame.sprite.DirtySprite):
@@ -178,9 +180,8 @@ class Card(pygame.sprite.DirtySprite):
 
     def drag(self, mouse_pos):
         assert self._drag_offset, "drag() without previous drag_start()"
-        self.dirty = 1
-        self.rect.topleft = (mouse_pos[0] - self._drag_offset[0],
-                             mouse_pos[1] - self._drag_offset[1])
+        self.move((mouse_pos[0] - self._drag_offset[0],
+                   mouse_pos[1] - self._drag_offset[1]))
 
     def drag_abort(self, *args):
         assert self._drag_offset, "drag_abort() without previous drag_start()"
@@ -197,6 +198,10 @@ class Card(pygame.sprite.DirtySprite):
     @property
     def drag_allowed(self, *args):
         return True
+
+    def move(self, pos):
+        self.dirty = 1
+        self.rect.topleft = pos
 
 
 
