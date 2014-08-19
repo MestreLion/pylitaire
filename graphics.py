@@ -36,9 +36,9 @@ import cursors
 log = logging.getLogger(__name__)
 
 # File extensions of pygame supported image formats
-# As documented in http://www.pygame.org/docs/ref/image.html
+# As documented at http://www.pygame.org/docs/ref/image.html
 IMAGE_EXTS = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'pcx', 'tga', 'tif', 'tiff',
-              'lbm', 'pbm', 'pbm', 'pgm', 'ppm', 'xpm']
+              'lbm', 'pbm', 'pgm', 'ppm', 'xpm']
 
 
 class Background():
@@ -147,11 +147,18 @@ def init_graphics():
     pygame.display.update()
 
 
-def render(sprites, clear=False):
-    sprites.clear(g.window, g.background.surface)
+def render(spritegroups, clear=False):
+    dirty = []
     if clear:
         g.background.draw()
-    dirty = sprites.draw(g.window)
+
+    for group in spritegroups:
+        group.clear(g.window, g.background.surface)
+        dirty.extend(group.draw(g.window))
+
+    if clear:
+        dirty = [g.window.rect()]
+
     pygame.display.update(dirty)
 
 

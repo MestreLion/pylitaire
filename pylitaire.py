@@ -54,8 +54,8 @@ def main(*argv):
     deck.shuffle()
 
     # Game objects
-    sprites = pygame.sprite.OrderedUpdates()
-    sprites.add(deck.cards[:10])
+    spritegroups = []
+    spritegroups.append(deck)
 
     def find_card(cardlist, pos):
         # This should probably be in Deck()
@@ -80,15 +80,15 @@ def main(*argv):
                 if event.key in [pygame.K_RETURN, pygame.K_KP_ENTER]:
                     # New game
                     print "New game"
-                    for card in sprites:
+                    for card in deck.cards:
                         card.rect.topleft = (0, 0)
+                        card.dirty = 1
                 if event.key == pygame.K_SPACE:
-                    # draw card
-                    print "Draw card"
+                    pass
 
             if event.type == pygame.MOUSEMOTION:
                 if not dragged_card:
-                    mouseover_card = find_card(sprites, event.pos)
+                    mouseover_card = find_card(deck, event.pos)
                     if mouseover_card and mouseover_card.drag_allowed:
                         pygame.mouse.set_cursor(*g.cursors['draggable'])
                     else:
@@ -96,7 +96,7 @@ def main(*argv):
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if not dragged_card:
-                    dragged_card = find_card(sprites, event.pos)
+                    dragged_card = find_card(deck, event.pos)
                     if dragged_card:
                         dragged_card.drag_start(event.pos)
                         drag_button = event.button
@@ -113,10 +113,11 @@ def main(*argv):
             dragged_card.drag(pygame.mouse.get_pos())
 
         # Update
-        sprites.update()
+        for group in spritegroups:
+            group.update()
 
         # Draw
-        graphics.render(sprites, clear)
+        graphics.render(spritegroups, clear)
         clear = False
 
         clock.tick(g.FPS)

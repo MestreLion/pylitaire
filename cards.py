@@ -91,7 +91,7 @@ class COLORS(Enum):
     RED   = 2
 
 
-class Deck(object):
+class Deck(pygame.sprite.LayeredDirty):
     ''' A collection of cards '''
 
     def __init__(self, theme=None):
@@ -99,9 +99,10 @@ class Deck(object):
         self.cardsdict = {}
         for suit in SUITS:
             for rank in RANKS:
-                card = Card(rank=rank, suit=suit, theme=theme)
+                card = Card(rank=rank, suit=suit, theme=theme, deck=self)
                 self.cards.append(card)
                 self.cardsdict[(rank, suit)] = card
+        super(Deck, self).__init__(self.cards)
 
     def card(self, rank=0, suit=0):
         ''' Return a Card of the given rank and suit '''
@@ -114,14 +115,16 @@ class Deck(object):
 
 
 
-class Card(pygame.sprite.Sprite):
+class Card(pygame.sprite.DirtySprite):
     ''' A sprite representing a card '''
 
-    def __init__(self, rank=0, suit=0, joker=False, color=0, back=False, theme=None):
+    def __init__(self, rank=0, suit=0, joker=False, color=0, back=False, theme=None,
+                 deck=None):
         super(Card, self).__init__()
 
         self.rank = rank
         self.suit = suit
+        self.deck = deck
 
         if self.rank in [SUITS.CLUBS, SUITS.SPADES]:
             self.color = COLORS.BLACK
@@ -168,9 +171,11 @@ class Card(pygame.sprite.Sprite):
         self._drag_offset = (mouse_pos[0] - self.rect[0],
                              mouse_pos[1] - self.rect[1])
         pygame.mouse.set_cursor(*g.cursors['drag'])
+        self.deck.move_to_front(self)
 
     def drag(self, mouse_pos):
         assert self._drag_offset, "drag() without previous drag_start()"
+        self.dirty = 1
         self.rect.topleft = (mouse_pos[0] - self._drag_offset[0],
                              mouse_pos[1] - self._drag_offset[1])
 
