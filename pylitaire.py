@@ -128,4 +128,7 @@ def main(*argv):
 if __name__ == "__main__":
     logging.basicConfig()
     log = logging.getLogger(g.GAMENAME)
-    sys.exit(0 if main(*sys.argv[1:]) else 1)
+    try:
+        sys.exit(0 if main(*sys.argv[1:]) else 1)
+    except KeyboardInterrupt:
+        pass
