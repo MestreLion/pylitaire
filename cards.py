@@ -99,7 +99,7 @@ class Deck(pygame.sprite.LayeredDirty):
         self.cardsdict = {}
         for suit in SUITS:
             for rank in RANKS:
-                card = Card(rank=rank, suit=suit, theme=theme, deck=self)
+                card = Card(rank=rank, suit=suit, theme=theme, deck=self, position=g.MARGIN)
                 self.cards.append(card)
                 self.cardsdict[(rank, suit)] = card
         super(Deck, self).__init__(self.cards)
@@ -119,7 +119,7 @@ class Card(pygame.sprite.DirtySprite):
     ''' A sprite representing a card '''
 
     def __init__(self, rank=0, suit=0, joker=False, color=0, back=False, theme=None,
-                 deck=None):
+                 deck=None, position=(0, 0)):
         super(Card, self).__init__()
 
         self.rank = rank
@@ -149,11 +149,11 @@ class Card(pygame.sprite.DirtySprite):
 
         if not self.theme:
             log.warn("Theme '%s' not found. Card will not be drawable", theme)
-            self.rect = pygame.Rect(0, 0, 0, 0)
+            self.rect = pygame.Rect(position, (0, 0))
             self.image = pygame.Surface((0, 0))
             return
 
-        self.rect = pygame.Rect((0, 0), self.theme.cardsize)
+        self.rect = pygame.Rect(position, self.theme.cardsize)
         imgrect = pygame.Rect(((self.rank - 1) * self.rect.width,
                                (self.suit - 1) * self.rect.height),
                               (self.rect.width, self.rect.height))

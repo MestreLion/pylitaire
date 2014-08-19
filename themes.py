@@ -52,7 +52,8 @@ class Theme(object):
 
         size = cardsize and (cardsize[0] * 13,
                              cardsize[1] *  5)
-        self.surface = graphics.load_image(self.path, size, keep_aspect)
+        self.surface = graphics.load_image(self.path, size, keep_aspect,
+                                           multiple=(13, 5))
 
         self.size = self.surface.get_size()
         self.cardsize = (self.size[0] / 13,

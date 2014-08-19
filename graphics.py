@@ -32,6 +32,7 @@ import PIL.Image
 
 import g
 import cursors
+import themes
 
 log = logging.getLogger(__name__)
 
@@ -143,6 +144,22 @@ def init_graphics():
     g.background = Background()
     g.background.draw()
 
+    # Init the themes
+    # Card height is fixed: 4 cards + margins (top, bottom, 3 between)
+    # Card width is free to adjust itself proportionally, according to theme aspect ratio
+    themes.init_themes((g.window_size[0], (g.window_size[1] - 5 * g.MARGIN[1]) / 4))
+    cardsize = themes.themes[g.theme].cardsize
+
+    # Draw the slots
+    for i, title in enumerate(['gnome', 'ubuntu']):
+        slot = load_image(os.path.join(g.DATADIR, 'images', 'slot-%s.svg' % title), cardsize, False)
+        top = g.MARGIN[1] + (cardsize[1] * i * 1.2)
+        for j in xrange(4):
+            g.background.surface.blit(slot, (g.window_size[0] -
+                                             g.MARGIN[0] -
+                                             cardsize[0] * (j+1) * 1.2,
+                                             top))
+
     # Display the initial window
     pygame.display.update()
 
@@ -171,14 +188,14 @@ def scale_keep_aspect(size, maxsize):
     return result.width, result.height
 
 
-def load_image(path, size=(), keep_aspect=True):
+def load_image(path, size=(), keep_aspect=True, multiple=(1, 1)):
     ''' Wrapper for pygame.image.load, adding support for SVG images
         If <keep_aspect> is True, rescaled images will maintain the original
         width and height proportions. For regular images, requesting a <size>
         will use pygame.transform.smoothscale()
     '''
     if os.path.splitext(path.lower())[1] == ".svg":
-        return load_svg(path, size, keep_aspect)
+        return load_svg(path, size, keep_aspect, multiple)
 
     image = pygame.image.load(path)
     if not size or size == image.get_size():
@@ -190,7 +207,7 @@ def load_image(path, size=(), keep_aspect=True):
     return pygame.transform.smoothscale(image, size)
 
 
-def load_svg(path, size=(), keep_aspect=True):
+def load_svg(path, size=(), keep_aspect=True, multiple=(1, 1)):
     ''' Load an SVG file and return a pygame.image surface with the specified size
         - size: a (width, height) tuple. If None, uses the SVG declared size
         - keep_aspect: if scaling should keep original width and height proportions,
@@ -219,8 +236,9 @@ def load_svg(path, size=(), keep_aspect=True):
     else:
         width, height = svgsize
 
-    # Make sure size is a multiple of (13, 5), so all cards have integer sizes
-    width, height = int(width / 13) * 13, int(height / 5) * 5
+    # Force size to be multiple of given integers. Allows themes to have cards of integer size
+    width, height = (int(width  / multiple[0]) * multiple[0],
+                     int(height / multiple[1]) * multiple[1])
 
     # If a size was requested, calculate the scale factor
     scale = size and (float(width)/svgsize[0], float(height)/svgsize[1])

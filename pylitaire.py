@@ -46,9 +46,6 @@ def main(*argv):
     pygame.init()
     graphics.init_graphics()
 
-    # Card height = (screen height - 10% margin) / 4, hence 9/40
-    themes.init_themes((g.window_size[0], g.window_size[1] * 9 / 40.))
-
     # Create the cards
     deck = cards.Deck()
     deck.shuffle()

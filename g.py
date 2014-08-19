@@ -38,6 +38,7 @@ CONFIGDIR = xdg.BaseDirectory.save_config_path(GAMENAME)
 # Graphics
 FPS = 30
 BGCOLOR = (0, 80, 16)  # Dark green
+MARGIN = (20, 10)  # window margins for the playarea, in pixels
 window = None  # surface created by pygame.dsplay.set_mode()
 background = None  # graphics.Background() instance
 cursors = {'default': None,
