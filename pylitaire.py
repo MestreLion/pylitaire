@@ -39,23 +39,35 @@ def main(*argv):
     # Too lazy for argparse right now
     if "--fullscreen" in argv: g.fullscreen = True
     if "--debug"      in argv: g.debug = True
+    if "--profile"    in argv: g.profile = True
 
     if g.debug:
         logging.root.level = logging.DEBUG
 
-    pygame.init()
+    pygame.display.init()
     graphics.init_graphics()
 
+    # Init themes
+    themes.init_themes()
+
+    # Calculate card size
+    # Card height is fixed: 4 cards + margins (top, bottom, 3 between)
+    # Card width is free to adjust itself proportionally, according to theme aspect ratio
+    # Actual card size is only defined when cards.Deck() renders the theme SVG
+    cardsize = (g.window_size[0], (g.window_size[1] - 5 * g.MARGIN[1]) / 4)
+
     # Create the cards
-    deck = cards.Deck()
+    deck = cards.Deck(g.theme, cardsize)
     deck.shuffle()
+
+    # Init slots
+    graphics.init_slots(deck.cardsize)
 
     # Game objects
     spritegroups = []
     spritegroups.append(deck)
 
     clock = pygame.time.Clock()
-
     dragged_card = None
     drag_button = 0
     clear = False
@@ -117,6 +129,8 @@ def main(*argv):
         graphics.render(spritegroups, clear)
         clear = False
 
+        if g.profile:
+            return True
         clock.tick(g.FPS)
 
     pygame.quit()

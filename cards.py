@@ -94,14 +94,35 @@ class COLORS(Enum):
 class Deck(pygame.sprite.LayeredDirty):
     ''' A collection of cards '''
 
-    def __init__(self, theme=None):
+    def __init__(self, theme=None, cardsize=(), proportional=True):
+
+        # Set the theme (self.theme is always an instance of themes.Theme)
+        if isinstance(theme, themes.Theme):
+            self.theme = theme
+        else:
+            theme = theme or g.theme
+            self.theme = themes.themes.get(theme, None)
+
+        if self.theme:
+            self.surface = self.theme.render(cardsize, proportional)
+            size = self.surface.get_size()
+            self.cardsize = (size[0] / 13,
+                             size[1] /  5)
+        else:
+            log.warn("Theme '%s' not found. Cards will not be drawable", theme)
+            self.surface = None
+            self.cardsize = ()
+
+        # Set the cards
         self.cards = []
         self.cardsdict = {}
         for suit in SUITS:
             for rank in RANKS:
-                card = Card(rank=rank, suit=suit, theme=theme, deck=self, position=g.MARGIN)
+                card = Card(rank=rank, suit=suit, deck=self, position=g.MARGIN)
                 self.cards.append(card)
                 self.cardsdict[(rank, suit)] = card
+
+        # Add all cards to the group
         super(Deck, self).__init__(self.cards)
 
     def card(self, rank=0, suit=0):
@@ -109,7 +130,7 @@ class Deck(pygame.sprite.LayeredDirty):
         return self.cardsdict[(rank, suit)]
 
     def shuffle(self):
-        ''' Shuffles the deck cards in-place. Return None '''
+        ''' Shuffle the deck cards in-place. Return None '''
         self.empty()
         random.shuffle(self.cards)
         self.add(*self.cards)
@@ -123,7 +144,7 @@ class Deck(pygame.sprite.LayeredDirty):
 class Card(pygame.sprite.DirtySprite):
     ''' A sprite representing a card '''
 
-    def __init__(self, rank=0, suit=0, joker=False, color=0, back=False, theme=None,
+    def __init__(self, rank=0, suit=0, joker=False, color=0, back=False,
                  deck=None, position=(0, 0)):
         super(Card, self).__init__()
 
@@ -146,25 +167,19 @@ class Card(pygame.sprite.DirtySprite):
             shortrank = rankname[:1].upper()
         self.shortname = shortrank + suitname[:1].lower()
 
-        if isinstance(theme, themes.Theme):
-            self.theme = theme
-        else:
-            theme = theme or g.theme
-            self.theme = themes.themes.get(theme, None)
+        self._drag_offset = self._drag_start_pos = ()
 
-        if not self.theme:
-            log.warn("Theme '%s' not found. Card will not be drawable", theme)
+        if not self.deck.surface:
             self.rect = pygame.Rect(position, (0, 0))
             self.image = pygame.Surface((0, 0))
             return
 
-        self.rect = pygame.Rect(position, self.theme.cardsize)
+        self.rect = pygame.Rect(position, self.deck.cardsize)
         imgrect = pygame.Rect(((self.rank - 1) * self.rect.width,
                                (self.suit - 1) * self.rect.height),
                               (self.rect.width, self.rect.height))
-        self.image = self.theme.surface.subsurface(imgrect)
+        self.image = self.deck.surface.subsurface(imgrect)
 
-        self._drag_offset = self._drag_start_pos = ()
 
     def __repr__(self):
         return "<%s(rank=%2d, suit=%r)>" % (

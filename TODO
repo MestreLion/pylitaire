@@ -17,13 +17,7 @@ Loosely ordered from "hanging fruits easy to do" to "deep stuff"
 	center and original also fill the background first
 	all file-based modes fallback to FILLCOLOR if file is not found
 
-- Themes
-	do no pre-render themes, rsvg.Handle() is *very* expensive. always cache its returned svg object
-	maybe move all surface/image-related code to Deck(), leave Theme() with name, id, file
-	deck.surface is the rendered theme surface, Card() subsurface it
-	allows fast-switching: new theme of same card size "just" re-render svg. if same ratio subsurfaces are intact
-
-- SPACE to load next theme. Show off, I know :)
+- TAB to load next theme. Show off, I know :)
 
 - Resize
 	main loop triggers graphics.resize(size, *objects). objects = initially, deck instances only
@@ -54,16 +48,6 @@ Loosely ordered from "hanging fruits easy to do" to "deep stuff"
 	[graphics]
 	fullscreen (boolean)
 	fullscreen_resolution (tuple, empty for desktop)
-
-- Better mouse cursors
-	X11 format:
-	/usr/share/icons/DMZ-White/cursors
-	Windows *.cur:
-	/usr/share/shutter/resources/icons/drawing_tool/objects/Cursors
-	Convert to XBM with imagemagick:
-		convert <input> -background white -alpha Background <output>.xbm
-		convert <input> -alpha extract -negate <output>.mask.xbm
-	hotspot must be set manually
 
 - Find a way to set all modules logging level without messing with root logger if main was imported
 

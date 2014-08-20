@@ -32,7 +32,6 @@ import PIL.Image
 
 import g
 import cursors
-import themes
 
 log = logging.getLogger(__name__)
 
@@ -144,15 +143,12 @@ def init_graphics():
     g.background = Background()
     g.background.draw()
 
-    # Show it as soon as possible, as other elements may take a while
+    # Display the initial window soon as possible, as other elements may take a while
     pygame.display.update()
 
-    # Init the themes
-    # Card height is fixed: 4 cards + margins (top, bottom, 3 between)
-    # Card width is free to adjust itself proportionally, according to theme aspect ratio
-    themes.init_themes((g.window_size[0], (g.window_size[1] - 5 * g.MARGIN[1]) / 4))
-    cardsize = themes.themes[g.theme].cardsize
 
+def init_slots(cardsize):
+    # Temporarily here in graphics
     # Draw the slots
     for i, title in enumerate(['gnome', 'ubuntu']):
         slot = load_image(os.path.join(g.DATADIR, 'images', 'slot-%s.svg' % title), cardsize, False)
@@ -162,9 +158,6 @@ def init_graphics():
                                              g.MARGIN[0] -
                                              cardsize[0] * (j+1) * 1.2,
                                              top))
-
-    # Display the initial window
-    pygame.display.update()
 
 
 def render(spritegroups, clear=False):

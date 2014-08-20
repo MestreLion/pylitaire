@@ -45,23 +45,33 @@ themes = {}
 class Theme(object):
     ''' Represents each card theme '''
 
-    def __init__(self, id, path, name="", cardsize=(), keep_aspect=True):
+    def __init__(self, id, path, name=""):
         self.id = id
         self.path = path
         self.name = name or self.id.replace("_", " ").title()
+        self._image = None
 
+    @property
+    def image(self):
+        ''' Lazy image load '''
+        if not self._image:
+            self._image = graphics.load_vector(self.path)
+        return self._image
+
+    @property
+    def card_proportion(self):
+        ''' Defined as card height / width '''
+        return (self.image.props.height / 5.) / (self.image.props.width / 13.)
+
+    def render(self, cardsize=(), proportional=True):
+        ''' Render the theme image into a pygame surface and return it '''
         size = cardsize and (cardsize[0] * 13,
                              cardsize[1] *  5)
-        self.surface = graphics.load_image(self.path, size, keep_aspect,
-                                           multiple=(13, 5))
-
-        self.size = self.surface.get_size()
-        self.cardsize = (self.size[0] / 13,
-                         self.size[1] /  5)
-        self.aspect = self.cardsize[1] / self.cardsize[0]
+        return graphics.render_vector(self.image, size, proportional, multiple=(13, 5))
 
 
-def init_themes(cardsize=(), keep_aspect=True):
+
+def init_themes():
     ''' Load all themes found in THEMEDIRS and populate the global themes dict
         cardsize and keep_aspect have the same meaning as in load_svg()
     '''
@@ -80,15 +90,9 @@ def init_themes(cardsize=(), keep_aspect=True):
                 if id in themes:
                     continue
 
-                # For now, load only the default theme
-                # No in-game switching yet, and pre-loading all is *very* expensive
-                if not id == g.theme:
-                    continue
-
                 # Create the theme and add it to the dict
                 log.debug("New card theme found: %s", id)
-                themes[id] = Theme(id, os.path.join(path, basename), name="",
-                                   cardsize=cardsize, keep_aspect=keep_aspect)
+                themes[id] = Theme(id, os.path.join(path, basename), name="")
 
         except OSError as e:
             # path not found
@@ -125,7 +129,7 @@ if __name__ == '__main__':
 
     # setup
     logging.basicConfig(level=logging.DEBUG)
-    pygame.init()
+    pygame.display.init()
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode(g.window_size)
     screen.fill(g.BGCOLOR)

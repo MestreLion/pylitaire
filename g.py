@@ -50,5 +50,6 @@ cursors = {'default': None,
 fullscreen = False
 window_size = (1000, 700)
 debug = False
+profile = False
 baize = "baize-ubuntu"
 theme = "life_and_smooth"
