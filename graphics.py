@@ -236,10 +236,21 @@ def load_image(path, size=(), proportional=True, multiple=(1, 1)):
     return pygame.transform.smoothscale(image, size)
 
 
-def load_svg(path, size=(), proportional=True, multiple=(1, 1)):
-    ''' Load an SVG file and return a pygame.image surface of requested <size>
+def load_svg(path, *scaleargs, **scalekwargs):
+    ''' Load an SVG file and return a pygame.image surface
+        See scale_size() for documentation on scale arguments.
+    '''
+    return render_vector(rsvg.Handle(path), *scaleargs, **scalekwargs)
 
-        See scale_size() for documentation on arguments.
+
+def load_vector(path):
+    ''' Load an SVG file from <path> and return a RsvgHandle instance '''
+    return rsvg.Handle(path)
+
+
+def render_vector(svg, *scaleargs, **scalekwargs):
+    ''' Render a vector surface, such as the one returned from load_vector(),
+        to a pygame surface and return it
     '''
 
     def bgra_to_rgba(surface):
@@ -251,20 +262,17 @@ def load_svg(path, size=(), proportional=True, multiple=(1, 1)):
             surface.get_data(), 'raw', 'BGRA', 0, 1)
         return img.tostring('raw', 'RGBA', 0, 1)
 
-    # Load the SVG
-    svg = rsvg.Handle(path)
-
     # Calculate size
     svgsize = (svg.props.width, svg.props.height)
-    width, height = scale_size(svgsize, size, proportional, multiple)
+    width, height = scale_size(svgsize, *scaleargs, **scalekwargs)
 
     # If new size is different than original, calculate the scale factor
     scale = (1, 1)
     if not (width, height) == svgsize:
         scale = (float(width)/svgsize[0], float(height)/svgsize[1])
 
-    log.debug("Loading SVG size (%4g,%4g)->(%4g,%4g): %s",
-              svgsize[0], svgsize[1], width, height, path)
+    log.debug("Rendering SVG size (%4g,%4g)->(%4g,%4g): %s",
+              svgsize[0], svgsize[1], width, height, svg.props.base_uri)
 
     # Create a Cairo surface. Architecture endianess determines if cairo surface
     # pixel format will be RGBA or BGRA
