@@ -37,7 +37,7 @@ def invert_cursor(cursor):
 
 def compile(strings, black="X", white=".", xor="o"):
     ''' Convenience wrapper to pygame.cursors.compile() with swapped black and
-        white arguments, to workaround its arguments swap.
+        white arguments, to workaround pygame arguments swap bug.
     '''
     return pygame.cursors.compile(strings, black=white, white=black, xor=xor)
 
@@ -71,16 +71,14 @@ def layerlines(bytelist, width=0, char0=".", char1="X"):
 def cursorstrings(cursor,
                      black="X",    white=".",    transparent=" ",
                   hotblack="X", hotwhite=".", hottransparent=" "):
-    ''' Return a list of strings, each string representing a cursor line,
-        and char a cursor pixel. Each pixel can have one of 3 possible values,
+    ''' Return a list of strings, each string representing a cursor image line,
+        and each char a cursor pixel. A pixel can have one of 3 possible values,
         interpreted as "black", "white" and "transparent". One of the pixels
         is also marked as the "hotspot" of the cursor.
 
-        Can also be used to view the icon as "ASCII art", dump its data and
-        easily manipulate its image
-
-        Default output format is compatible as input to pygame.cursors.compile(),
-        to be used as its <string> argument.
+        Can be used to view the icon as "ASCII art", dump its data and easily
+        manipulate its image, or as input to pygame.cursors.compile().
+        Default output format is compatible with its <string> argument.
 
         IMPORTANT NOTE!!! pygame.cursors.compile() has a bug that with default
         options it swaps black and white. You may use compile() wrapper as a
@@ -115,7 +113,7 @@ def cursorcode(cursor, indent=4, tuples=True, singlequotes=True, json=False):
         a cursor: a 3-tuple (or list) with size, hotspot and image strings.
 
         Output can be directly pasted in code for manual editing of image data,
-        or dumped to a json file. The image strings is compatible as input to
+        or dumped to a json file. The image strings tuple is compatible with
         pygame.cursors.compile(), so the cursor can be easily re-created.
 
         By default output delimiters are single quotes `'` and parenthesis `()`,
