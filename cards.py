@@ -179,17 +179,14 @@ class Card(pygame.sprite.DirtySprite):
         self.deck.move_to_front(self)
 
     def drag(self, mouse_pos):
-        assert self._drag_offset, "drag() without previous drag_start()"
         self.move((mouse_pos[0] - self._drag_offset[0],
                    mouse_pos[1] - self._drag_offset[1]))
 
     def drag_abort(self, *args):
-        assert self._drag_offset, "drag_abort() without previous drag_start()"
         self.rect.topleft = self._drag_start_pos
         self.drag_stop()
 
     def drag_stop(self, *args):
-        assert self._drag_offset, "drag_stop() without previous drag_start()"
         self._drag_offset = self._drag_start_pos = ()
         pygame.mouse.set_cursor(*g.cursors['draggable'])
 
