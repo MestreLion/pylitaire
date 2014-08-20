@@ -98,18 +98,22 @@ def main(*argv):
 
             if event.type == pygame.MOUSEMOTION:
                 if not dragged_card:
-                    if topcard and topcard.drag_allowed:
+                    if topcard and topcard.draggable:
                         pygame.mouse.set_cursor(*g.cursors['draggable'])
                     else:
                         pygame.mouse.set_cursor(*g.cursors['default'])
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if not dragged_card:
-                    if topcard:
-                        dragged_card = topcard
-                        dragged_card.drag_start(event.pos)
-                        drag_button = event.button
+                    if topcard and topcard.draggable:
+                        if not event.button == 3:
+                            dragged_card = topcard
+                            dragged_card.drag_start(event.pos)
+                            drag_button = event.button
+
             if event.type == pygame.MOUSEBUTTONUP:
+                if not dragged_card and topcard and topcard.flippable and event.button == 3:
+                    topcard.flip()
                 if dragged_card and event.button == drag_button:
                     if drag_button == 1:
                         dragged_card.drag_stop()

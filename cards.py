@@ -125,6 +125,13 @@ class Deck(pygame.sprite.LayeredDirty):
         # Add all cards to the group
         super(Deck, self).__init__(self.cards)
 
+        # Special cards
+        if self.surface:
+            self.back = self.surface.subsurface(pygame.Rect(
+                (2 * self.cardsize[0],
+                 4 * self.cardsize[1]),
+                self.cardsize))
+
     def card(self, rank=0, suit=0):
         ''' Return a Card of the given rank and suit '''
         return self.cardsdict[(rank, suit)]
@@ -145,7 +152,7 @@ class Card(pygame.sprite.DirtySprite):
     ''' A sprite representing a card '''
 
     def __init__(self, rank=0, suit=0, joker=False, color=0, back=False,
-                 deck=None, position=(0, 0)):
+                 deck=None, position=(0, 0), faceup=True):
         super(Card, self).__init__()
 
         self.rank = rank
@@ -178,7 +185,11 @@ class Card(pygame.sprite.DirtySprite):
         imgrect = pygame.Rect(((self.rank - 1) * self.rect.width,
                                (self.suit - 1) * self.rect.height),
                               (self.rect.width, self.rect.height))
-        self.image = self.deck.surface.subsurface(imgrect)
+        self.cardimage = self.deck.surface.subsurface(imgrect)
+
+        self._faceup = faceup
+        self.image = None
+        self.flip(self._faceup)
 
 
     def __repr__(self):
@@ -208,12 +219,31 @@ class Card(pygame.sprite.DirtySprite):
     drop = drag_stop
 
     @property
-    def drag_allowed(self, *args):
-        return True
+    def draggable(self, *args):
+        return self._faceup
 
     def move(self, pos):
         self.dirty = 1
         self.rect.topleft = pos
+
+    @property
+    def faceup(self):
+        return self._faceup
+
+    def flip(self, faceup=None):
+        '''Flip a card, either <faceup> or down. If no <faceup>, toggle state'''
+        if faceup is None:
+            faceup = not self._faceup  # perhaps should be self.faceup
+        self._faceup = faceup
+        if self._faceup:
+            self.image = self.cardimage
+        else:
+            self.image = self.deck.back
+        self.dirty = 1
+
+    @property
+    def flippable(self):
+        return True
 
 
 
