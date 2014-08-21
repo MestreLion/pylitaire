@@ -41,15 +41,16 @@ IMAGE_EXTS = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'pcx', 'tga', 'tif', 'tiff',
               'lbm', 'pbm', 'pgm', 'ppm', 'xpm']
 
 
-class Background():
+class Background(object):
     def __init__(self, path="", size=(), color=None, title=""):
-        ''' Create a new background of <size> from a <path> image file,
+        '''Create a new background of <size> from a <path> image file,
             with <color> as a fallback for solid fill. If <path> is empty,
-            try to find one using find_background_file(<title>).
+            try to find one using an image named <title> in datadirs.
             <color> defaults to g.BGCOLOR
             <size> defaults to g.window's size
+            <title> defaults to g.baize
         '''
-        self.path = path or self.find_background_file()
+        self.path = path or find_image(g.datadirs('images'), title or g.baize)
         if self.path:
             self.original = load_image(self.path).convert()
         else:
@@ -87,27 +88,19 @@ class Background():
         surface = destsurface or g.window
         surface.blit(self.surface, position or (0, 0))
 
-    @classmethod
-    def find_background_file(cls, title=""):
-        ''' Find a suitable background file in config and data dirs, return
-            its full path. "Suitable" means being a supported image file with
-            title (basename sans extension) matching <title>
-            <title> defaults to g.baize
-        '''
-        title = title or g.baize
-        for path in [os.path.join(g.CONFIGDIR, 'images'),
-                     os.path.join(g.DATADIR, 'images')]:
-            try:
-                for basename in os.listdir(path):
-                    filetitle, ext = os.path.splitext(basename.lower())
-                    if filetitle == title and ext[1:] in IMAGE_EXTS:
-                        return os.path.join(path, basename)
-            except OSError as e:
-                # path not found
-                if e.errno == 2:
-                    continue
-                else:
-                    raise
+
+class Slot(object):
+    '''Represents a slot image'''
+
+    def __init__(self, path="", size=()):
+        self.path = path or find_image(g.datadirs('images'), g.slotname, ['svg'])
+        self.original = load_vector(self.path)
+        self.surface = None
+
+        self.resize(size)
+
+    def resize(self, size):
+        self.surface = render_vector(self.original, size)
 
 
 def init_graphics():
@@ -149,15 +142,22 @@ def init_graphics():
 
 def init_slots(cardsize):
     # Temporarily here in graphics
-    # Draw the slots
-    for i, title in enumerate(['gnome', 'ubuntu']):
-        slot = load_image(os.path.join(g.DATADIR, 'images', 'slot-%s.svg' % title), cardsize, False)
-        top = g.MARGIN[1] + (cardsize[1] * i * 1.2)
-        for j in xrange(4):
-            g.background.surface.blit(slot, (g.window_size[0] -
-                                             g.MARGIN[0] -
-                                             cardsize[0] * (j+1) * 1.2,
-                                             top))
+    g.slot = Slot(size=cardsize)
+
+    step = ((g.window_size[0] - g.MARGIN[0]) / 8,
+            (g.window_size[1] - g.MARGIN[1]) / 4)
+
+    # Stock, Waste, Foundations
+    for i in (0, 1, 4, 5, 6, 7):
+        g.background.surface.blit(g.slot.surface,
+                                  (g.MARGIN[0] + i * step[0],
+                                   g.MARGIN[1]))
+
+    # Tableau
+    for i in xrange(8):
+        g.background.surface.blit(g.slot.surface,
+                                  (g.MARGIN[0] + i * step[0],
+                                   g.MARGIN[1] + step[1]))
 
 
 def render(spritegroups, clear=False):
@@ -289,3 +289,24 @@ def render_vector(svg, *scaleargs, **scalekwargs):
         data = dataarray.tostring()
 
     return pygame.image.frombuffer(data, (width, height), "RGBA").convert_alpha()
+
+
+def find_image(dirs, title="", exts=()):
+    '''Find the first suitable image file in <dirs> and return its full path.
+        "Suitable" means being a supported image file, its extension in <exts>,
+        and, if <title>, with file title (basename sans extension) matching it.
+    '''
+    for path in dirs:
+        try:
+            for basename in os.listdir(path):
+                filetitle, ext = os.path.splitext(basename.lower())
+                if ((not title or title == filetitle) and
+                    (not exts or ext[1:] in exts) and
+                    (ext[1:] in IMAGE_EXTS+['svg'])):
+                    return os.path.join(path, basename)
+        except OSError as e:
+            # path not found
+            if e.errno == 2:
+                continue
+            else:
+                raise

@@ -21,7 +21,7 @@
 import os.path
 import xdg.BaseDirectory
 
-''' As a convention, UPPERCASE indicates a constant value, and lowercase is
+'''As a convention, UPPERCASE indicates a constant value, and lowercase is
     for values that may change, either via config file, command-line arguments
     or in-game settings
 '''
@@ -40,7 +40,8 @@ FPS = 30
 BGCOLOR = (0, 80, 16)  # Dark green
 MARGIN = (20, 10)  # window margins for the playarea, in pixels
 window = None  # surface created by pygame.dsplay.set_mode()
-background = None  # graphics.Background() instance
+background = None  # graphics.Background
+slot = None  # graphics.Slot
 cursors = {'default': None,
            'drag': None,
            'draggable': None,
@@ -53,6 +54,7 @@ debug = False
 profile = False
 baize = "baize-ubuntu"
 theme = "life_and_smooth"
+slotname = "slot-gnome"
 
 
 class Enum(object):
@@ -85,3 +87,11 @@ class Enum(object):
                     not name in ['name'] + getattr(self, '__non_members__', [])):
                     yield value
     __metaclass__ = _meta
+
+
+def datadirs(dirname):
+    '''Return a list of game relevant data directories, useful for finding data
+        files such as themes as images
+    '''
+    return [os.path.join(CONFIGDIR, dirname),
+            os.path.join(DATADIR, dirname)]
