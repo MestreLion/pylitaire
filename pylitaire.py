@@ -58,6 +58,7 @@ def main(*argv):
 
     # Create the cards
     deck = cards.Deck(g.theme, cardsize)
+    deck.create_cards(faceup=False)
     deck.shuffle()
 
     # Init slots
@@ -114,6 +115,7 @@ def main(*argv):
             if event.type == pygame.MOUSEBUTTONUP:
                 if not dragged_card and topcard and topcard.flippable and event.button == 3:
                     topcard.flip()
+                    pygame.mouse.set_cursor(*(g.cursors['draggable'] if topcard.draggable else g.cursors['default']))
                 if dragged_card and event.button == drag_button:
                     if drag_button == 1:
                         dragged_card.drag_stop()
@@ -135,6 +137,7 @@ def main(*argv):
 
         if g.profile:
             return True
+
         clock.tick(g.FPS)
 
     pygame.quit()

@@ -63,6 +63,7 @@ class Deck(pygame.sprite.LayeredDirty):
     ''' A collection of cards '''
 
     def __init__(self, theme=None, cardsize=(), proportional=True):
+        super(Deck, self).__init__()
 
         # Set the theme (self.theme is always an instance of themes.Theme)
         if isinstance(theme, themes.Theme):
@@ -84,14 +85,6 @@ class Deck(pygame.sprite.LayeredDirty):
         # Set the cards
         self.cards = []
         self.cardsdict = {}
-        for suit in SUITS:
-            for rank in RANKS:
-                card = Card(rank=rank, suit=suit, deck=self, position=g.MARGIN)
-                self.cards.append(card)
-                self.cardsdict[(rank, suit)] = card
-
-        # Add all cards to the group
-        super(Deck, self).__init__(self.cards)
 
         # Special cards
         if self.surface:
@@ -114,6 +107,16 @@ class Deck(pygame.sprite.LayeredDirty):
         cards = self.get_sprites_at(pos)
         if cards:
             return cards[-1]  # last card is top card
+
+    def create_cards(self, faceup=True, doubledeck=False, jokers=0):
+        for suit in SUITS:
+            for rank in RANKS:
+                card = Card(rank=rank, suit=suit, deck=self, position=g.MARGIN, faceup=faceup)
+                self.add(card)
+                self.cards.append(card)
+                self.cardsdict[(rank, suit)] = card
+
+
 
 
 class Card(pygame.sprite.DirtySprite):
@@ -156,9 +159,10 @@ class Card(pygame.sprite.DirtySprite):
         self.cardimage = self.deck.surface.subsurface(imgrect)
 
         self._faceup = faceup
-        self.image = None
-        self.flip(self._faceup)
-
+        if self._faceup:
+            self.image = self.cardimage
+        else:
+            self.image = self.deck.back
 
     def __repr__(self):
         return "<%s(rank=%2d, suit=%r)>" % (
@@ -205,6 +209,7 @@ class Card(pygame.sprite.DirtySprite):
         self._faceup = faceup
         if self._faceup:
             self.image = self.cardimage
+            self.deck.move_to_front(self)
         else:
             self.image = self.deck.back
         self.dirty = 1
