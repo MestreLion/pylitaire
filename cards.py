@@ -29,39 +29,7 @@ import themes
 log = logging.getLogger(__name__)
 
 
-class Enum(object):
-    ''' A basic implementation of Enums in Python '''
-
-    @classmethod
-    def name(cls, value):
-        ''' Quick-and-dirty fallback for getting the "name" of an enum item
-            Enums can customize the name by overwriting this method
-        '''
-
-        # value as string, if it matches an enum attribute.
-        # Allows short usage as Enum.name("VALUE") besides Enum.name(Enum.VALUE)
-        if hasattr(cls, str(value)):
-            return cls.name(getattr(cls, value, None))
-
-        # value not handled in subclass name()
-        for k, v in cls.__dict__.items():
-            if v == value:
-                return k.replace('_', ' ').title()
-
-        # value not found
-        raise KeyError("Value '%s' not found in enum '%s'" %
-                       (value, cls.__name__))
-
-    class _meta(type):
-        def __iter__(self):  # "self" for a metaclass refers to classes, not instances
-            for name, value in sorted(self.__dict__.items(), key=lambda _: _[1]):
-                if (not name.startswith("_") and
-                    not name in ['name'] + getattr(self, '__non_members__', [])):
-                    yield value
-    __metaclass__ = _meta
-
-
-class RANKS(Enum):
+class RANKS(g.Enum):
     ''' Card ranks '''
     ACE   =  1
     TWO   =  2
@@ -78,7 +46,7 @@ class RANKS(Enum):
     KING  = 13
 
 
-class SUITS(Enum):
+class SUITS(g.Enum):
     ''' Card suits '''
     CLUBS    = 1
     DIAMONDS = 2
@@ -86,7 +54,7 @@ class SUITS(Enum):
     SPADES   = 4
 
 
-class COLORS(Enum):
+class COLORS(g.Enum):
     BLACK = 1
     RED   = 2
 
