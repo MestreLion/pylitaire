@@ -175,8 +175,8 @@ def render(spritegroups, clear=False):
     pygame.display.update(dirty)
 
 
-def scale_size(original, requested=(), proportional=True, multiple=(1, 1)):
-    ''' Enlarge or shrink <original> size so it fits a <requested>
+def scale_size(original, size=(), proportional=True, multiple=(1, 1)):
+    ''' Enlarge or shrink <original> size so it fits a <size>
 
         If <proportional>, rescaled size will maintain the original width and
         height proportions, so resulting size may be smaller than requested in
@@ -186,21 +186,21 @@ def scale_size(original, requested=(), proportional=True, multiple=(1, 1)):
         allow themes to ensure cards have integer size, but may slightly change
         image aspect ratio.
 
-        <original>, <requested>, <multiple> and the return value are 2-tuple
+        <original>, <size>, <multiple> and the return value are 2-tuple
         (width, height). Returned width and height are rounded to integers
     '''
     def round_to_multiple(size, multiple):
         return (int(size[0] / multiple[0]) * multiple[0],
                 int(size[1] / multiple[1]) * multiple[1])
 
-    if not requested or requested == original:
+    if not size or size == original:
         return round_to_multiple(original, multiple)
 
     if not proportional:
-        return round_to_multiple(requested, multiple)
+        return round_to_multiple(size, multiple)
 
     rect = pygame.Rect((0,0), original)
-    result = rect.fit(pygame.Rect((0,0), requested))
+    result = rect.fit(pygame.Rect((0,0), size))
     return round_to_multiple((result.width, result.height), multiple)
 
 

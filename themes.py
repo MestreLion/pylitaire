@@ -50,12 +50,15 @@ class Theme(object):
         self.path = path
         self.name = name or self.id.replace("_", " ").title()
         self._image = None
+        self.size = ()
 
     @property
     def image(self):
         ''' Lazy image load '''
         if not self._image:
             self._image = graphics.load_vector(self.path)
+            self.size = (self.image.props.height,
+                         self.image.props.width)
         return self._image
 
     @property
@@ -140,11 +143,14 @@ if __name__ == '__main__':
 
     # Theme()
     theme = Theme(g.GAMENAME, TESTTHEME)
-    print theme.id, theme.name, theme.path, theme.size, theme.cardsize, theme.aspect
-    screen.blit(theme.surface, (0,0))
+    print theme.id, theme.name, theme.path, theme.size, theme.card_proportion
+    screen.blit(graphics.render_vector(theme.image), (0,0))
     pause()
 
     # init_themes()
     init_themes()
     for id, theme in sorted(themes.items()):
-        print id, theme.cardsize
+        print id, theme.card_proportion
+        screen.blit(graphics.render_vector(theme.image, size=g.window_size), (0,0))
+        if pause():
+            break
