@@ -33,8 +33,6 @@ class Yukon(object):
         self.deck = deck
 
         # set in resize(), all but grid are pygame.Rect
-        self.stock = None
-        self.waste = None
         self.tableau = []
         self.foundations = []
         self.cell = ()  # (width, height) of game "cell" (cardsize + margins)
@@ -48,9 +46,6 @@ class Yukon(object):
 
         self.cell = (self.playarea.width  / 8,
                      self.playarea.height / 4)
-
-        self.stock = self._game_slot(0, 0)
-        self.waste = self._game_slot(1, 0)
 
         self.foundations = []
         for i in (4, 5, 6, 7):
@@ -86,18 +81,13 @@ class Yukon(object):
                 card.move((left, top))
                 self.deck.move_to_front(card)
                 c += 1
-        # Stock - should be empty
-        for card in self.deck.cards[c:]:
-            card.flip(faceup=False)
-            card.move(self.stock.topleft)
-            self.deck.move_to_front(card)
 
     def click(self, card):
         '''Click on a card. Return True if card state changed'''
-        card.flip()  # for now, outside the IF
-        if card.rect.topleft == self.stock.topleft:
-            card.move(self.waste.topleft)
+        # delete both flip() and return when tests are over, leave only pass
+        card.flip()
         return True
+        pass  # no stock or waste
 
     def flippable(self, card):
         return True
