@@ -30,6 +30,7 @@ import graphics
 import cards
 import themes
 import gamerules
+import ui
 
 log = logging.getLogger(__name__)
 
@@ -53,69 +54,17 @@ def main(*argv):
     game = gamerules.Yukon(g.playarea, deck)
     game.new_game()
 
+    gui = ui.Gui()
+
     clock = pygame.time.Clock()
-    update_cursor = False
-    dragged_card = None
-    drag_button = 0
-    clear = False
-    done = False
-    while not done:
+    run = True
+    while run:
         for event in pygame.event.get():
-            if (event.type == pygame.QUIT or
-                event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
-                done = True
+            run = gui.handle_event(event, game)
 
-            if event.type == pygame.KEYDOWN:
-
-                if event.key in [pygame.K_RETURN, pygame.K_KP_ENTER]:
-                    print "New game"
-                    game.new_game()
-                if event.key == pygame.K_SPACE:
-                    print "Restart game"
-                    game.restart()
-
-            if event.type in [pygame.MOUSEMOTION, pygame.MOUSEBUTTONDOWN]:
-                topcard = game.deck.get_top_card(event.pos)
-
-            if event.type == pygame.MOUSEMOTION:
-                if not dragged_card:
-                    update_cursor = True
-
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if not dragged_card:
-                    if topcard and topcard.draggable:
-                        if not event.button == 3:
-                            dragged_card = topcard
-                            dragged_card.drag_start(event.pos)
-                            drag_button = event.button
-                            pygame.mouse.set_cursor(*g.cursors['drag'])
-
-            if event.type == pygame.MOUSEBUTTONUP:
-                if not dragged_card and topcard and topcard.flippable and event.button == 3:
-                    topcard.flip()
-                    update_cursor = True
-                if dragged_card and event.button == drag_button:
-                    if drag_button == 1:
-                        dragged_card.drag_stop()
-                    else:
-                        dragged_card.drag_abort()
-                    dragged_card = None
-                    drag_button = 0
-                    update_cursor = True
-
-        if dragged_card:
-            dragged_card.drag(pygame.mouse.get_pos())
-
-        if update_cursor:
-            if topcard and topcard.draggable:
-                pygame.mouse.set_cursor(*(g.cursors['draggable']))
-            else:
-                pygame.mouse.set_cursor(*(g.cursors['default']))
-            update_cursor = False
-
+        gui.update()
         deck.update()
-        graphics.render([deck], clear)
-        clear = False
+        graphics.render([deck])
 
         if g.profile:
             return True

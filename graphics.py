@@ -108,11 +108,10 @@ def init_graphics():
 
     log.info("Initializing graphics")
 
-    # Set caption and icon
+    # Caption, icon and mouse cursor should be set before window is created
     pygame.display.set_caption("Pylitaire")
     pygame.display.set_icon(pygame.image.load(os.path.join(g.DATADIR, 'icons', 'icon-32.png')))
 
-    # Set the cursors
     for cursor in g.cursors.keys():
         g.cursors[cursor] = cursors.load_json(os.path.join(g.DATADIR,
                                                            'cursors', "%s.json" % cursor))
@@ -150,17 +149,12 @@ def init_graphics():
     g.slot = Slot(size=g.cardsize)
 
 
-def render(spritegroups, clear=False):
+def render(spritegroups):
     dirty = []
-    if clear:
-        g.background.draw()
 
     for group in spritegroups:
         group.clear(g.window, g.background.surface)
         dirty.extend(group.draw(g.window))
-
-    if clear:
-        dirty = [g.window.rect()]
 
     pygame.display.update(dirty)
 
