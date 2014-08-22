@@ -51,7 +51,7 @@ cursors = {'default': None,
 
 # Options
 fullscreen = False
-window_size = (1000, 700)
+window_size = (1300, 900)
 debug = False
 profile = False
 baize = "baize-ubuntu"
