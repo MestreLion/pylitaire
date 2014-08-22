@@ -32,20 +32,22 @@ class Yukon(object):
         self.playarea = playarea
         self.deck = deck
 
-        # all pygame.Rect, and set in resize()
+        # set in resize(), all but grid are pygame.Rect
         self.stock = None
         self.waste = None
         self.tableau = []
         self.foundations = []
+        self.cell = ()  # (width, height) of game "cell" (cardsize + margins)
 
         self.resize(playarea)
+
         self.deck.create_cards(faceup=False)
 
     def resize(self, playarea):
         self.playarea = playarea
 
-        self._grid = (self.playarea.width  / 8,
-                      self.playarea.height / 4)
+        self.cell = (self.playarea.width  / 8,
+                     self.playarea.height / 4)
 
         self.stock = self._game_slot(0, 0)
         self.waste = self._game_slot(1, 0)
@@ -62,8 +64,8 @@ class Yukon(object):
         # this function probably go to an API module, class method or base class
         # it is the only code that requires g and pygame to be imported, thus
         # preventing true decoupling
-        position = (self.playarea.left + i * self._grid[0],
-                    self.playarea.top  + j * self._grid[1])
+        position = (self.playarea.left + i * self.cell[0],
+                    self.playarea.top  + j * self.cell[1])
         g.background.surface.blit(g.slot.surface, position)
         return pygame.Rect(position, g.slot.surface.get_size())
 
@@ -72,10 +74,34 @@ class Yukon(object):
         self.restart()
 
     def restart(self):
-        for card in self.deck.cards:
-            card.move(self.playarea.topleft)
+        c = 0
+        # Klondike tableau
+        for row in xrange(8):
+            # 0.18 would be 0.2 if not for margin (cardsize instead of cell)
+            top = self.tableau[0].top + 0.18 * row * self.cell[1]
+            for col in xrange(row, 8):
+                left = self.tableau[col].left
+                card = self.deck.cards[c]
+                card.flip(row == col)
+                card.move((left, top))
+                self.deck.move_to_front(card)
+                c += 1
+        # Aditional Yukon cards
+        for col in xrange(0, 8):
+            left = self.tableau[col].left
+            tail = col + 1
+            for row in xrange(2):
+                top = self.tableau[0].top + 0.18 * (row + tail) * self.cell[1]
+                card = self.deck.cards[c]
+                card.flip(True)
+                card.move((left, top))
+                self.deck.move_to_front(card)
+                c += 1
+        # Stock - should be empty
+        for card in self.deck.cards[c:]:
             card.flip(faceup=False)
-            self.deck.move_to_back(card)
+            card.move(self.stock.topleft)
+            self.deck.move_to_front(card)
 
     def click(self, card):
         '''Click on a card. Return True if card state changed'''
