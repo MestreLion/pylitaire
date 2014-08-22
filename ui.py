@@ -43,6 +43,7 @@ class Gui(object):
         self.dragcard = None
         self.dragbutton = MOUSEBUTTONS.NONE
         self.updatecursor = False
+        self.cursorname = 'default'
 
 
     def handle_event(self, event, game):
@@ -107,13 +108,18 @@ class Gui(object):
 
         if self.updatecursor:
             self.updatecursor = False
+
             if self.dragcard:
-                pygame.mouse.set_cursor(*(g.cursors['drag']))
-                log.debug("Update cursor to drag")
+                self.set_mouse_cursor('drag')
             else:
                 if self.topcard and self.topcard.draggable:
-                    pygame.mouse.set_cursor(*(g.cursors['draggable']))
-                    log.debug("Update cursor to draggable")
+                    self.set_mouse_cursor('draggable')
                 else:
-                    pygame.mouse.set_cursor(*(g.cursors['default']))
-                    log.debug("Update cursor to default")
+                    self.set_mouse_cursor('default')
+
+
+    def set_mouse_cursor(self, cursorname):
+        if cursorname != self.cursorname:
+            pygame.mouse.set_cursor(*(g.cursors[cursorname]))
+            log.debug("Update cursor to %s", cursorname)
+            self.cursorname = cursorname
