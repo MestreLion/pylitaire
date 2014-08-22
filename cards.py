@@ -191,10 +191,6 @@ class Card(pygame.sprite.DirtySprite):
 
     drop = drag_stop
 
-    @property
-    def draggable(self, *args):
-        return self._faceup
-
     def move(self, pos):
         self.dirty = 1
         self.rect.topleft = pos
@@ -214,10 +210,6 @@ class Card(pygame.sprite.DirtySprite):
         else:
             self.image = self.deck.back
         self.dirty = 1
-
-    @property
-    def flippable(self):
-        return True
 
 
 

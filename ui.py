@@ -70,23 +70,22 @@ class Gui(object):
             self.topcard = topcard
 
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if not self.dragcard:
-                if self.topcard and self.topcard.draggable:
-                    if not event.button == MOUSEBUTTONS.RIGHT:
-                        self.dragcard = self.topcard
-                        self.dragcard.drag_start(event.pos)
-                        self.dragbutton = event.button
-                        self.updatecursor = True
-                        log.debug("Start dragging %s", self.dragcard)
+            if (not event.button == MOUSEBUTTONS.RIGHT
+                and not self.dragcard
+                and self.topcard
+                and game.draggable(self.topcard)):
+                    log.debug("Start dragging %s", self.topcard)
+                    self.dragcard = self.topcard
+                    self.dragcard.drag_start(event.pos)
+                    self.dragbutton = event.button
+                    self.updatecursor = True
 
         if event.type == pygame.MOUSEBUTTONUP:
-            if (event.button == MOUSEBUTTONS.RIGHT and
-                not self.dragcard and
-                self.topcard and
-                self.topcard.flippable):
-                self.topcard.flip()
-                self.updatecursor = True
-                log.debug("Flip card %s", self.topcard)
+            if (event.button == MOUSEBUTTONS.RIGHT
+                and not self.dragcard
+                and self.topcard):
+                log.debug("Click card %s", self.topcard)
+                self.updatecursor = game.click(self.topcard)
 
             if self.dragcard and event.button == self.dragbutton:
                 if self.dragbutton == MOUSEBUTTONS.LEFT:
@@ -102,7 +101,7 @@ class Gui(object):
         return True
 
 
-    def update(self):
+    def update(self, game):
         if self.dragcard:
             self.dragcard.drag(pygame.mouse.get_pos())
 
@@ -112,7 +111,7 @@ class Gui(object):
             if self.dragcard:
                 self.set_mouse_cursor('drag')
             else:
-                if self.topcard and self.topcard.draggable:
+                if self.topcard and game.draggable(self.topcard):
                     self.set_mouse_cursor('draggable')
                 else:
                     self.set_mouse_cursor('default')

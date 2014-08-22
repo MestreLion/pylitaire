@@ -62,7 +62,7 @@ def main(*argv):
         for event in pygame.event.get():
             run = gui.handle_event(event, game)
 
-        gui.update()
+        gui.update(game)
         deck.update()
         graphics.render([deck])
 

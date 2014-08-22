@@ -18,8 +18,12 @@
 #
 # Game rules and logic
 
+import logging
 
 import g
+
+log = logging.getLogger(__name__)
+
 
 class Yukon(object):
     def __init__(self, playarea, deck):
@@ -56,3 +60,13 @@ class Yukon(object):
             card.move(self.playarea.topleft)
             card.flip(faceup=False)
             self.deck.move_to_back(card)
+
+    def click(self, card):
+        card.flip()
+        return True
+
+    def flippable(self, card):
+        return True
+
+    def draggable(self, card):
+        return card.faceup
