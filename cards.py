@@ -116,6 +116,9 @@ class Deck(pygame.sprite.LayeredDirty):
                 self.cards.append(card)
                 self.cardsdict[(rank, suit)] = card
 
+    def resize(self, cardsize):
+        pass
+
 
 
 

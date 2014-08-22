@@ -42,6 +42,8 @@ MARGIN = (20, 10)  # window margins for the playarea, in pixels
 window = None  # surface created by pygame.dsplay.set_mode()
 background = None  # graphics.Background
 slot = None  # graphics.Slot
+playarea = None  # pygame.Rect
+cardsize = ()  # (width, height) of current card size
 cursors = {'default': None,
            'drag': None,
            'draggable': None,

@@ -139,25 +139,15 @@ def init_graphics():
     # Display the initial window soon as possible, as other elements may take a while
     pygame.display.update()
 
+    g.playarea = pygame.Rect(g.MARGIN, (g.window_size[0] - g.MARGIN[0],
+                                        g.window_size[1] - g.MARGIN[1]))
 
-def init_slots(cardsize):
-    # Temporarily here in graphics
-    g.slot = Slot(size=cardsize)
+    # Card height is fixed: 4 cards + margins (top, bottom, 3 between)
+    # Card width is free to adjust itself proportionally, according to theme aspect ratio
+    # Actual card size is only defined when cards.Deck() renders the theme SVG
+    g.cardsize = (g.window_size[0], (g.window_size[1] - 5 * g.MARGIN[1]) / 4)
 
-    step = ((g.window_size[0] - g.MARGIN[0]) / 8,
-            (g.window_size[1] - g.MARGIN[1]) / 4)
-
-    # Stock, Waste, Foundations
-    for i in (0, 1, 4, 5, 6, 7):
-        g.background.surface.blit(g.slot.surface,
-                                  (g.MARGIN[0] + i * step[0],
-                                   g.MARGIN[1]))
-
-    # Tableau
-    for i in xrange(8):
-        g.background.surface.blit(g.slot.surface,
-                                  (g.MARGIN[0] + i * step[0],
-                                   g.MARGIN[1] + step[1]))
+    g.slot = Slot(size=g.cardsize)
 
 
 def render(spritegroups, clear=False):

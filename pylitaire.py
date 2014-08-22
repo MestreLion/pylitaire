@@ -29,6 +29,7 @@ import g
 import graphics
 import cards
 import themes
+import gamerules
 
 log = logging.getLogger(__name__)
 
@@ -46,27 +47,11 @@ def main(*argv):
 
     pygame.display.init()
     graphics.init_graphics()
-
-    # Init themes
     themes.init_themes()
 
-    # Calculate card size
-    # Card height is fixed: 4 cards + margins (top, bottom, 3 between)
-    # Card width is free to adjust itself proportionally, according to theme aspect ratio
-    # Actual card size is only defined when cards.Deck() renders the theme SVG
-    cardsize = (g.window_size[0], (g.window_size[1] - 5 * g.MARGIN[1]) / 4)
-
-    # Create the cards
-    deck = cards.Deck(g.theme, cardsize)
-    deck.create_cards(faceup=False)
-    deck.shuffle()
-
-    # Init slots
-    graphics.init_slots(deck.cardsize)
-
-    # Game objects
-    spritegroups = []
-    spritegroups.append(deck)
+    deck = cards.Deck(g.theme, g.cardsize)
+    game = gamerules.Yukon(g.playarea, deck)
+    game.new_game()
 
     clock = pygame.time.Clock()
     dragged_card = None
@@ -81,21 +66,15 @@ def main(*argv):
 
             if event.type == pygame.KEYDOWN:
 
-                def restart():
-                    for card in deck.cards:
-                        card.move(g.MARGIN)
-                        deck.move_to_back(card)
-
                 if event.key in [pygame.K_RETURN, pygame.K_KP_ENTER]:
                     print "New game"
-                    deck.shuffle()
-                    restart()
+                    game.new_game()
                 if event.key == pygame.K_SPACE:
                     print "Restart game"
-                    restart()
+                    game.restart()
 
             if event.type in [pygame.MOUSEMOTION, pygame.MOUSEBUTTONDOWN]:
-                topcard = deck.get_top_card(event.pos)
+                topcard = game.deck.get_top_card(event.pos)
 
             if event.type == pygame.MOUSEMOTION:
                 if not dragged_card:
@@ -127,12 +106,8 @@ def main(*argv):
         if dragged_card:
             dragged_card.drag(pygame.mouse.get_pos())
 
-        # Update
-        for group in spritegroups:
-            group.update()
-
-        # Draw
-        graphics.render(spritegroups, clear)
+        deck.update()
+        graphics.render([deck], clear)
         clear = False
 
         if g.profile:
