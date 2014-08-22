@@ -176,7 +176,6 @@ class Card(pygame.sprite.DirtySprite):
         self._drag_start_pos = self.rect.topleft
         self._drag_offset = (mouse_pos[0] - self.rect[0],
                              mouse_pos[1] - self.rect[1])
-        pygame.mouse.set_cursor(*g.cursors['drag'])
         self.deck.move_to_front(self)
 
     def drag(self, mouse_pos):
@@ -189,7 +188,6 @@ class Card(pygame.sprite.DirtySprite):
 
     def drag_stop(self, *args):
         self._drag_offset = self._drag_start_pos = ()
-        pygame.mouse.set_cursor(*g.cursors['draggable'])
 
     drop = drag_stop
 
@@ -206,9 +204,9 @@ class Card(pygame.sprite.DirtySprite):
         return self._faceup
 
     def flip(self, faceup=None):
-        '''Flip a card, either <faceup> or down. If no <faceup>, toggle state'''
+        '''Flip a card, either face up, down, or toggle'''
         if faceup is None:
-            faceup = not self._faceup  # perhaps should be self.faceup
+            faceup = not self._faceup
         self._faceup = faceup
         if self._faceup:
             self.image = self.cardimage

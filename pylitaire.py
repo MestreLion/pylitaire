@@ -54,6 +54,7 @@ def main(*argv):
     game.new_game()
 
     clock = pygame.time.Clock()
+    update_cursor = False
     dragged_card = None
     drag_button = 0
     clear = False
@@ -78,10 +79,7 @@ def main(*argv):
 
             if event.type == pygame.MOUSEMOTION:
                 if not dragged_card:
-                    if topcard and topcard.draggable:
-                        pygame.mouse.set_cursor(*g.cursors['draggable'])
-                    else:
-                        pygame.mouse.set_cursor(*g.cursors['default'])
+                    update_cursor = True
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if not dragged_card:
@@ -90,11 +88,12 @@ def main(*argv):
                             dragged_card = topcard
                             dragged_card.drag_start(event.pos)
                             drag_button = event.button
+                            pygame.mouse.set_cursor(*g.cursors['drag'])
 
             if event.type == pygame.MOUSEBUTTONUP:
                 if not dragged_card and topcard and topcard.flippable and event.button == 3:
                     topcard.flip()
-                    pygame.mouse.set_cursor(*(g.cursors['draggable'] if topcard.draggable else g.cursors['default']))
+                    update_cursor = True
                 if dragged_card and event.button == drag_button:
                     if drag_button == 1:
                         dragged_card.drag_stop()
@@ -102,9 +101,17 @@ def main(*argv):
                         dragged_card.drag_abort()
                     dragged_card = None
                     drag_button = 0
+                    update_cursor = True
 
         if dragged_card:
             dragged_card.drag(pygame.mouse.get_pos())
+
+        if update_cursor:
+            if topcard and topcard.draggable:
+                pygame.mouse.set_cursor(*(g.cursors['draggable']))
+            else:
+                pygame.mouse.set_cursor(*(g.cursors['default']))
+            update_cursor = False
 
         deck.update()
         graphics.render([deck], clear)
