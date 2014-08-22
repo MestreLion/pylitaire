@@ -54,10 +54,8 @@ class Gui(object):
         if event.type == pygame.KEYDOWN:
 
             if event.key in [pygame.K_RETURN, pygame.K_KP_ENTER]:
-                log.info("New game")
                 game.new_game()
             if event.key == pygame.K_SPACE:
-                log.info("Restart game")
                 game.restart()
 
         def update_topcard(force=False):

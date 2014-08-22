@@ -65,10 +65,15 @@ class Yukon(object):
         return pygame.Rect(position, g.slot.surface.get_size())
 
     def new_game(self):
-        self.deck.shuffle()
-        self.restart()
+        self.restart(True)
 
-    def restart(self):
+    def restart(self, new=False):
+        if new:
+            log.info("New game")
+            self.deck.shuffle()
+        else:
+            log.info("Restart game")
+
         c = 0
         e = 2  # extra cards in each column
         for row in xrange(8 + e):
@@ -79,7 +84,6 @@ class Yukon(object):
                 card = self.deck.cards[c]
                 card.flip(row >= col)
                 card.move((left, top))
-                self.deck.move_to_front(card)
                 c += 1
 
     def click(self, card):

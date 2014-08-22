@@ -194,6 +194,7 @@ class Card(pygame.sprite.DirtySprite):
     def move(self, pos):
         self.dirty = 1
         self.rect.topleft = pos
+        self.deck.move_to_front(self)
 
     @property
     def faceup(self):
@@ -207,7 +208,6 @@ class Card(pygame.sprite.DirtySprite):
         self._faceup = faceup
         if self._faceup:
             self.image = self.cardimage
-            self.deck.move_to_front(self)
         else:
             self.image = self.deck.back
         self.dirty = 1
