@@ -52,7 +52,6 @@ class Gui(object):
             return False
 
         if event.type == pygame.KEYDOWN:
-
             if event.key in [pygame.K_RETURN, pygame.K_KP_ENTER]:
                 game.new_game()
             if event.key == pygame.K_SPACE:
