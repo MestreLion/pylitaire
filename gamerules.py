@@ -75,25 +75,14 @@ class Yukon(object):
 
     def restart(self):
         c = 0
-        # Klondike tableau
-        for row in xrange(8):
+        e = 2  # extra cards in each column
+        for row in xrange(8 + e):
             # 0.18 would be 0.2 if not for margin (cardsize instead of cell)
             top = self.tableau[0].top + 0.18 * row * self.cell[1]
-            for col in xrange(row, 8):
+            for col in xrange(max(0, row - e), 8):
                 left = self.tableau[col].left
                 card = self.deck.cards[c]
-                card.flip(row == col)
-                card.move((left, top))
-                self.deck.move_to_front(card)
-                c += 1
-        # Aditional Yukon cards
-        for col in xrange(0, 8):
-            left = self.tableau[col].left
-            tail = col + 1
-            for row in xrange(2):
-                top = self.tableau[0].top + 0.18 * (row + tail) * self.cell[1]
-                card = self.deck.cards[c]
-                card.flip(True)
+                card.flip(row >= col)
                 card.move((left, top))
                 self.deck.move_to_front(card)
                 c += 1
