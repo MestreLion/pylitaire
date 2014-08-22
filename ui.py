@@ -60,12 +60,12 @@ class Gui(object):
                 log.info("Restart game")
                 game.restart()
 
-        def update_topcard():
+        def update_topcard(force=False):
             topcard = game.deck.get_top_card(event.pos)
             # "not self.dragcard" test here is needed only because rapid mouse
             # movement may cause topcard != dragcard when mouse momentarily
             # moves out of dragged card
-            if topcard != self.topcard and not self.dragcard:
+            if (force or topcard != self.topcard) and not self.dragcard:
                 self.updatecursor = True
             self.topcard = topcard
 
@@ -100,7 +100,8 @@ class Gui(object):
                     self.dragcard.drag_abort()
                 self.dragcard = None
                 self.dragbutton = MOUSEBUTTONS.NONE
-                update_topcard()
+                # forced, as topcard may be the same but cursor will change
+                update_topcard(True)
 
         return True
 
