@@ -60,7 +60,7 @@ class Gui(object):
                 log.info("Restart game")
                 game.restart()
 
-        if event.type in [pygame.MOUSEMOTION, pygame.MOUSEBUTTONDOWN]:
+        def update_topcard():
             topcard = game.deck.get_top_card(event.pos)
             # "not self.dragcard" test here is needed only because rapid mouse
             # movement may cause topcard != dragcard when mouse momentarily
@@ -68,6 +68,9 @@ class Gui(object):
             if topcard != self.topcard and not self.dragcard:
                 self.updatecursor = True
             self.topcard = topcard
+
+        if event.type in [pygame.MOUSEMOTION, pygame.MOUSEBUTTONDOWN]:
+            update_topcard()
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if (not event.button == MOUSEBUTTONS.RIGHT
@@ -85,18 +88,19 @@ class Gui(object):
                 and not self.dragcard
                 and self.topcard):
                 log.debug("Click card %s", self.topcard)
-                self.updatecursor = game.click(self.topcard)
+                if game.click(self.topcard):
+                    update_topcard()
 
             if self.dragcard and event.button == self.dragbutton:
                 if self.dragbutton == MOUSEBUTTONS.LEFT:
-                    self.dragcard.drag_stop()
                     log.debug("Drop %s", self.dragcard)
+                    self.dragcard.drag_stop()
                 else:
+                    log.debug("Abort drag %s", self.dragcard)
                     self.dragcard.drag_abort()
-                    log.debug("Abort drag %s", self.topcard)
                 self.dragcard = None
                 self.dragbutton = MOUSEBUTTONS.NONE
-                self.updatecursor = True
+                update_topcard()
 
         return True
 

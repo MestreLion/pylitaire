@@ -183,7 +183,7 @@ class Card(pygame.sprite.DirtySprite):
                    mouse_pos[1] - self._drag_offset[1]))
 
     def drag_abort(self, *args):
-        self.rect.topleft = self._drag_start_pos
+        self.move(self._drag_start_pos)
         self.drag_stop()
 
     def drag_stop(self, *args):
@@ -197,10 +197,11 @@ class Card(pygame.sprite.DirtySprite):
 
     @property
     def faceup(self):
+        '''If card is faced up or down. Read-only. To change state, use flip()'''
         return self._faceup
 
     def flip(self, faceup=None):
-        '''Flip a card, either face up, down, or toggle'''
+        '''Flip a card either face up, down, or toggle'''
         if faceup is None:
             faceup = not self._faceup
         self._faceup = faceup

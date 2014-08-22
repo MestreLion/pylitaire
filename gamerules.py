@@ -20,6 +20,8 @@
 
 import logging
 
+import pygame
+
 import g
 
 log = logging.getLogger(__name__)
@@ -30,26 +32,40 @@ class Yukon(object):
         self.playarea = playarea
         self.deck = deck
 
+        # all pygame.Rect, and set in resize()
+        self.stock = None
+        self.waste = None
+        self.tableau = []
+        self.foundations = []
+
         self.resize(playarea)
         self.deck.create_cards(faceup=False)
 
     def resize(self, playarea):
         self.playarea = playarea
 
-        grid = (self.playarea.width  / 8,
-                self.playarea.height / 4)
+        self._grid = (self.playarea.width  / 8,
+                      self.playarea.height / 4)
 
-        # Stock, Waste, Foundations
-        top = self.playarea.top
-        for i in (0, 1, 4, 5, 6, 7):
-            g.background.surface.blit(g.slot.surface,
-                                      (self.playarea.left + i * grid[0], top))
+        self.stock = self._game_slot(0, 0)
+        self.waste = self._game_slot(1, 0)
 
-        # Tableau
-        top = self.playarea.top + grid[1]
+        self.foundations = []
+        for i in (4, 5, 6, 7):
+            self.foundations.append(self._game_slot(i, 0))
+
+        self.tableau = []
         for i in xrange(8):
-            g.background.surface.blit(g.slot.surface,
-                                      (self.playarea.left + i * grid[0], top))
+            self.tableau.append(self._game_slot(i, 1))
+
+    def _game_slot(self, i, j):
+        # this function probably go to an API module, class method or base class
+        # it is the only code that requires g and pygame to be imported, thus
+        # preventing true decoupling
+        position = (self.playarea.left + i * self._grid[0],
+                    self.playarea.top  + j * self._grid[1])
+        g.background.surface.blit(g.slot.surface, position)
+        return pygame.Rect(position, g.slot.surface.get_size())
 
     def new_game(self):
         self.deck.shuffle()
@@ -62,7 +78,10 @@ class Yukon(object):
             self.deck.move_to_back(card)
 
     def click(self, card):
-        card.flip()
+        '''Click on a card. Return True if card state changed'''
+        card.flip()  # for now, outside the IF
+        if card.rect.topleft == self.stock.topleft:
+            card.move(self.waste.topleft)
         return True
 
     def flippable(self, card):
