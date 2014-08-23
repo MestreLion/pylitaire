@@ -127,8 +127,14 @@ class Deck(pygame.sprite.LayeredDirty):
                 self.cards.append(card)
                 self.cardsdict[(rank, suit)] = card
 
+    def pop_cards(self):
+        '''Break all stacks, pop()'ing each card'''
+        for card in self.cards:
+            card.pop()
+
     def resize(self, cardsize):
         pass
+
 
 
 class Card(pygame.sprite.DirtySprite):
@@ -144,7 +150,7 @@ class Card(pygame.sprite.DirtySprite):
         self.suit = suit
         self.deck = deck
 
-        if self.rank in [SUIT.CLUBS, SUIT.SPADES]:
+        if self.suit in [SUIT.CLUBS, SUIT.SPADES]:
             self.color = COLORS.BLACK
         else:
             self.color = COLORS.RED

@@ -78,6 +78,7 @@ class Yukon(object):
             self.deck.shuffle()
         else:
             log.info("Restart game")
+        self.deck.pop_cards()
 
         c = 0
         e = 2  # extra cards in each column
