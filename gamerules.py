@@ -89,13 +89,15 @@ class Yukon(object):
     def click(self, card):
         '''Click on a card. Return True if card state changed'''
         # delete all statements when tests are over, leave only pass
-        card.move(self.foundations[card.suit-1].topleft)
-        card.flip(True)
-        return True
+        if not card.faceup:
+            card.flip(True)
+            return True
         pass  # no stock in yukon
 
     def doubleclick(self, card):
-        pass
+        if card.faceup:
+            card.move(self.foundations[card.suit-1].topleft)
+            return True
 
     def flippable(self, card):
         return True
@@ -103,5 +105,9 @@ class Yukon(object):
     def draggable(self, card):
         return card.faceup
 
-    def droppable(self, cards):
-        return cards[0]
+    def droppable(self, card, targets):
+        droplist = []
+        for target in targets:
+            if target.faceup:
+                droplist.append(target)
+        return droplist

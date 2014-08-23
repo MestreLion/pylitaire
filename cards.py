@@ -212,6 +212,12 @@ class Card(pygame.sprite.DirtySprite):
             self.image = self.deck.back
         self.dirty = 1
 
+    def peep(self):
+        pass
+
+    def snap(self, card):
+        self.move((card.rect.left, card.rect.top + card.rect.height * 0.2))
+
 
 
 

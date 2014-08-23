@@ -54,15 +54,14 @@ def main(*argv):
     game = gamerules.Yukon(g.playarea, deck)
     game.new_game()
 
-    gui = ui.Gui()
+    gui = ui.Gui(game)
 
     clock = pygame.time.Clock()
     run = True
     while run:
-        for event in pygame.event.get():
-            run = gui.handle_event(event, game)
+        run = gui.handle_events()
 
-        gui.update(game)
+        gui.update()
         deck.update()
         graphics.render([deck])
 
