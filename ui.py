@@ -71,7 +71,7 @@ class Gui(object):
 
     def _update_card(self, force_cursor_update=False):
         '''Get the (possibly new) card under mouse position.
-            Also, if card is different or
+            Also, if card is different, flag to update the mouse cursor
         '''
         card = self.game.deck.get_top_card(self.pos)
         # mouse cursor is never changed during drag, no matter what
@@ -125,14 +125,26 @@ class Gui(object):
             if event.button == MOUSEBUTTONS.LEFT:
 
                 if self.dragcard:
-                    targetcards = pygame.sprite.spritecollide(self.dragcard, self.dragcard.deck, False)
-                    targetcards.remove(self.dragcard)
+                    # GUI assumptions for drop candidates, hope any game is OK:
+                    # - not itself (duh)
+                    # - not one of its descendants (fair enough)
+                    # Note that it *does* allow drop on a card that has a child
+                    # It's up for the game rules to decide on that
+                    candidates = pygame.sprite.Group(*self.dragcard.deck.sprites())
+                    candidates.remove(self.dragcard, *self.dragcard.children)
+                    targetcards = pygame.sprite.spritecollide(self.dragcard, candidates, False)
+
+                    # Ask the game which candidates are valid drop targets
+                    # Will also be asked on MOUSEMOVE for target highlight
                     dropcards = game.droppable(self.dragcard, targetcards)
                     if dropcards:
-                        dropcard = dropcards[-1]  # should choose the closest
+                        dropcard = dropcards[0]  # should choose the closest
                         log.debug("Drop %s onto %s", self.dragcard, dropcard)
+                        # let the game itself drop, as GUI shall not assume card
+                        # will stack, or just snap, or leave position alone
+                        # GUI job is just to end the card drop
                         self.dragcard.drop()
-                        self.dragcard.snap(dropcard)
+                        self.game.drop(self.dragcard, dropcard)
                     else:
                         log.debug("Abort drag %s", self.dragcard)
                         self.dragcard.abort_drag()

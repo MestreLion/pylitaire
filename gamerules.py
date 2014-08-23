@@ -76,14 +76,16 @@ class Yukon(object):
 
         c = 0
         e = 2  # extra cards in each column
-        for row in xrange(8 + e):
-            # 0.18 would be 0.2 if not for margin (cardsize instead of cell)
-            top = self.tableau[0].top + 0.18 * row * self.cell[1]
-            for col in xrange(max(0, row - e), 8):
-                left = self.tableau[col].left
+        for col in xrange(8):
+            x = self.tableau[col].x
+            for row in xrange(col + 1 + e):
                 card = self.deck.cards[c]
                 card.flip(row >= col)
-                card.move((left, top))
+                if row == 0:
+                    y = self.tableau[0].y
+                    card.move((x, y))
+                else:
+                    card.stack(self.deck.cards[c-1])
                 c += 1
 
     def click(self, card):
@@ -96,6 +98,7 @@ class Yukon(object):
 
     def doubleclick(self, card):
         if card.faceup:
+            card.pop()
             card.move(self.foundations[card.suit-1].topleft)
             return True
 
@@ -108,6 +111,9 @@ class Yukon(object):
     def droppable(self, card, targets):
         droplist = []
         for target in targets:
-            if target.faceup:
+            if target.faceup and not target.child:
                 droplist.append(target)
         return droplist
+
+    def drop(self, card, target):
+        card.stack(target)
