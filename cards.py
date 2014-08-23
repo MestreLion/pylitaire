@@ -59,6 +59,15 @@ class COLORS(g.Enum):
     RED   = 2
 
 
+class ORIENTATION(g.Enum):
+    '''Stack orientation'''
+    NONE  = None    # Do not snap
+    KEEP  = ()      # Use same orientation of last stacking
+    RIGHT = (1, 0)
+    DOWN  = (0, 1)
+    PILE  = (0, 0)  # No orientation, place on top or card
+
+
 class Deck(pygame.sprite.LayeredDirty):
     ''' A collection of cards '''
 
@@ -125,6 +134,8 @@ class Deck(pygame.sprite.LayeredDirty):
 class Card(pygame.sprite.DirtySprite):
     ''' A sprite representing a card '''
 
+    snap_overlap = (0.2, 0.2)
+
     def __init__(self, rank=0, suit=0, joker=False, color=0, back=False,
                  deck=None, position=(0, 0), faceup=True):
         super(Card, self).__init__()
@@ -147,6 +158,10 @@ class Card(pygame.sprite.DirtySprite):
         else:
             shortrank = rankname[:1].upper()
         self.shortname = shortrank + suitname[:1].lower()
+
+        self.parent = None
+        self.child = None
+        self.orientation = ORIENTATION.NONE
 
         self._drag_offset = self._drag_start_pos = ()
 
@@ -189,6 +204,8 @@ class Card(pygame.sprite.DirtySprite):
     def abort_drag(self):
         self.move(self._drag_start_pos)
         self.drop()
+        if self.child:
+            self.child.snap(self, ORIENTATION.KEEP)
 
     def drop(self):
         self._drag_offset = self._drag_start_pos = ()
@@ -222,9 +239,61 @@ class Card(pygame.sprite.DirtySprite):
     def stop_peep(self):
         pass
 
+    def stack(self, card, orientation=ORIENTATION.DOWN):
+        '''Snap to <card> as a child, forming a stack'''
+        if card in self.children:
+            log.warn("Trying to stack %s with its descendant %s", self, card)
+            if self.parent:
+                # disconnect from parent, since we're no longer there
+                self.parent.child = None
+                self.parent = None
+            return
+        if card.child:
+            log.warn("Trying to stack %s to %s which already have child %s",
+                     self, card, card.child)
+            return
+        if card is self:
+            log.warn("Trying to stack %s with itself", self)
+            return
+
+        # disconnect with old parent
+        if self.parent:
+            self.parent.child = None
+
+        # connect to new one
+        self.parent = card
+        self.parent.child = self
+
+        # snap
+        if orientation == ORIENTATION.KEEP:
+            orientation = self.orientation
+        self.orientation = orientation
+        self.snap(card, orientation)
+
+    def pop(self):
+        '''Disconnect from its parent, if any, slicing the stack'''
+        if self.parent:
+            self.parent.child = None
+        self.parent = None
+
     def snap(self, card, orientation=ORIENTATION.DOWN):
-        '''Move the card to a position relative to another card'''
-        self.move((card.rect.left, card.rect.top + card.rect.height * 0.2))
+        '''Move the card to a position relative to another card,
+            also recursively snap all children
+        '''
+        if orientation == ORIENTATION.KEEP:
+            orientation = self.orientation
+        if orientation != ORIENTATION.NONE:
+            self.move((card.rect.x + orientation[0] * self.snap_overlap[0] * card.rect.width,
+                       card.rect.y + orientation[1] * self.snap_overlap[1] * card.rect.height))
+        if self.child:
+            self.child.snap(self, orientation)
+
+    @property
+    def children(self):
+        if self.child:
+            return [self.child] + self.child.children
+        else:
+            return []
 
 
 
