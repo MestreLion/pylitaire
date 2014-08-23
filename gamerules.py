@@ -23,6 +23,7 @@ import logging
 import pygame
 
 import g
+import cards
 
 log = logging.getLogger(__name__)
 
@@ -31,6 +32,7 @@ class Yukon(object):
     def __init__(self, playarea, deck):
         self.playarea = playarea
         self.deck = deck
+        self.slots = []
 
         # set in resize(), all but grid are pygame.Rect
         self.tableau = []
@@ -54,6 +56,9 @@ class Yukon(object):
         self.tableau = []
         for i in xrange(8):
             self.tableau.append(self._game_slot(i, 1))
+
+        # Perhaps should go in _game_slot()
+        self.slots = self.tableau + self.foundations
 
     def _game_slot(self, i, j):
         # this function probably go to an API module, class method or base class
@@ -89,31 +94,40 @@ class Yukon(object):
                 c += 1
 
     def click(self, card):
-        '''Click on a card. Return True if card state changed'''
-        # delete all statements when tests are over, leave only pass
-        if not card.faceup:
+        '''Handle click on <card>. Return True if card state changed'''
+        if card.stacktail and not card.faceup:
             card.flip(True)
             return True
-        pass  # no stock in yukon
 
     def doubleclick(self, card):
-        if card.faceup:
+        '''Handle double click on <card>. Return True if card state changed'''
+        if not card.stacktail or not card.faceup:
+            return
+
+        if (card.rank == cards.RANK.ACE or
+            self.deck.card(card.rank - 1, card.suit).rect in self.foundations):
+            # both detection and moving would be a lot more elegant if
+            # self.foundations items were more than simply a rect
+            # (entity, list of cards, sprite group), something I could just
+            # card.stack(<top foundation card>, orientation=cards.ORIENTATION.PILE)
             card.pop()
             card.move(self.foundations[card.suit-1].topleft)
             return True
 
-    def flippable(self, card):
-        return True
+    def drop(self, card, target):
+        '''Handle <card> dropped onto <target>'''
+        card.stack(target)
 
     def draggable(self, card):
-        return card.faceup
+        '''Return True if card can be dragged.
+            Used to set mouse cursor. Actual drag is performed by GUI
+        '''
+        return card.faceup and not card.rect in self.foundations
 
     def droppable(self, card, targets):
+        '''Return a subset of <targets> that are valid drop cards for <card>'''
         droplist = []
         for target in targets:
-            if target.faceup and not target.child:
+            if target.faceup and target.stacktail:
                 droplist.append(target)
         return droplist
-
-    def drop(self, card, target):
-        card.stack(target)

@@ -308,6 +308,16 @@ class Card(pygame.sprite.DirtySprite):
         else:
             return []
 
+    @property
+    def stacktail(self):
+        '''Return True if card is the tail (leaf) of its current stack'''
+        return not self.child
+
+    @property
+    def stackhead(self):
+        '''Return True if card is the head (root) of its current stack'''
+        return not self.parent
+
 
 
 
