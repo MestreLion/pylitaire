@@ -105,30 +105,49 @@ class Yukon(object):
         if not card.stacktail or not card.faceup:
             return
 
+        # So this much for DRY... API needs a fake card representing a slot ASAP
+        # Also a sprite Group for foundation
+        # whole function would be something like:
+        # targeds = droppable(card, *FoundationGroup(*[SlotFakeCard(position=f.rect,...)
+        #                                              for f in self.foundation]))
+        # if targets:
+        #     self.drop(targets[0])
         if (card.rank == cards.RANK.ACE or
             self.deck.card(card.rank - 1, card.suit).rect in self.foundations):
-            # both detection and moving would be a lot more elegant if
-            # self.foundations items were more than simply a rect
-            # (entity, list of cards, sprite group), something I could just
-            # card.stack(<top foundation card>, orientation=cards.ORIENTATION.PILE)
             card.pop()
             card.move(self.foundations[card.suit-1].topleft)
             return True
 
     def drop(self, card, target):
         '''Handle <card> dropped onto <target>'''
-        card.stack(target)
+        if target.rect in self.foundations:
+            orientation = cards.ORIENTATION.PILE
+        else:
+            orientation = cards.ORIENTATION.DOWN
+        card.stack(target, orientation)
 
     def draggable(self, card):
         '''Return True if card can be dragged.
             Used to set mouse cursor. Actual drag is performed by GUI
         '''
-        return card.faceup and not card.rect in self.foundations
+        return card.faceup  # and not card.rect in self.foundations
 
     def droppable(self, card, targets):
         '''Return a subset of <targets> that are valid drop cards for <card>'''
         droplist = []
         for target in targets:
-            if target.faceup and target.stacktail:
+
+            if target.rect in self.foundations:
+                if (card.stacktail
+                    and (card.rank == cards.RANK.ACE
+                         or self.deck.card(card.rank - 1, card.suit).rect
+                            in self.foundations)):
+                    droplist.append(target)
+
+            elif (target.faceup
+                  and target.stacktail
+                  and target.color != card.color
+                  and target.rank == card.rank + 1):
                 droplist.append(target)
+
         return droplist
