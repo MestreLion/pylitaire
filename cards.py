@@ -180,26 +180,17 @@ class Card(pygame.sprite.DirtySprite):
                              mouse_pos[1] - self.rect[1])
         self.deck.move_to_front(self)
 
-    def _check_illegal_drag(self, funcname):
-        if not self._drag_start_pos:
-            log.warn("%r.%s called with no prior matching call to drag_start()",
-                     self, funcname)
-            return True
-
     def drag(self, mouse_pos):
-        if self._check_illegal_drag('drag()'): return
         self.move((mouse_pos[0] - self._drag_offset[0],
                    mouse_pos[1] - self._drag_offset[1]))
         if self.child:
             self.child.snap(self)
 
     def abort_drag(self):
-        if self._check_illegal_drag('abort_drag()'): return
         self.move(self._drag_start_pos)
         self.drop()
 
     def drop(self):
-        if self._check_illegal_drag('drop()'): return
         self._drag_offset = self._drag_start_pos = ()
 
     stop_drag = drop
