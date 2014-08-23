@@ -16,7 +16,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program. See <http://www.gnu.org/licenses/gpl.html>
 #
-# Card handling
+# Card handling, game rules independent
 
 import logging
 import random
@@ -29,8 +29,8 @@ import themes
 log = logging.getLogger(__name__)
 
 
-class RANKS(g.Enum):
-    ''' Card ranks '''
+class RANK(g.Enum):
+    '''Card ranks'''
     ACE   =  1
     TWO   =  2
     THREE =  3
@@ -46,8 +46,8 @@ class RANKS(g.Enum):
     KING  = 13
 
 
-class SUITS(g.Enum):
-    ''' Card suits '''
+class SUIT(g.Enum):
+    '''Card suits'''
     CLUBS    = 1
     DIAMONDS = 2
     HEARTS   = 3
@@ -55,6 +55,7 @@ class SUITS(g.Enum):
 
 
 class COLORS(g.Enum):
+    '''Card "color". Black for Clubs and Spades, Red for Diamonds and Hearts'''
     BLACK = 1
     RED   = 2
 
@@ -74,7 +75,8 @@ class Deck(pygame.sprite.LayeredDirty):
     def __init__(self, theme=None, cardsize=(), proportional=True):
         super(Deck, self).__init__()
 
-        # Set the theme (self.theme is always an instance of themes.Theme)
+        # theme can be either a name or an instance of themes.Theme
+        # self.theme is always an instance
         if isinstance(theme, themes.Theme):
             self.theme = theme
         else:
@@ -117,10 +119,10 @@ class Deck(pygame.sprite.LayeredDirty):
         if cards:
             return cards[-1]  # last card is top card
 
-    def create_cards(self, faceup=True, doubledeck=False, jokers=0):
-        for suit in SUITS:
-            for rank in RANKS:
-                card = Card(rank=rank, suit=suit, deck=self, position=g.MARGIN, faceup=faceup)
+    def create_cards(self, doubledeck=False, jokers=0, **cardkwargs):
+        for suit in SUIT:
+            for rank in RANK:
+                card = Card(rank=rank, suit=suit, deck=self, **cardkwargs)
                 self.add(card)
                 self.cards.append(card)
                 self.cardsdict[(rank, suit)] = card
@@ -129,28 +131,26 @@ class Deck(pygame.sprite.LayeredDirty):
         pass
 
 
-
-
 class Card(pygame.sprite.DirtySprite):
     ''' A sprite representing a card '''
 
     snap_overlap = (0.2, 0.2)
 
-    def __init__(self, rank=0, suit=0, joker=False, color=0, back=False,
-                 deck=None, position=(0, 0), faceup=True):
+    def __init__(self, rank, suit, deck=None,
+                 position=(0, 0), faceup=True, orientation=ORIENTATION.DOWN):
         super(Card, self).__init__()
 
         self.rank = rank
         self.suit = suit
         self.deck = deck
 
-        if self.rank in [SUITS.CLUBS, SUITS.SPADES]:
+        if self.rank in [SUIT.CLUBS, SUIT.SPADES]:
             self.color = COLORS.BLACK
         else:
             self.color = COLORS.RED
 
-        rankname = RANKS.name(self.rank)
-        suitname = SUITS.name(self.suit)
+        rankname = RANK.name(self.rank)
+        suitname = SUIT.name(self.suit)
         self.name = "%s of %s" % (rankname, suitname)
 
         if self.rank <= 10:
@@ -161,7 +161,7 @@ class Card(pygame.sprite.DirtySprite):
 
         self.parent = None
         self.child = None
-        self.orientation = ORIENTATION.NONE
+        self.orientation = orientation
 
         self._drag_offset = self._drag_start_pos = ()
 
@@ -187,6 +187,9 @@ class Card(pygame.sprite.DirtySprite):
             self.__class__.__name__, self.rank, self.suit)
 
     def start_drag(self, mouse_pos):
+        '''Start dragging card. Save the current position and mouse offset,
+            so drag() and abort_drag() act as expected.
+        '''
         if self._drag_start_pos:
             log.warn("start_drag() called during an ongoing drag. "
                      "Forgot to drop() or abort_drag()?")
@@ -196,23 +199,33 @@ class Card(pygame.sprite.DirtySprite):
         self.deck.move_to_front(self)
 
     def drag(self, mouse_pos):
+        '''Drag a card to current mouse position, recursively dragging
+            its children as a stack.
+        '''
         self.move((mouse_pos[0] - self._drag_offset[0],
                    mouse_pos[1] - self._drag_offset[1]))
         if self.child:
-            self.child.snap(self)
+            self.child.snap(self, ORIENTATION.KEEP)
 
     def abort_drag(self):
+        '''Abort a drag, moving the card back to its original position
+            and adjusting its children accordingly
+        '''
         self.move(self._drag_start_pos)
         self.drop()
         if self.child:
             self.child.snap(self, ORIENTATION.KEEP)
 
     def drop(self):
+        '''Drop the card at its current position.
+            Actually a No-Op, just discard the values saved by start_drag()
+        '''
         self._drag_offset = self._drag_start_pos = ()
 
     stop_drag = drop
 
     def move(self, pos):
+        '''Move the card to <pos>, a (x, y) tuple'''
         self.dirty = 1
         self.rect.topleft = pos
         self.deck.move_to_front(self)
@@ -234,31 +247,30 @@ class Card(pygame.sprite.DirtySprite):
         self.dirty = 1
 
     def start_peep(self):
+        '''Temporarily show this card above all others'''
         pass
 
     def stop_peep(self):
+        '''Send the card back to its original Z-Order'''
         pass
 
-    def stack(self, card, orientation=ORIENTATION.DOWN):
+    def stack(self, card, orientation=ORIENTATION.KEEP):
         '''Snap to <card> as a child, forming a stack'''
-        if card in self.children:
-            log.warn("Trying to stack %s with its descendant %s", self, card)
-            if self.parent:
-                # disconnect from parent, since we're no longer there
-                self.parent.child = None
-                self.parent = None
-            return
-        if card.child:
-            log.warn("Trying to stack %s to %s which already have child %s",
-                     self, card, card.child)
-            return
         if card is self:
             log.warn("Trying to stack %s with itself", self)
             return
+        if card in self.children:
+            log.warn("Trying to stack %s with its descendant %s", self, card)
+            # disconnect the descendant
+            card.pop()
+        if card.child:
+            log.warn("Trying to stack %s to %s which already have a child %s",
+                     self, card, card.child)
+            # disconnect the former child
+            card.child.pop()
 
-        # disconnect with old parent
-        if self.parent:
-            self.parent.child = None
+        # disconnect from old parent
+        self.pop()
 
         # connect to new one
         self.parent = card
@@ -276,7 +288,7 @@ class Card(pygame.sprite.DirtySprite):
             self.parent.child = None
         self.parent = None
 
-    def snap(self, card, orientation=ORIENTATION.DOWN):
+    def snap(self, card, orientation=ORIENTATION.KEEP):
         '''Move the card to a position relative to another card,
             also recursively snap all children
         '''
@@ -290,6 +302,7 @@ class Card(pygame.sprite.DirtySprite):
 
     @property
     def children(self):
+        '''List all descendants, in order, not including itself'''
         if self.child:
             return [self.child] + self.child.children
         else:
@@ -311,7 +324,7 @@ if __name__ == '__main__':
     themes.init_themes()
 
     # Card
-    card = Card(RANKS.QUEEN, SUITS.HEARTS)
+    card = Card(RANK.QUEEN, SUIT.HEARTS)
     print card, card.shortname, card.name
     window.blit(card.image, (0, 0))
     pygame.display.update()
@@ -319,7 +332,7 @@ if __name__ == '__main__':
     # Deck
     deck = Deck()
     print len(deck.cards)
-    print deck.card(RANKS.ACE, SUITS.SPADES)
+    print deck.card(RANK.ACE, SUIT.SPADES)
     print deck.cards[:5]
     deck.shuffle()
     print deck.cards[:5]
