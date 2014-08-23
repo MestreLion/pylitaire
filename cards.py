@@ -171,25 +171,38 @@ class Card(pygame.sprite.DirtySprite):
         return "<%s(rank=%2d, suit=%r)>" % (
             self.__class__.__name__, self.rank, self.suit)
 
-    def drag_start(self, mouse_pos):
-        assert not self._drag_offset, "drag_start() called during an ongoing drag."
+    def start_drag(self, mouse_pos):
+        if self._drag_start_pos:
+            log.warn("start_drag() called during an ongoing drag. "
+                     "Forgot to drop() or abort_drag()?")
         self._drag_start_pos = self.rect.topleft
         self._drag_offset = (mouse_pos[0] - self.rect[0],
                              mouse_pos[1] - self.rect[1])
         self.deck.move_to_front(self)
 
+    def _check_illegal_drag(self, funcname):
+        if not self._drag_start_pos:
+            log.warn("%r.%s called with no prior matching call to drag_start()",
+                     self, funcname)
+            return True
+
     def drag(self, mouse_pos):
+        if self._check_illegal_drag('drag()'): return
         self.move((mouse_pos[0] - self._drag_offset[0],
                    mouse_pos[1] - self._drag_offset[1]))
+        if self.child:
+            self.child.snap(self)
 
-    def drag_abort(self, *args):
+    def abort_drag(self):
+        if self._check_illegal_drag('abort_drag()'): return
         self.move(self._drag_start_pos)
-        self.drag_stop()
+        self.drop()
 
-    def drag_stop(self, *args):
+    def drop(self):
+        if self._check_illegal_drag('drop()'): return
         self._drag_offset = self._drag_start_pos = ()
 
-    drop = drag_stop
+    stop_drag = drop
 
     def move(self, pos):
         self.dirty = 1
@@ -212,10 +225,14 @@ class Card(pygame.sprite.DirtySprite):
             self.image = self.deck.back
         self.dirty = 1
 
-    def peep(self):
+    def start_peep(self):
         pass
 
-    def snap(self, card):
+    def stop_peep(self):
+        pass
+
+    def snap(self, card, orientation=ORIENTATION.DOWN):
+        '''Move the card to a position relative to another card'''
         self.move((card.rect.left, card.rect.top + card.rect.height * 0.2))
 
 

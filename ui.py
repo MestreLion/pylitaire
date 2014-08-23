@@ -111,7 +111,7 @@ class Gui(object):
                     if game.draggable(self.card):
                         log.debug("Start dragging %s", self.card)
                         self.dragcard = self.card
-                        self.dragcard.drag_start(event.pos)
+                        self.dragcard.start_drag(event.pos)
                         self.set_mouse_cursor('drag')
                     self.clickcard = self.doubleclickcard = self.card
                     self.doubleclicktimer = pygame.time.get_ticks() + g.doubleclicklimit
@@ -131,13 +131,13 @@ class Gui(object):
                     if dropcards:
                         dropcard = dropcards[-1]  # should choose the closest
                         log.debug("Drop %s onto %s", self.dragcard, dropcard)
+                        self.dragcard.drop()
                         self.dragcard.snap(dropcard)
-                        self.dragcard.drag_stop()
                     else:
                         log.debug("Abort drag %s", self.dragcard)
-                        self.dragcard.drag_abort()
+                        self.dragcard.abort_drag()
                     self.dragcard = None
-                    self._update_card()
+                    self._update_card(True)
 
                 if self.clickcard:
                     if self.card == self.clickcard:
