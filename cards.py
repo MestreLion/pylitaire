@@ -61,12 +61,12 @@ class COLORS(g.Enum):
 
 
 class ORIENTATION(g.Enum):
-    '''Stack orientation'''
+    '''Stack orientation of a card in relation to its parent'''
     NONE  = None    # Do not snap
     KEEP  = ()      # Use same orientation of last stacking
     RIGHT = (1, 0)
     DOWN  = (0, 1)
-    PILE  = (0, 0)  # No orientation, place on top or card
+    PILE  = (0, 0)  # No orientation, place on top of card
 
 
 class Deck(pygame.sprite.LayeredDirty):
