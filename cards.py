@@ -133,8 +133,8 @@ class Deck(pygame.sprite.LayeredDirty):
             card.pop()
 
     def resize(self, cardsize):
-        pass
-
+        for card in self.cards:
+            card.resize(cardsize)
 
 
 class Card(pygame.sprite.DirtySprite):
@@ -191,6 +191,9 @@ class Card(pygame.sprite.DirtySprite):
     def __repr__(self):
         return "<%s(rank=%2d, suit=%r)>" % (
             self.__class__.__name__, self.rank, self.suit)
+
+    def resize(self, cardsize):
+        self.dirty = 1
 
     def start_drag(self, mouse_pos):
         '''Start dragging card. Save the current position and mouse offset,

@@ -23,6 +23,7 @@ import logging
 import pygame
 
 import g
+import graphics
 
 log = logging.getLogger(__name__)
 
@@ -87,6 +88,11 @@ class Gui(object):
         if (event.type == pygame.QUIT or
             event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
             raise Quit
+
+        if event.type == pygame.VIDEORESIZE:
+            graphics.resize(event.size)
+            game.deck.resize(g.cardsize)
+            game.resize(g.playarea)
 
         if event.type == pygame.KEYDOWN:
             if event.key in [pygame.K_RETURN, pygame.K_KP_ENTER]:

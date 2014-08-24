@@ -51,12 +51,12 @@ class Background(object):
             <title> defaults to g.baize
         '''
         self.path = path or find_image(g.datadirs('images'), title or g.baize)
-        if self.path:
-            self.original = load_image(self.path).convert()
-        else:
-            self.original = None
         self.color = color or g.BGCOLOR
-        self.resize(size or g.window.get_size())
+        self.original = None
+        self.surface = None
+
+        if size:
+            self.resize(size)
 
     def resize(self, size):
         ''' Creates a background surface of <size> and render the original
@@ -64,6 +64,9 @@ class Background(object):
             than (800, 600) tile (repeat) it, otherwise rescale (stretch/shrink)
         '''
         self.surface = pygame.Surface(size)
+
+        if not self.original and self.path:
+            self.original = load_image(self.path).convert()
 
         if not self.original:
             # No suitable background file found. Use a solid color fill
@@ -97,14 +100,15 @@ class Slot(object):
         self.original = load_vector(self.path)
         self.surface = None
 
-        self.resize(size)
+        if size:
+            self.resize(size)
 
     def resize(self, size):
         self.surface = render_vector(self.original, size)
 
 
 def init_graphics():
-    ''' Initialize the game window and graphics '''
+    '''Initialize the game window and graphics'''
 
     log.info("Initializing graphics")
 
@@ -117,9 +121,14 @@ def init_graphics():
                                                            'cursors', "%s.json" % cursor))
     pygame.mouse.set_cursor(*g.cursors['default'])
 
+    g.background = Background()
+    g.slot = Slot()
+    resize(g.window_size)
+
+
+def resize(size):
     # Set the screen
-    flags = 0
-    size = g.window_size
+    flags = 0  # pygame.RESIZABLE
     if g.fullscreen:
         log.debug("Setting fullscreen, desktop resolution (%s, %s)",
                   pygame.display.Info().current_w,
@@ -131,8 +140,7 @@ def init_graphics():
     g.window = pygame.display.set_mode(size, flags)
     g.window_size = g.window.get_size()
 
-    # Set the background
-    g.background = Background()
+    g.background.resize(g.window_size)
     g.background.draw()
 
     # Display the initial window soon as possible, as other elements may take a while
@@ -146,7 +154,7 @@ def init_graphics():
     # Actual card size is only defined when cards.Deck() renders the theme SVG
     g.cardsize = (g.window_size[0], (g.window_size[1] - 5 * g.MARGIN[1]) / 4)
 
-    g.slot = Slot(size=g.cardsize)
+    g.slot.resize(g.cardsize)
 
 
 def render(spritegroups):
