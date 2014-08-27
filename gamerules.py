@@ -32,12 +32,21 @@ log = logging.getLogger(__name__)
 
 
 def load_game(gamename):
-    if gamename == "klondike":
-        return Klondike()
-    elif gamename == "yukon":
-        return Yukon()
-    elif gamename == "pylitaire":
-        return Pylitaire()
+    def find_class(base, name):
+        for cls in base.__subclasses__():
+            if cls.__name__.lower() == name:
+                return cls
+            result = find_class(cls, name)
+            if result:
+                return result
+    gameclass = find_class(Game, gamename)
+    if not gameclass:
+        log.error("Game '%s' not found", gamename)
+        return
+
+    game = gameclass()
+    log.info("Loading game '%s'", game.name)
+    return game
 
 
 class Game(object):
@@ -45,6 +54,7 @@ class Game(object):
         self.grid = (0, 0)
         self.slots = []
         self.deck = cards.Deck()
+        self.name = self.__class__.__name__
 
     def create_slot(self, *slotargs, **slotkwargs):
         '''Create a game slot. See cards.Slot for arguments'''
