@@ -36,6 +36,8 @@ def load_game(gamename):
         return Klondike()
     elif gamename == "yukon":
         return Yukon()
+    elif gamename == "pylitaire":
+        return Pylitaire()
 
 
 class Game(object):
@@ -222,4 +224,28 @@ class Yukon(Klondike):
             card = self.stock.tail
             card.flip()
             card.stack(self.tableau[1 + i/e].tail)
+            i += 1
+
+
+class Pylitaire(Klondike):
+    '''Yukon variation: 8 tableau slots with 2 extra open cards in each
+        (including the first tableau slot)
+    '''
+    def __init__(self):
+        super(Pylitaire, self).__init__()
+        self.slots.remove(self.stock)
+        self.slots.remove(self.waste)
+        self.grid = (8, 4)
+        self.tableau.append(self.create_slot((7, 1), cards.ORIENTATION.DOWN))
+        for foundation in self.foundations:
+            foundation.cell = (foundation.cell[0] + 1, 0)
+
+    def reset(self):
+        super(Pylitaire, self).reset()
+        e = 2  # extra cards in each column
+        i = 0
+        while not self.stock.empty:
+            card = self.stock.tail
+            card.flip()
+            card.stack(self.tableau[i/e].tail)
             i += 1

@@ -58,7 +58,7 @@ baize = "baize-ubuntu"
 theme = "life_and_smooth"
 slotname = "slot-gnome"
 doubleclicklimit = 400
-gamename = "yukon"
+gamename = "pylitaire"
 
 
 def datadirs(dirname):
