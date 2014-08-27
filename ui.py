@@ -220,7 +220,9 @@ class Gui(object):
             self.cursorname = cursorname
 
     def resize(self, size):
-        playarea = graphics.resize(size)
+        graphics.resize(size)
+        playarea = pygame.Rect(g.MARGIN, (g.window_size[0] - g.MARGIN[0],
+                                          g.window_size[1] - g.MARGIN[1]))
         cellsize = self.game.resize(playarea)
         maxcardsize = (cellsize[0] - g.MARGIN[0],
                        cellsize[1] - g.MARGIN[1])
