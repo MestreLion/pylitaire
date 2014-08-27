@@ -19,14 +19,13 @@
 '''Game rules and logic
 
 Design notes:
-- Game rules should be decoupled from pygame, graphics, and, if possible, g
+- Game rules should not depend on any other module than cards
 - Talks to Deck/Card only via API, but should not rely on its implementation internals
 - Talks to GUI only via high-level events such as `click(card)`, `drop(card)`, etc
 '''
 
 import logging
 
-import g
 import cards
 
 log = logging.getLogger(__name__)
@@ -43,7 +42,7 @@ class Game(object):
     def __init__(self):
         self.grid = (0, 0)
         self.slots = []
-        self.deck = cards.Deck(g.theme)
+        self.deck = cards.Deck()
 
     def create_slot(self, *slotargs, **slotkwargs):
         '''Create a game slot. See cards.Slot for arguments'''
