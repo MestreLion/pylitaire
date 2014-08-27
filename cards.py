@@ -63,7 +63,7 @@ class COLORS(g.Enum):
 class ORIENTATION(g.Enum):
     '''Stack orientation of a card in relation to its parent'''
     NONE  = None    # Do not snap
-    KEEP  = ()      # Use same orientation of last stacking
+    KEEP  = ()      # Keep the same orientation of the parent
     RIGHT = (1, 0)
     DOWN  = (0, 1)
     PILE  = (0, 0)  # No orientation, place on top of card
@@ -287,7 +287,7 @@ class Card(pygame.sprite.DirtySprite):
 
         # snap
         if orientation == ORIENTATION.KEEP:
-            orientation = self.orientation
+            orientation = self.parent.orientation
         self.orientation = orientation
         self.snap(card, orientation)
 
@@ -302,7 +302,7 @@ class Card(pygame.sprite.DirtySprite):
             also recursively snap all children
         '''
         if orientation == ORIENTATION.KEEP:
-            orientation = self.orientation
+            orientation = card.orientation
         if orientation != ORIENTATION.NONE:
             self.move((card.rect.x + orientation[0] * self.snap_overlap[0] * card.rect.width,
                        card.rect.y + orientation[1] * self.snap_overlap[1] * card.rect.height))
