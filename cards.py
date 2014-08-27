@@ -232,8 +232,8 @@ class Card(pygame.sprite.DirtySprite):
         self.dirty = 1
 
     def start_drag(self, mouse_pos):
-        '''Start dragging card. Save the current position and mouse offset,
-            so drag() and abort_drag() act as expected.
+        '''Start dragging card and its children. Save the current position
+            and mouse offset, so drag() and abort_drag() act as expected.
         '''
         if self._drag_start_pos:
             log.warn("start_drag() called during an ongoing drag. "
@@ -242,30 +242,34 @@ class Card(pygame.sprite.DirtySprite):
         self._drag_offset = (mouse_pos[0] - self.rect[0],
                              mouse_pos[1] - self.rect[1])
         self.deck.move_to_front(self)
+        if self.child:
+            self.child.start_drag(mouse_pos)
 
     def drag(self, mouse_pos):
         '''Drag a card to current mouse position, recursively dragging
-            its children as a stack.
+            its children.
         '''
         self.move((mouse_pos[0] - self._drag_offset[0],
                    mouse_pos[1] - self._drag_offset[1]))
         if self.child:
-            self.child.snap(self, ORIENTATION.KEEP)
+            self.child.drag(mouse_pos)
 
     def abort_drag(self):
-        '''Abort a drag, moving the card back to its original position
-            and adjusting its children accordingly
+        '''Abort a drag, moving the card and its children back to its original
+            position
         '''
         self.move(self._drag_start_pos)
-        self.drop()
         if self.child:
-            self.child.snap(self, ORIENTATION.KEEP)
+            self.child.abort_drag()
+        self.drop()
 
     def drop(self):
         '''Drop the card at its current position.
             Actually a No-Op, just discard the values saved by start_drag()
         '''
         self._drag_offset = self._drag_start_pos = ()
+        if self.child:
+            self.child.drop()
 
     stop_drag = drop
 
