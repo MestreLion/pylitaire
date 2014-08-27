@@ -28,6 +28,184 @@ import cards
 log = logging.getLogger(__name__)
 
 
+class Game(object):
+    def __init__(self, deck):
+        self.slots = pygame.sprite.Group()
+        self.deck = deck
+
+    def resize(self, playarea):
+        '''Resize a the game to <playarea>'''
+        self.cellsize = (playarea.width  / self.grid[0],
+                         playarea.height / self.grid[1])
+
+        for slot in self.slots:
+            position = (playarea.x + slot.cell[0] * self.cellsize[0],
+                        playarea.y + slot.cell[1] * self.cellsize[1])
+
+            slot.rect.topleft = position
+            slot.rect.size = g.cardsize
+            g.background.surface.blit(g.slot.surface, position)
+            if not slot.empty:
+                slot.head.place(slot)
+
+    def create_slot(self, *slotargs, **slotkwargs):
+        '''Create a game slot. See cards.Slot for arguments'''
+        slot = cards.Slot(*slotargs, **slotkwargs)
+        self.slots.add(slot)
+        return slot
+
+    def new_game(self):
+        self.restart(True)
+
+    def restart(self, new=False):
+        if new:
+            log.info("New game")
+            self.deck.shuffle()
+        else:
+            log.info("Restart game")
+        self.deck.pop_cards()
+        self.reset()
+
+
+class Klondike(Game):
+    def __init__(self, playarea, deck, *args, **kwargs):
+        super(Klondike, self).__init__(deck, *args, **kwargs)
+
+        self.grid = (7, 4)  # size of play area, measured in card "cells"
+
+        self.stock = self.create_slot((0, 0))
+        self.waste = self.create_slot((1, 0))
+
+        self.foundations = []
+        for i in xrange(self.grid[0] - 4, self.grid[0]):
+            self.foundations.append(self.create_slot((i, 0),
+                                                     rank=cards.RANK.ACE-1))
+
+        self.tableau = []
+        for i in xrange(self.grid[0]):
+            self.tableau.append(self.create_slot((i, 1),
+                                                 cards.ORIENTATION.DOWN,
+                                                 rank=cards.RANK.ACE-1))
+
+        self.resize(playarea)
+
+        self.deck.create_cards(faceup=False)
+
+    def reset(self):
+        '''Called once per game, either new one or restart same game'''
+        c = 0
+
+        for col, slot in enumerate(self.tableau):
+            for row in xrange(col + 1):
+                card = self.deck.cards[c]
+                card.flip(row >= col)
+                if row == 0:
+                    card.place(slot)
+                else:
+                    card.stack(self.deck.cards[c-1])
+                c += 1
+
+        self.deck.cards[c].place(self.stock)
+        c += 1
+        for card in self.deck.cards[c:]:
+            card.stack(self.deck.cards[c-1])
+            card.flip(False)
+            c += 1
+
+    def click(self, card):
+        '''Handle click on <card>, which may be a slot.
+            Return True if card state changed
+        '''
+        if card in self.slots:
+            if card is self.stock and not self.waste.empty:
+                cards = self.waste.cards[::-1]
+                for c, card in enumerate(cards):
+                    if c == 0:
+                        card.place(self.stock)
+                    else:
+                        card.stack(cards[c-1])
+                    card.flip()
+                return True
+
+        elif card.stacktail and not card.faceup:
+            if card.headslot is self.stock:
+                if self.waste.empty:
+                    card.place(self.waste)
+                else:
+                    card.stack(self.waste.tail)
+            card.flip()
+            return True
+
+    def doubleclick(self, card):
+        '''Handle double click on <card>. Return True if card state changed'''
+        if card in self.slots or card.slot in self.foundations:
+            return
+
+        targets = []
+        for slot in self.foundations:
+            if slot.empty:
+                targets.append(slot)
+            else:
+                targets.append(slot.tail)
+
+        droplist = self.droppable(card, targets)
+        if droplist:
+            self.drop(card, droplist[0])
+            return True
+
+    def drop(self, card, target):
+        '''Handle <card> dropped onto <target>'''
+        if target in self.slots:
+            card.place(target)
+        else:
+            card.stack(target)
+
+    def draggable(self, card):
+        '''Return True if card can be dragged.
+            Used to set mouse cursor. Actual drag is performed by GUI
+        '''
+        return (card not in self.slots
+                and card.faceup)
+                # and not card.headslot in self.foundations
+
+    def droppable(self, card, targets):
+        '''Return a subset of <targets> that are valid drop cards for <card>'''
+        droplist = []
+        for target in targets:
+
+            # dropping to a slot
+            if target in self.slots:
+                if not target.empty:
+                    continue
+                if target in self.foundations:
+                    if card.stacktail and card.rank == cards.RANK.ACE:
+                        droplist.append(target)
+                elif target in self.tableau:
+                    if card.rank == cards.RANK.KING:
+                        droplist.append(target)
+                continue
+
+            headslot = target.headslot
+
+            # dropping to card in foundation
+            if headslot in self.foundations:
+                if (card.stacktail
+                    and target.stacktail
+                    and target.suit == card.suit
+                    and target.rank == card.rank - 1):
+                    droplist.append(target)
+
+            # droppping to card in tableau
+            elif headslot in self.tableau:
+                if (target.faceup
+                    and target.stacktail
+                    and target.color != card.color
+                    and target.rank == card.rank + 1):
+                    droplist.append(target)
+
+        return droplist
+
+
 class Yukon(object):
     def __init__(self, playarea, deck):
         self.playarea = playarea

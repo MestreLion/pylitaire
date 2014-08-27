@@ -380,7 +380,7 @@ class Slot(pygame.sprite.DirtySprite):
         self.orientation = orientation
 
         self.child = None  # Card instance, set by card on place()
-        self.rect = None  # will be set by game.resize()
+        self.rect = pygame.sprite.Rect(0, 0, 0, 0)  # size and position will be set by game.resize()
         self.image = None  # will not be drawn as a sprite
 
     @property

@@ -51,7 +51,7 @@ def main(*argv):
     themes.init_themes()
 
     deck = cards.Deck(g.theme, g.cardsize)
-    game = gamerules.Yukon(g.playarea, deck)
+    game = gamerules.Klondike(g.playarea, deck)
     game.new_game()
 
     gui = ui.Gui(game)
