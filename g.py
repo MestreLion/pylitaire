@@ -58,7 +58,7 @@ baize = "baize-ubuntu"
 theme = "life_and_smooth"
 slotname = "slot-gnome"
 doubleclicklimit = 400
-gamename = "klondike"
+gamename = "yukon"
 
 
 class Enum(object):
