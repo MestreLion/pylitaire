@@ -44,21 +44,6 @@ class Game(object):
         self.slots = pygame.sprite.Group()
         self.deck = cards.Deck(g.theme)
 
-    def resize(self, playarea):
-        '''Resize a the game to <playarea>, return cellsize'''
-        self.cellsize = (playarea.width  / self.grid[0],
-                         playarea.height / self.grid[1])
-
-        for slot in self.slots:
-            position = (playarea.x + slot.cell[0] * self.cellsize[0],
-                        playarea.y + slot.cell[1] * self.cellsize[1])
-
-            slot.rect.topleft = position
-            if not slot.empty:
-                slot.head.place(slot)
-
-        return self.cellsize
-
     def create_slot(self, *slotargs, **slotkwargs):
         '''Create a game slot. See cards.Slot for arguments'''
         slot = cards.Slot(*slotargs, **slotkwargs)

@@ -220,16 +220,35 @@ class Gui(object):
             self.cursorname = cursorname
 
     def resize(self, size):
+        '''Resize and re-position all elements according to new window <size>
+            Current elements are:
+            - main window and background, done by graphics.resize(window_size)
+            - game.deck and its cards, by Deck.resize(maxcardsize)
+            - slot image, by its own .resize(cardsize)
+            - game.slots. Formerly by game, now here. Also reposition them
+                and their cards
+        '''
         graphics.resize(size)
+
+        # Recalculate board geometry
         playarea = pygame.Rect(g.MARGIN, (g.window_size[0] - g.MARGIN[0],
                                           g.window_size[1] - g.MARGIN[1]))
-        cellsize = self.game.resize(playarea)
+        cellsize = (playarea.width  / self.game.grid[0],
+                    playarea.height / self.game.grid[1])
         maxcardsize = (cellsize[0] - g.MARGIN[0],
                        cellsize[1] - g.MARGIN[1])
+
         cardsize = self.game.deck.resize(maxcardsize)
+
         g.slot.resize(cardsize)
         for slot in self.game.slots:
+            position = (playarea.x + slot.cell[0] * cellsize[0],
+                        playarea.y + slot.cell[1] * cellsize[1])
+            slot.rect.topleft = position
             slot.rect.size = cardsize
             slot.image = g.slot.surface
             g.background.surface.blit(g.slot.surface, slot.rect)
+            if not slot.empty:
+                slot.head.place(slot)
+
         self.clear = True
