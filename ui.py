@@ -74,15 +74,13 @@ class Gui(object):
         '''Get the (possibly new) card under mouse position.
             Also, if card is different, flag to update the mouse cursor
         '''
-        card = self.game.deck.get_top_card(self.pos)
+        card = self.game.get_top_card_or_slot(self.pos)
         # mouse cursor is never changed during drag, no matter what
         # current card may be None when mouse is fast and momentarily
         # moves out of dragged card
         if not self.dragcard and (force_cursor_update or card != self.card):
             self.updatecursor = True
         self.card = card
-
-        self.card = self.game.deck.get_top_card(self.pos)
 
     def _handle_event(self, event, game):
         if (event.type == pygame.QUIT or
@@ -117,7 +115,7 @@ class Gui(object):
                     if game.draggable(self.card):
                         log.debug("Start dragging %s", self.card)
                         self.dragcard = self.card
-                        self.dragcard.start_drag(event.pos)
+                        self.dragcard.start_drag(self.pos)
                         self.set_mouse_cursor('drag')
                     self.clickcard = self.doubleclickcard = self.card
                     self.doubleclicktimer = pygame.time.get_ticks() + g.doubleclicklimit
@@ -136,8 +134,9 @@ class Gui(object):
                     # - not one of its descendants (fair enough)
                     # Note that it *does* allow drop on a card that has a child
                     # It's up for the game rules to decide on that
-                    candidates = pygame.sprite.Group(*self.dragcard.deck.sprites())
+                    candidates = pygame.sprite.Group(*self.game.deck)
                     candidates.remove(self.dragcard, *self.dragcard.children)
+                    candidates.add(*self.game.slots)
                     targetcards = pygame.sprite.spritecollide(self.dragcard, candidates, False)
 
                     # Ask the game which candidates are valid drop targets

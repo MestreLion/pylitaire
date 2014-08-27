@@ -66,6 +66,15 @@ class Game(object):
         self.deck.pop_cards()
         self.reset()
 
+    def get_top_card_or_slot(self, pos):
+        '''Return the top card at <pos>, or a slot, if any'''
+        card = self.deck.get_top_card(pos)
+        if card:
+            return card
+        for slot in self.slots:
+            if slot.rect.collidepoint(pos):
+                return slot
+
 
 class Klondike(Game):
     def __init__(self, playarea, deck, *args, **kwargs):
