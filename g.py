@@ -63,7 +63,7 @@ gamename = "yukon"
 
 def datadirs(dirname):
     '''Return a list of game relevant data directories, useful for finding data
-        files such as themes as images
+        files such as themes and images
     '''
     return [os.path.join(CONFIGDIR, dirname),
             os.path.join(DATADIR, dirname)]

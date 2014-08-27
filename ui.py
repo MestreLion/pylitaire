@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 #    Copyright (C) 2014 Rodrigo Silva (MestreLion) <linux@rodrigosilva.com>
-#    This file is part of Pylitaire gamerules
+#    This file is part of Pylitaire game
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,17 +24,6 @@ Design notes:
 - Purely graphical actions, like drag a card, use Deck/Card methods directly
 - Resizing IS game rule dependent, as each game sets its own grid
 '''
-
-
-'''GUI functions and classes.
-
-Design notes:
-- Can fully use and modify the global values from g module
-- Actions that dependent on a game rule use Game methods
-- Purely graphical actions, like drag a card, use Deck/Card methods directly
-- Resizing IS game rule dependent, as each game sets its own grid
-'''
-
 
 import logging
 
