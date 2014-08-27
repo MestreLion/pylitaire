@@ -103,7 +103,10 @@ class Deck(pygame.sprite.LayeredDirty):
             log.warn("Theme '%s' not found. Cards will not be drawn", theme)
 
     def card(self, rank=0, suit=0):
-        ''' Return a Card of the given rank and suit '''
+        '''Return a Card of the given rank and suit
+            For double decks it may return either card, as they distinct
+            instances but otherwise indistinguishable
+        '''
         return self.cardsdict[(rank, suit)]
 
     def shuffle(self):
@@ -118,12 +121,20 @@ class Deck(pygame.sprite.LayeredDirty):
             return cards[-1]  # last card is top card
 
     def create_cards(self, doubledeck=False, jokers=0, **cardkwargs):
-        for suit in SUIT:
-            for rank in RANK:
-                card = Card(rank=rank, suit=suit, deck=self, **cardkwargs)
-                self.add(card)
-                self.cards.append(card)
-                self.cardsdict[(rank, suit)] = card
+        self.remove(*self)
+        self.cardsdict.clear()
+        del self.cards[:]
+        if doubledeck:
+            decks = 2
+        else:
+            decks = 1
+        for _ in xrange(decks):
+            for suit in SUIT:
+                for rank in RANK:
+                    card = Card(rank=rank, suit=suit, deck=self, **cardkwargs)
+                    self.add(card)
+                    self.cards.append(card)
+                    self.cardsdict[(rank, suit)] = card
 
     def pop_cards(self):
         '''Break all stacks, pop()'ing each card'''
@@ -199,7 +210,8 @@ class Card(pygame.sprite.DirtySprite):
             self.__class__.__name__, self.rank, self.suit)
 
     def resize(self, cardsize):
-        # FIXME: must also receive or recalculate position based on old position!!! But how?
+        # this can be smarter on resizing to same size,
+        # and should take re-theming into account
 
         self.rect.size = cardsize
 
