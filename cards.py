@@ -165,6 +165,7 @@ class Card(pygame.sprite.DirtySprite):
             shortrank = rankname[:1].upper()
         self.shortname = shortrank + suitname[:1].lower()
 
+        self.slot = None
         self.parent = None
         self.child = None
         self.orientation = orientation
@@ -293,6 +294,9 @@ class Card(pygame.sprite.DirtySprite):
 
     def pop(self):
         '''Disconnect from its parent, if any, slicing the stack'''
+        if self.slot:
+            self.slot.child = None
+        self.slot = None
         if self.parent:
             self.parent.child = None
         self.parent = None
@@ -308,6 +312,23 @@ class Card(pygame.sprite.DirtySprite):
                        card.rect.y + orientation[1] * self.snap_overlap[1] * card.rect.height))
         if self.child:
             self.child.snap(self, orientation)
+
+    def place(self, slot):
+        '''Set the card to <slot>, moving it there and snapping all children
+            according to slot's orientation
+        '''
+        if slot.child and slot.child is not self:
+            log.warn("Trying to place %s in a non-empty slot %s, first card is %s",
+                     self, slot, slot.child)
+            # disconnect the former child
+            slot.child.pop()
+        self.pop()
+        self.slot = slot
+        self.slot.child = self
+        self.orientation = self.slot.orientation
+        self.move((self.slot.rect.x, self.slot.rect.y))
+        if self.child:
+            self.child.snap(self, self.orientation)
 
     @property
     def children(self):
@@ -326,6 +347,61 @@ class Card(pygame.sprite.DirtySprite):
     def stackhead(self):
         '''Return True if card is the head (root) of its current stack'''
         return not self.parent
+
+    @property
+    def headslot(self):
+        '''Return the slot, if any, of the stack head card'''
+        if self.parent:
+            return self.parent.headslot
+        else:
+            return self.slot
+
+
+class Slot(pygame.sprite.DirtySprite):
+    '''A sprite-like object representing a slot
+        It has a <rect> for positioning but no <image> since all slots share
+        the same image that is only drawn onto background once per resize
+    '''
+
+    def __init__(self, cell=(0, 0), orientation=ORIENTATION.PILE,
+                 rank=-1, suit=-1):
+        '''Create slot at position <cell>, a (cx, cy) tuple in game grid units,
+            each game grid cell has (cardsize + margins) size.
+            Cards dropped will stack with <orientation>
+            <rank> and <suit> can be useful when creating rules for dropping
+            cards: usually rank is RANK.ACE - 1 for foundation and
+            RANK.KING + 1 for tableau
+        '''
+        super(Slot, self).__init__()
+
+        self.rank = rank
+        self.suit = suit
+        self.cell = cell
+        self.orientation = orientation
+
+        self.child = None  # Card instance, set by card on place()
+        self.rect = None  # will be set by game.resize()
+        self.image = None  # will not be drawn as a sprite
+
+    @property
+    def empty(self):
+        return not self.child
+
+    @property
+    def head(self):
+        return self.child
+
+    @property
+    def cards(self):
+        if self.child:
+            return ([self.child] + self.child.children)
+        else:
+            return []
+
+    @property
+    def tail(self):
+        if self.child:
+            return self.cards[-1]
 
 
 
