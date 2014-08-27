@@ -72,7 +72,7 @@ class ORIENTATION(g.Enum):
 class Deck(pygame.sprite.LayeredDirty):
     ''' A collection of cards '''
 
-    def __init__(self, theme=None, cardsize=(), proportional=True):
+    def __init__(self, theme=None):
         super(Deck, self).__init__()
 
         # theme can be either a name or an instance of themes.Theme
@@ -83,26 +83,16 @@ class Deck(pygame.sprite.LayeredDirty):
             theme = theme or g.theme
             self.theme = themes.themes.get(theme, None)
 
-        if self.theme:
-            self.surface = self.theme.render(cardsize, proportional)
-            size = self.surface.get_size()
-            self.cardsize = (size[0] / 13,
-                             size[1] /  5)
-        else:
+        if not self.theme:
             log.warn("Theme '%s' not found. Cards will not be drawable", theme)
-            self.surface = None
-            self.cardsize = ()
+
+        self.cardsize = ()
+        self.surface = None
+        self.back = None
 
         # Set the cards
         self.cards = []
         self.cardsdict = {}
-
-        # Special cards
-        if self.surface:
-            self.back = self.surface.subsurface(pygame.Rect(
-                (2 * self.cardsize[0],
-                 4 * self.cardsize[1]),
-                self.cardsize))
 
     def card(self, rank=0, suit=0):
         ''' Return a Card of the given rank and suit '''
@@ -132,9 +122,26 @@ class Deck(pygame.sprite.LayeredDirty):
         for card in self.cards:
             card.pop()
 
-    def resize(self, cardsize):
+    def resize(self, maxcardsize=(), proportional=True):
+        if not self.theme:
+            self.cardsize = ()
+            self.surface = None
+            self.back = None
+            return
+
+        self.surface = self.theme.render(maxcardsize, proportional)
+        size = self.surface.get_size()
+        self.cardsize = (size[0] / 13,
+                         size[1] /  5)
+        self.back = self.surface.subsurface(pygame.Rect(
+            (2 * self.cardsize[0],
+             4 * self.cardsize[1]),
+            self.cardsize))
+
         for card in self.cards:
-            card.resize(cardsize)
+            card.resize(self.cardsize)
+
+        return self.cardsize
 
 
 class Card(pygame.sprite.DirtySprite):
@@ -172,28 +179,36 @@ class Card(pygame.sprite.DirtySprite):
 
         self._drag_offset = self._drag_start_pos = ()
 
-        if not self.deck.surface:
-            self.rect = pygame.Rect(position, (0, 0))
-            self.image = pygame.Surface((0, 0))
-            return
-
-        self.rect = pygame.Rect(position, self.deck.cardsize)
-        imgrect = pygame.Rect(((self.rank - 1) * self.rect.width,
-                               (self.suit - 1) * self.rect.height),
-                              (self.rect.width, self.rect.height))
-        self.cardimage = self.deck.surface.subsurface(imgrect)
+        self.rect = pygame.Rect(position, (0, 0))
 
         self._faceup = faceup
-        if self._faceup:
-            self.image = self.cardimage
-        else:
-            self.image = self.deck.back
+
+        # to be defined in resize()
+        self.cardimage = None
 
     def __repr__(self):
         return "<%s(rank=%2d, suit=%r)>" % (
             self.__class__.__name__, self.rank, self.suit)
 
     def resize(self, cardsize):
+        # FIXME: must also receive or recalculate position based on old position!!! But how?
+
+        self.rect.size = cardsize
+
+        if not self.deck.surface:
+            self.cardimage = None
+            return
+
+        imgrect = pygame.Rect(((self.rank - 1) * self.rect.width,
+                               (self.suit - 1) * self.rect.height),
+                              (self.rect.width, self.rect.height))
+        self.cardimage = self.deck.surface.subsurface(imgrect)
+
+        if self._faceup:
+            self.image = self.cardimage
+        else:
+            self.image = self.deck.back
+
         self.dirty = 1
 
     def start_drag(self, mouse_pos):

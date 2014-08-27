@@ -63,7 +63,7 @@ class Quit(Exception):
 
 class Gui(object):
     def __init__(self):
-        self.game = gamerules.load_game(g.gamename, g.playarea)
+        self.game = gamerules.load_game(g.gamename)
 
         self.pos = None
         self.card = None
@@ -75,6 +75,8 @@ class Gui(object):
         self.cursorname = 'default'
 
         self.spritegroups = [self.game.deck]
+
+        self.resize(g.window_size)
         self.game.new_game()
 
     def handle_events(self):
@@ -112,9 +114,7 @@ class Gui(object):
             raise Quit
 
         if event.type == pygame.VIDEORESIZE:
-            graphics.resize(event.size)
-            game.deck.resize(g.cardsize)
-            game.resize(g.playarea)
+            self.resize(event.size)
 
         if event.type == pygame.KEYDOWN:
             if event.key in [pygame.K_RETURN, pygame.K_KP_ENTER]:
@@ -218,3 +218,16 @@ class Gui(object):
             pygame.mouse.set_cursor(*(g.cursors[cursorname]))
             log.debug("Update cursor to %s", cursorname)
             self.cursorname = cursorname
+
+    def resize(self, size):
+        playarea = graphics.resize(size)
+        cellsize = self.game.resize(playarea)
+        maxcardsize = (cellsize[0] - g.MARGIN[0],
+                       cellsize[1] - g.MARGIN[1])
+        cardsize = self.game.deck.resize(maxcardsize)
+        g.slot.resize(cardsize)
+        for slot in self.game.slots:
+            slot.rect.size = cardsize
+            slot.image = g.slot.surface
+            g.background.surface.blit(g.slot.surface, slot.rect)
+        self.clear = True

@@ -103,7 +103,7 @@ class Slot(object):
         if size:
             self.resize(size)
 
-    def resize(self, size):
+    def resize(self, size=()):
         self.surface = render_vector(self.original, size)
 
 
@@ -123,12 +123,11 @@ def init_graphics():
 
     g.background = Background()
     g.slot = Slot()
-    resize(g.window_size)
 
 
 def resize(size):
     # Set the screen
-    flags = 0  # pygame.RESIZABLE
+    flags = pygame.RESIZABLE
     if g.fullscreen:
         log.debug("Setting fullscreen, desktop resolution (%s, %s)",
                   pygame.display.Info().current_w,
@@ -146,15 +145,17 @@ def resize(size):
     # Display the initial window soon as possible, as other elements may take a while
     pygame.display.update()
 
-    g.playarea = pygame.Rect(g.MARGIN, (g.window_size[0] - g.MARGIN[0],
-                                        g.window_size[1] - g.MARGIN[1]))
+    playarea = pygame.Rect(g.MARGIN, (g.window_size[0] - g.MARGIN[0],
+                                      g.window_size[1] - g.MARGIN[1]))
+
+    return playarea
 
     # Card height is fixed: 4 cards + margins (top, bottom, 3 between)
     # Card width is free to adjust itself proportionally, according to theme aspect ratio
     # Actual card size is only defined when cards.Deck() renders the theme SVG
-    g.cardsize = (g.window_size[0], (g.window_size[1] - 5 * g.MARGIN[1]) / 4)
+    #g.cardsize = (g.window_size[0], (g.window_size[1] - 5 * g.MARGIN[1]) / 4)
 
-    g.slot.resize(g.cardsize)
+    #g.slot.resize(g.cardsize)
 
 
 def render(spritegroups):

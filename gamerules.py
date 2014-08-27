@@ -34,18 +34,18 @@ import cards
 log = logging.getLogger(__name__)
 
 
-def load_game(gamename, playarea):
+def load_game(gamename):
     if gamename == "klondike":
-        return Klondike(playarea)
+        return Klondike()
 
 
 class Game(object):
     def __init__(self):
         self.slots = pygame.sprite.Group()
-        self.deck = cards.Deck(g.theme, g.cardsize)
+        self.deck = cards.Deck(g.theme)
 
     def resize(self, playarea):
-        '''Resize a the game to <playarea>'''
+        '''Resize a the game to <playarea>, return cellsize'''
         self.cellsize = (playarea.width  / self.grid[0],
                          playarea.height / self.grid[1])
 
@@ -54,10 +54,10 @@ class Game(object):
                         playarea.y + slot.cell[1] * self.cellsize[1])
 
             slot.rect.topleft = position
-            slot.rect.size = g.cardsize
-            g.background.surface.blit(g.slot.surface, position)
             if not slot.empty:
                 slot.head.place(slot)
+
+        return self.cellsize
 
     def create_slot(self, *slotargs, **slotkwargs):
         '''Create a game slot. See cards.Slot for arguments'''
@@ -88,7 +88,7 @@ class Game(object):
 
 
 class Klondike(Game):
-    def __init__(self, playarea, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(Klondike, self).__init__(*args, **kwargs)
 
         self.grid = (7, 4)  # size of play area, measured in card "cells"
@@ -106,8 +106,6 @@ class Klondike(Game):
             self.tableau.append(self.create_slot((i, 1),
                                                  cards.ORIENTATION.DOWN,
                                                  rank=cards.RANK.ACE-1))
-
-        self.resize(playarea)
 
         self.deck.create_cards(faceup=False)
 
