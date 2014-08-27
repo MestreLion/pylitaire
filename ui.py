@@ -43,11 +43,12 @@ import pygame
 import g
 import graphics
 import gamerules
+import enum
 
 log = logging.getLogger(__name__)
 
 
-class MOUSEBUTTONS(g.Enum):
+class MOUSEBUTTONS(enum.Enum):
     '''Pygame mouse buttons'''
     NONE      = None
     LEFT      = 1

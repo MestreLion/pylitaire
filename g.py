@@ -61,38 +61,6 @@ doubleclicklimit = 400
 gamename = "yukon"
 
 
-class Enum(object):
-    ''' A basic implementation of Enums in Python '''
-
-    @classmethod
-    def name(cls, value):
-        ''' Quick-and-dirty fallback for getting the "name" of an enum item
-            Enums can customize the name by overwriting this method
-        '''
-
-        # value as string, if it matches an enum attribute.
-        # Allows short usage as Enum.name("VALUE") besides Enum.name(Enum.VALUE)
-        if hasattr(cls, str(value)):
-            return cls.name(getattr(cls, value, None))
-
-        # value not handled in subclass name()
-        for k, v in cls.__dict__.items():
-            if v == value:
-                return k.replace('_', ' ').title()
-
-        # value not found
-        raise KeyError("Value '%s' not found in enum '%s'" %
-                       (value, cls.__name__))
-
-    class _meta(type):
-        def __iter__(self):  # "self" for a metaclass refers to classes, not instances
-            for name, value in sorted(self.__dict__.items(), key=lambda _: _[1]):
-                if (not name.startswith("_") and
-                    not name in ['name'] + getattr(self, '__non_members__', [])):
-                    yield value
-    __metaclass__ = _meta
-
-
 def datadirs(dirname):
     '''Return a list of game relevant data directories, useful for finding data
         files such as themes as images

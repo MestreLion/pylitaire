@@ -25,11 +25,12 @@ import pygame
 
 import g
 import themes
+import enum
 
 log = logging.getLogger(__name__)
 
 
-class RANK(g.Enum):
+class RANK(enum.Enum):
     '''Card ranks'''
     ACE   =  1
     TWO   =  2
@@ -46,7 +47,7 @@ class RANK(g.Enum):
     KING  = 13
 
 
-class SUIT(g.Enum):
+class SUIT(enum.Enum):
     '''Card suits'''
     CLUBS    = 1
     DIAMONDS = 2
@@ -54,13 +55,13 @@ class SUIT(g.Enum):
     SPADES   = 4
 
 
-class COLORS(g.Enum):
+class COLORS(enum.Enum):
     '''Card "color". Black for Clubs and Spades, Red for Diamonds and Hearts'''
     BLACK = 1
     RED   = 2
 
 
-class ORIENTATION(g.Enum):
+class ORIENTATION(enum.Enum):
     '''Stack orientation of a card in relation to its parent'''
     NONE  = None    # Do not snap
     KEEP  = ()      # Keep the same orientation of the parent
