@@ -31,15 +31,13 @@ import cards
 log = logging.getLogger(__name__)
 
 
+_games = {}
+
 def load_game(gamename):
-    def find_class(base, name):
-        for cls in base.__subclasses__():
-            if cls.__name__.lower() == name:
-                return cls
-            result = find_class(cls, name)
-            if result:
-                return result
-    gameclass = find_class(Game, gamename)
+    if not _games:
+        load_games()
+
+    gameclass = _games.get(gamename, None)
     if not gameclass:
         log.error("Game '%s' not found", gamename)
         return
@@ -47,6 +45,15 @@ def load_game(gamename):
     game = gameclass()
     log.info("Loading game '%s'", game.name)
     return game
+
+
+def load_games():
+    def list_classes(base):
+        for cls in base.__subclasses__():
+            _games[cls.__name__.lower()] = cls
+            list_classes(cls)
+    list_classes(Game)
+    return _games
 
 
 class Game(object):
