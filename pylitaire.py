@@ -55,7 +55,8 @@ def main(*argv):
     while run:
         run = gui.handle_events()
         gui.update()
-        graphics.render(gui.spritegroups)
+        graphics.render(gui.spritegroups, gui.clear)
+        gui.clear = False
 
         if g.profile:
             return True

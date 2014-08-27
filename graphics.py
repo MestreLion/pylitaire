@@ -158,8 +158,12 @@ def resize(size):
     #g.slot.resize(g.cardsize)
 
 
-def render(spritegroups):
+def render(spritegroups, clear=False):
     dirty = []
+
+    if clear:
+        g.background.draw(g.window)
+        dirty = [g.window.get_rect()]
 
     for group in spritegroups:
         group.clear(g.window, g.background.surface)
