@@ -41,13 +41,14 @@ def load_game(gamename):
 
 class Game(object):
     def __init__(self):
-        self.slots = pygame.sprite.Group()
+        self.grid = (0, 0)
+        self.slots = []
         self.deck = cards.Deck(g.theme)
 
     def create_slot(self, *slotargs, **slotkwargs):
         '''Create a game slot. See cards.Slot for arguments'''
         slot = cards.Slot(*slotargs, **slotkwargs)
-        self.slots.add(slot)
+        self.slots.append(slot)
         return slot
 
     def new_game(self):
