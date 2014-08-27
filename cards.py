@@ -76,16 +76,9 @@ class Deck(pygame.sprite.LayeredDirty):
     def __init__(self, theme=None):
         super(Deck, self).__init__()
 
-        # theme can be either a name or an instance of themes.Theme
-        # self.theme is always an instance
-        if isinstance(theme, themes.Theme):
-            self.theme = theme
-        else:
-            theme = theme or g.theme
-            self.theme = themes.themes.get(theme, None)
-
-        if not self.theme:
-            log.warn("Theme '%s' not found. Cards will not be drawable", theme)
+        self.theme = theme
+        if theme:
+            self.set_theme(theme)
 
         self.cardsize = ()
         self.surface = None
@@ -94,6 +87,21 @@ class Deck(pygame.sprite.LayeredDirty):
         # Set the cards
         self.cards = []
         self.cardsdict = {}
+
+    def set_theme(self, theme):
+        '''Set the card theme for the deck.
+            <theme> can be either an instance of themes.Theme
+            or a key name, looked up in themes.themes dict,
+            theme attribute will always be set as instance, if any
+        '''
+        # FIXME: changing theme could trigger a .resize()
+        if isinstance(theme, themes.Theme):
+            self.theme = theme
+        else:
+            self.theme = themes.themes.get(theme or g.theme, None)
+
+        if not self.theme:
+            log.warn("Theme '%s' not found. Cards will not be drawn", theme)
 
     def card(self, rank=0, suit=0):
         ''' Return a Card of the given rank and suit '''
