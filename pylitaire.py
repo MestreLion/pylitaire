@@ -27,9 +27,7 @@ import pygame
 
 import g
 import graphics
-import cards
 import themes
-import gamerules
 import ui
 
 log = logging.getLogger(__name__)
@@ -50,20 +48,14 @@ def main(*argv):
     graphics.init_graphics()
     themes.init_themes()
 
-    deck = cards.Deck(g.theme, g.cardsize)
-    game = gamerules.Klondike(g.playarea, deck)
-    game.new_game()
-
-    gui = ui.Gui(game)
+    gui = ui.Gui()
 
     clock = pygame.time.Clock()
     run = True
     while run:
         run = gui.handle_events()
-
         gui.update()
-        deck.update()
-        graphics.render([deck])
+        graphics.render(gui.spritegroups)
 
         if g.profile:
             return True

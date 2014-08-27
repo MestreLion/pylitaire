@@ -15,8 +15,14 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program. See <http://www.gnu.org/licenses/gpl.html>
-#
-# Game rules and logic
+
+'''Game rules and logic
+
+Design notes:
+- Game rules should be decoupled from pygame, graphics, and, if possible, g
+- Talks to Deck/Card only via API, but should not rely on its implementation internals
+- Talks to GUI only via high-level events such as `click(card)`, `drop(card)`, etc
+'''
 
 import logging
 
@@ -28,10 +34,15 @@ import cards
 log = logging.getLogger(__name__)
 
 
+def load_game(gamename, playarea):
+    if gamename == "klondike":
+        return Klondike(playarea)
+
+
 class Game(object):
-    def __init__(self, deck):
+    def __init__(self):
         self.slots = pygame.sprite.Group()
-        self.deck = deck
+        self.deck = cards.Deck(g.theme, g.cardsize)
 
     def resize(self, playarea):
         '''Resize a the game to <playarea>'''
@@ -77,8 +88,8 @@ class Game(object):
 
 
 class Klondike(Game):
-    def __init__(self, playarea, deck, *args, **kwargs):
-        super(Klondike, self).__init__(deck, *args, **kwargs)
+    def __init__(self, playarea, *args, **kwargs):
+        super(Klondike, self).__init__(*args, **kwargs)
 
         self.grid = (7, 4)  # size of play area, measured in card "cells"
 
