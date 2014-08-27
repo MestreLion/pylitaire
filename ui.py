@@ -228,6 +228,7 @@ class Gui(object):
         maxcardsize = (cellsize[0] - g.MARGIN[0],
                        cellsize[1] - g.MARGIN[1])
 
+        self.game.deck.set_theme(g.theme)
         cardsize = self.game.deck.resize(maxcardsize)
 
         g.slot.resize(cardsize)

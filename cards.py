@@ -23,7 +23,6 @@ import random
 
 import pygame
 
-import g
 import themes
 import enum
 
@@ -98,7 +97,7 @@ class Deck(pygame.sprite.LayeredDirty):
         if isinstance(theme, themes.Theme):
             self.theme = theme
         else:
-            self.theme = themes.themes.get(theme or g.theme, None)
+            self.theme = themes.themes.get(theme, None)
 
         if not self.theme:
             log.warn("Theme '%s' not found. Cards will not be drawn", theme)
@@ -437,8 +436,8 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     pygame.init()
     clock = pygame.time.Clock()
-    window = pygame.display.set_mode(g.window_size)
-    window.fill(g.BGCOLOR)
+    window = pygame.display.set_mode((800, 600))
+    window.fill((0, 80, 16))
     pygame.display.update()
     themes.init_themes()
 
