@@ -1,14 +1,17 @@
-Brainstorm of new features and code ideas
-Loosely ordered from "hanging fruits easy to do" to "deep stuff"
+Brainstorm of new features and code ideas, in no particular order
 
 - "blue mask" highlight when dragging card over a droppable area
 
-- Slots could perhaps be special cards handled by Game: they resize the same, also need collision detection
-  with cards, have a highlight, etc. Or be handled separately from GUI
+- Integrate cards.Slot with graphics.Slot
 
-- Stacks can either be a simple (card.parent + card.child) chain in Card, handled by themselves, or an Class
-  with head, tail, sprite, orientation, etc. If entity, could also represent slots: everything would be a stack
-  empty stacks have slot rect, full stacks have rect.union(*card.rect). Would also handle expand/shrink height
+- Expand/shrink stack height. Will require a revamp of ALIGN/ORIENTATION model. snap_offset cannot be class member
+
+- Instructions splash
+
+- Concept idea: cards are always in a slot. will make GUI/gamerules API a LOT simpler!
+
+- Allow drop on tail when card collide with any card of stack (highlight the tail). Will perhaps require either
+	stack/slot.rect = rect.union(*card.rect) or the "all cards have a slot" model
 
 - Idea for Enum: metaclass special *value* NONE (==None). Any member with this value is excluded from iterations.
   Enums define their own NONE *member*, if they want to, as NONE = Enum.NONE
@@ -24,21 +27,18 @@ Loosely ordered from "hanging fruits easy to do" to "deep stuff"
 	center and original also fill the background first
 	all file-based modes fallback to FILLCOLOR if file is not found
 
+- Background, Theme and Slot should handle both vector and non-vector images, and deal appropriately (original/render)
+
 - TAB to load next theme. Show off, I know :)
 
-- Resize
-	main loop triggers graphics.resize(pygame.VIDEOSIZE, game)
-	graphics.resize() do:
-		g.window_size = size
-		rebuild g.window
-		g.background.resize(g.window_size)
-		new playarea and cardsize
-		g.slot.resize(cardsize)
-		game.deck.resize(cardsize)
-		game.resize(playarea)
-		all known elements (menu, etc)
-		for each object, object.resize()
-	Deck.resize() - re-render svg and update each card rect
+- F1..Fn to select games
+
+- Deck.set_theme should trigger resize() if cardsize is not the same. That would require storing maxcardsize I guess
+	But if IS the same, blit on self.surface instead of re-assigning it
+
+- create install: .desktop, shell script, setup.py, debian/ dir, PPA
+
+- Change iconset due to conflicting licensing
 
 - Config file
 	have a template at data/, use  it for factory defaults, copy to CONFIGDIR if not there
@@ -59,6 +59,10 @@ Loosely ordered from "hanging fruits easy to do" to "deep stuff"
 	fullscreen (boolean)
 	fullscreen_resolution (tuple, empty for desktop)
 
+	[game]
+	gamename
+	game options?
+
 - Find a way to set all modules logging level without messing with root logger if main was imported
   Not sure if this is feasible (or needed) at all. Perhaps only when (and IF) I move all source to a
   package. And that's one huge IF ;)
@@ -66,14 +70,17 @@ Loosely ordered from "hanging fruits easy to do" to "deep stuff"
 - create statusbar (bottom), menu+info (at right side, a la arkanoid, or perhaps as button bar on top)
   gui module controls them, widgets register callbacks for certain events
 
+- statusbar: timer, score
+
+- double-click on foundation (slot or card) bring all possible cards
+
 - use custom exceptions to signal events from UI to Main loop/render: Quit, ClearScreen, etc.
   the ones who were formerly boolean flags such as done, clear
 
 - Keep track of cards movements, and BACKSPACE to undo
 
-- Cards "falling/bouncing" when win, a la Windows 3.1 Solitaire
+- Cards "falling/bouncing" when win, a la Windows 3.1 Solitaire. Well, *ANY* "You Win" would be great for now!
+
+- "No more moves" detection
 
 - Rename the project to Pyukon Solitaire. Perhaps Pyleriot, given the artwork and behavior :)
-  Also, game module seems to be pretty decoupled, and Yukon class easily modifiable to other games
-
-- Make a working game (getting closer now!) :)
