@@ -74,8 +74,8 @@ class Game(object):
 
 
 class Klondike(Game):
-    def __init__(self, *args, **kwargs):
-        super(Klondike, self).__init__(*args, **kwargs)
+    def __init__(self):
+        super(Klondike, self).__init__()
 
         self.grid = (7, 4)  # size of play area, measured in card "cells"
 
@@ -84,16 +84,15 @@ class Klondike(Game):
 
         self.foundations = []
         for i in xrange(self.grid[0] - 4, self.grid[0]):
-            self.foundations.append(self.create_slot((i, 0),
-                                                     rank=cards.RANK.ACE-1))
+            self.foundations.append(self.create_slot((i, 0)))
 
         self.tableau = []
         for i in xrange(self.grid[0]):
             self.tableau.append(self.create_slot((i, 1),
-                                                 cards.ORIENTATION.DOWN,
-                                                 rank=cards.RANK.ACE-1))
+                                                 cards.ORIENTATION.DOWN))
 
-        self.deck.create_cards(faceup=False)
+        self.deck.create_cards(doubledeck=False, jokers=0, faceup=False)
+
 
     def reset(self):
         '''Called once per game, either new one or restart same game'''
