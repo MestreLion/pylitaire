@@ -403,12 +403,20 @@ class Slot(pygame.sprite.DirtySprite):
         It has a <rect> for positioning but no <image> since all slots share
         the same image that is only drawn onto background once per resize
     '''
-
-    def __init__(self, cell=(0, 0), orientation=ORIENTATION.PILE,
-                 rank=-1, suit=-1, overlap=(0.2, 0.2)):
-        '''Create slot at position <cell>, a (cx, cy) tuple in game grid units,
-            each game grid cell has (cardsize + margins) size.
-            Cards dropped will stack with <orientation>
+    def __init__(self,
+                 cell=(0, 0),
+                 orientation=ORIENTATION.PILE,
+                 overlap=(0.2, 0.2),
+                 position=(0, 0),
+                 size=(0, 0),
+                 rank=-1,
+                 suit=-1):
+        '''Create slot at position <cell>, a (cx, cy) tuple in game grid units
+            logic units, each cell sized card size + margins. Useful for
+            repositioning the slot according to board geometry.
+            <position>, as opposed to <cell>, is an absolute (x, y) position
+            inside the window. <size> is (x, y), should be set to card size.
+            Cards dropped will stack with <orientation> and <overlap>.
             <rank> and <suit> can be useful when creating rules for dropping
             cards: usually rank is RANK.ACE - 1 for foundation and
             RANK.KING + 1 for tableau
@@ -422,28 +430,42 @@ class Slot(pygame.sprite.DirtySprite):
         self.overlap = overlap
 
         self.child = None  # Card instance, set by card on place()
-        self.rect = pygame.sprite.Rect(0, 0, 0, 0)  # size and position will be set by game.resize()
+        self.rect = pygame.sprite.Rect(position, size)
         self.image = None  # will not be drawn as a sprite
+
+    def resize(self, cardsize):
+        '''Resize the slot to <cardsize> (width, height)'''
+        self.rect.size = cardsize
+
+    def move(self, position):
+        '''Move the slot to an absolute (x, y) window position'''
+        self.rect.topleft = position
 
     @property
     def empty(self):
+        '''Return True if the stack is empty'''
         return not self.child
 
     @property
     def head(self):
+        '''Return the stack top card (ie, bottom layer), if any'''
         return self.child
-
-    @property
-    def cards(self):
-        if self.child:
-            return ([self.child] + self.child.children)
-        else:
-            return []
+    top = head
 
     @property
     def tail(self):
+        '''Return the stack tip card (ie, topmost layer), if any'''
         if self.child:
             return self.cards[-1]
+    tip = tail
+
+    @property
+    def cards(self):
+        '''Return a list of all cards in this slot, in stack order'''
+        if self.child:
+            return [self.child] + self.child.children
+        else:
+            return []
 
 
 
