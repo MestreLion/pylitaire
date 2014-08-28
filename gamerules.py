@@ -260,3 +260,84 @@ class Pylitaire(Yukon):
 
     def reset(self):
         super(Pylitaire, self).reset(2, 0)
+
+
+class Backbone(Game):
+    def __init__(self):
+        super(Backbone, self).__init__()
+
+        self.grid = (8, 4)
+
+        self.stock = self.create_slot((5, 2))
+        self.waste = self.create_slot((6, 2))
+
+        self.foundations = []
+        for i in xrange(8):
+            self.foundations.append(self.create_slot((4 + i%4, i/4)))
+
+        self.tableau = []
+        for i in xrange(8):
+            self.tableau.append(self.create_slot((3 * (i/4), i%4)))
+
+        self.backbone = []
+        for i in xrange(18):
+            self.backbone.append(self.create_slot((1 + i/9, 0.33 * (i%9))))
+        self.backbone.append(self.create_slot((1.5, 3)))
+
+        self.deck.create_cards(doubledeck=True)
+
+    def reset(self):
+        c = 0
+        for slot in self.tableau + self.backbone:
+            card = self.deck.cards[c]
+            card.place(slot)
+            card.flip(True)
+            c += 1
+
+        card = self.deck.cards[c]
+        card.place(self.stock)
+        card.flip(False)
+
+        c += 1
+        for card in self.deck.cards[c:]:
+            card.stack(self.deck.cards[c-1])
+            card.flip(False)
+            c += 1
+
+    def click(self, card):
+        if card in self.slots:
+            if card is self.stock and not self.waste.empty:
+                cards = self.waste.cards[::-1]
+                for c, card in enumerate(cards):
+                    if c == 0:
+                        card.place(self.stock)
+                    else:
+                        card.stack(cards[c-1])
+                    card.flip()
+                return True
+
+        elif card.is_tail and not card.faceup:
+            if card.slot is self.stock:
+                if self.waste.empty:
+                    card.place(self.waste)
+                else:
+                    card.stack(self.waste.tail)
+            card.flip()
+            return True
+
+    def doubleclick(self, card):
+        return
+
+    def drop(self, card, target):
+        if target in self.slots:
+            card.place(target)
+        else:
+            card.stack(target)
+
+    def draggable(self, card):
+        return (card not in self.slots
+                and card.slot in self.tableau + [self.waste, self. backbone[-1]])
+                # and not card.slot in self.foundations
+
+    def droppable(self, card, targets):
+        return []
