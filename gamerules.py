@@ -150,8 +150,8 @@ class Klondike(Game):
                     card.flip()
                 return True
 
-        elif card.stacktail and not card.faceup:
-            if card.headslot is self.stock:
+        elif card.is_tail and not card.faceup:
+            if card.slot is self.stock:
                 if self.waste.empty:
                     card.place(self.waste)
                 else:
@@ -189,7 +189,7 @@ class Klondike(Game):
         '''
         return (card not in self.slots
                 and card.faceup)
-                # and not card.headslot in self.foundations
+                # and not card.slot in self.foundations
 
     def droppable(self, card, targets):
         '''Return a subset of <targets> that are valid drop cards for <card>'''
@@ -201,27 +201,25 @@ class Klondike(Game):
                 if not target.empty:
                     continue
                 if target in self.foundations:
-                    if card.stacktail and card.rank == cards.RANK.ACE:
+                    if card.is_tail and card.rank == cards.RANK.ACE:
                         droplist.append(target)
                 elif target in self.tableau:
                     if card.rank == cards.RANK.KING:
                         droplist.append(target)
                 continue
 
-            headslot = target.headslot
-
             # dropping to card in foundation
-            if headslot in self.foundations:
-                if (card.stacktail
-                    and target.stacktail
+            if target.slot in self.foundations:
+                if (card.is_tail
+                    and target.is_tail
                     and target.suit == card.suit
                     and target.rank == card.rank - 1):
                     droplist.append(target)
 
-            # droppping to card in tableau
-            elif headslot in self.tableau:
+            # dropping to card in tableau
+            elif target.slot in self.tableau:
                 if (target.faceup
-                    and target.stacktail
+                    and target.is_tail
                     and target.color != card.color
                     and target.rank == card.rank + 1):
                     droplist.append(target)

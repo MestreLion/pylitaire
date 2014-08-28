@@ -395,22 +395,14 @@ class Card(pygame.sprite.DirtySprite):
             return []
 
     @property
-    def stacktail(self):
+    def is_tail(self):
         '''Return True if card is the tail (leaf) of its current stack'''
         return not self.child
 
     @property
-    def stackhead(self):
+    def is_head(self):
         '''Return True if card is the head (root) of its current stack'''
         return not self.parent
-
-    @property
-    def headslot(self):
-        '''Return the slot, if any, of the stack head card'''
-        if self.parent:
-            return self.parent.headslot
-        else:
-            return self.slot
 
 
 class Slot(pygame.sprite.DirtySprite):
