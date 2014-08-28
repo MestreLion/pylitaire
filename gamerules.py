@@ -235,36 +235,30 @@ class Yukon(Klondike):
         self.slots.remove(self.stock)
         self.slots.remove(self.waste)
 
-    def reset(self):
+    def reset(self, e=4, j=1):
+        '''Parametrized to be variation-friendly:
+            <e>: extra cards in each column
+            <j>: start column for extra cards
+        '''
         super(Yukon, self).reset()
-        e = 4  # extra cards in each but the first column
         i = 0
         while not self.stock.empty:
             card = self.stock.tail
             card.flip(True)
-            card.stack(self.tableau[1 + i/e].tail)
+            card.stack(self.tableau[j + i/e].tail)
             i += 1
 
 
-class Pylitaire(Klondike):
+class Pylitaire(Yukon):
     '''Yukon variation: 8 tableau slots with 2 extra open cards in each
         (including the first tableau slot)
     '''
     def __init__(self):
         super(Pylitaire, self).__init__()
-        self.slots.remove(self.stock)
-        self.slots.remove(self.waste)
         self.grid = (8, 4)
         self.tableau.append(self.create_slot((7, 1), cards.ORIENTATION.DOWN))
         for foundation in self.foundations:
             foundation.cell = (foundation.cell[0] + 1, 0)
 
     def reset(self):
-        super(Pylitaire, self).reset()
-        e = 2  # extra cards in each column
-        i = 0
-        while not self.stock.empty:
-            card = self.stock.tail
-            card.flip(True)
-            card.stack(self.tableau[i/e].tail)
-            i += 1
+        super(Pylitaire, self).reset(2, 0)
