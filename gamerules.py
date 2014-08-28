@@ -282,13 +282,19 @@ class Backbone(Game):
         self.backbone = []
         for i in xrange(18):
             self.backbone.append(self.create_slot((1 + i/9, 0.33 * (i%9))))
-        self.backbone.append(self.create_slot((1.5, 3)))
+
+        for i, slot in enumerate(self.backbone[:-1]):
+            slot.blockedby = self.backbone[i+1]
+
+        self.block = self.create_slot((1.5, 3))
+        for i in [8, 17]:
+            self.backbone[i].blockedby = self.block
 
         self.deck.create_cards(doubledeck=True)
 
     def reset(self):
         c = 0
-        for slot in self.tableau + self.backbone:
+        for slot in self.tableau + self.backbone + [self.block]:
             card = self.deck.cards[c]
             card.place(slot)
             card.flip(True)
@@ -326,7 +332,20 @@ class Backbone(Game):
             return True
 
     def doubleclick(self, card):
-        return
+        if card in self.slots or card.slot in self.foundations:
+            return
+
+        targets = []
+        for slot in self.foundations:
+            if slot.empty:
+                targets.append(slot)
+            else:
+                targets.append(slot.tail)
+
+        droplist = self.droppable(card, targets)
+        if droplist:
+            self.drop(card, droplist[0])
+            return True
 
     def drop(self, card, target):
         if target in self.slots:
@@ -336,8 +355,39 @@ class Backbone(Game):
 
     def draggable(self, card):
         return (card not in self.slots
-                and card.slot in self.tableau + [self.waste, self. backbone[-1]])
+                and not (card.slot is self.stock
+                         or (card.slot in self.backbone
+                             and not card.slot.blockedby.empty)))
                 # and not card.slot in self.foundations
 
     def droppable(self, card, targets):
-        return []
+        droplist = []
+        for target in targets:
+
+            # dropping to a slot
+            if target in self.slots:
+                if not target.empty:
+                    continue
+                if target in self.foundations:
+                    if card.is_tail and card.rank == cards.RANK.ACE:
+                        droplist.append(target)
+                elif target in self.tableau:
+                        droplist.append(target)
+                continue
+
+            # dropping to card in foundation
+            elif target.slot in self.foundations:
+                if (card.is_tail
+                    and target.is_tail
+                    and target.suit == card.suit
+                    and target.rank == card.rank - 1):
+                    droplist.append(target)
+
+            # dropping to card in tableau
+            elif target.slot in self.tableau:
+                if (target.is_tail
+                    and target.suit == card.suit
+                    and target.rank == card.rank + 1):
+                    droplist.append(target)
+
+        return droplist
