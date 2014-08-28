@@ -303,7 +303,7 @@ class Card(pygame.sprite.DirtySprite):
         '''Send the card back to its original Z-Order'''
         pass
 
-    def stack(self, card, orientation=ORIENTATION.KEEP):
+    def stack(self, card, orientation=ORIENTATION.KEEP, overlap=()):
         '''Snap to <card> as a child, forming a stack'''
         if card is self:
             log.warn("Trying to stack %s with itself", self)
@@ -329,7 +329,7 @@ class Card(pygame.sprite.DirtySprite):
         if orientation == ORIENTATION.KEEP:
             orientation = self.parent.orientation
         self.orientation = orientation
-        self.snap(card, orientation)
+        self.snap(card, orientation, overlap)
 
     def pop(self):
         '''Disconnect from its parent, if any, slicing the stack'''
@@ -340,21 +340,23 @@ class Card(pygame.sprite.DirtySprite):
             self.parent.child = None
         self.parent = None
 
-    def snap(self, card, orientation=ORIENTATION.KEEP):
+    def snap(self, card, orientation=ORIENTATION.KEEP, overlap=()):
         '''Move the card to a position relative to another card,
             also recursively snap all children
         '''
         if orientation == ORIENTATION.KEEP:
             orientation = card.orientation
+        if not overlap:
+            overlap = self.snap_overlap
         if orientation != ORIENTATION.NONE:
-            self.move((card.rect.x + orientation[0] * self.snap_overlap[0] * card.rect.width,
-                       card.rect.y + orientation[1] * self.snap_overlap[1] * card.rect.height))
+            self.move((card.rect.x + orientation[0] * overlap[0] * card.rect.width,
+                       card.rect.y + orientation[1] * overlap[1] * card.rect.height))
         if self.child:
-            self.child.snap(self, orientation)
+            self.child.snap(self, orientation, overlap)
 
     def place(self, slot):
         '''Set the card to <slot>, moving it there and snapping all children
-            according to slot's orientation
+            according to slot's alignment (orientation and overlap)
         '''
         if slot.child and slot.child is not self:
             log.warn("Trying to place %s in a non-empty slot %s, first card is %s",
@@ -367,7 +369,7 @@ class Card(pygame.sprite.DirtySprite):
         self.orientation = self.slot.orientation
         self.move((self.slot.rect.x, self.slot.rect.y))
         if self.child:
-            self.child.snap(self, self.orientation)
+            self.child.snap(self, self.orientation, self.slot.overlap)
 
     @property
     def children(self):
@@ -403,7 +405,7 @@ class Slot(pygame.sprite.DirtySprite):
     '''
 
     def __init__(self, cell=(0, 0), orientation=ORIENTATION.PILE,
-                 rank=-1, suit=-1):
+                 rank=-1, suit=-1, overlap=(0.2, 0.2)):
         '''Create slot at position <cell>, a (cx, cy) tuple in game grid units,
             each game grid cell has (cardsize + margins) size.
             Cards dropped will stack with <orientation>
@@ -417,6 +419,7 @@ class Slot(pygame.sprite.DirtySprite):
         self.suit = suit
         self.cell = cell
         self.orientation = orientation
+        self.overlap = overlap
 
         self.child = None  # Card instance, set by card on place()
         self.rect = pygame.sprite.Rect(0, 0, 0, 0)  # size and position will be set by game.resize()
