@@ -26,6 +26,7 @@ Design notes:
 '''
 
 import logging
+import datetime
 
 import pygame
 
@@ -207,16 +208,19 @@ class Gui(object):
 
         if self.ticks > self.statustimer:
             self.statustimer = self.ticks + 1000
-            log.info("%s\t\tTime:%d\tScore:%5d",
+            log.info("%s\t\tTime:%s\tScore:%5d",
                      self.game.status(),
-                     self.ticks - self.gamestarttime,
+                     datetime.timedelta(seconds=(self.ticks -
+                                                 self.gamestarttime)/1000),
                      self.game.score())
+
 
     def set_mouse_cursor(self, cursorname):
         if cursorname != self.cursorname:
             pygame.mouse.set_cursor(*(g.cursors[cursorname]))
             log.debug("Update cursor to %s", cursorname)
             self.cursorname = cursorname
+
 
     def resize(self, size):
         '''Resize and re-position all elements according to new window <size>
@@ -248,6 +252,7 @@ class Gui(object):
             slot.draw(g.background.surface, g.slot.surface)
 
         self.clear = True
+
 
     def startgame(self, new=True):
         self.gamestarttime = self.ticks
