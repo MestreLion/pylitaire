@@ -410,7 +410,8 @@ class Slot(pygame.sprite.DirtySprite):
                  position=(0, 0),
                  size=(0, 0),
                  rank=-1,
-                 suit=-1):
+                 suit=-1,
+                 image=None):
         '''Create slot at position <cell>, a (cx, cy) tuple in game grid units
             logic units, each cell sized card size + margins. Useful for
             repositioning the slot according to board geometry.
@@ -420,6 +421,7 @@ class Slot(pygame.sprite.DirtySprite):
             <rank> and <suit> can be useful when creating rules for dropping
             cards: usually rank is RANK.ACE - 1 for foundation and
             RANK.KING + 1 for tableau
+            <image> is a pygame.Surface that can be used to draw() the slot
         '''
         super(Slot, self).__init__()
 
@@ -431,7 +433,7 @@ class Slot(pygame.sprite.DirtySprite):
 
         self.child = None  # Card instance, set by card on place()
         self.rect = pygame.sprite.Rect(position, size)
-        self.image = None  # will not be drawn as a sprite
+        self.image = image
 
     def resize(self, cardsize):
         '''Resize the slot to <cardsize> (width, height)'''
@@ -440,6 +442,26 @@ class Slot(pygame.sprite.DirtySprite):
     def move(self, position):
         '''Move the slot to an absolute (x, y) window position'''
         self.rect.topleft = position
+
+    def boardmove(self, geometry):
+        '''Reposition according to board <geometry> and current (logical) cell
+            grid position, moving its cards accordingly.
+            <geometry> is a pygame.Rect indicating the top left cell, ie, the
+            absolute position of cell (0, 0) and the board cell size.
+        '''
+        self.move((geometry.x + self.cell[0] * geometry.size[0],
+                   geometry.y + self.cell[1] * geometry.size[1]))
+        if self.child:
+            self.child.place(self)
+
+    def draw(self, destsurface, image=None):
+        '''Blit the slot to a destination <surface>.
+            If <image> is given, it will be used as the slot surface
+            and saved for future drawings
+        '''
+        if image:
+            self.image = image
+        destsurface.blit(self.image, self.rect)
 
     @property
     def empty(self):
