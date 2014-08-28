@@ -83,8 +83,7 @@ class Gui(object):
                               pygame.MOUSEBUTTONDOWN,
                               pygame.MOUSEBUTTONUP]:
                 self.pos = event.pos
-                self._update_card()
-                self.updatestatus = False
+                self._update_card(updatestatus=False)
             try:
                 self._handle_event(event, self.game)
             except Quit:
@@ -92,10 +91,10 @@ class Gui(object):
         return True
 
 
-    def _update_card(self, force_cursor_update=False):
+    def _update_card(self, force_cursor_update=False, updatestatus=True):
         '''Get the (possibly new) card under mouse position.
             Also, if card is different, flag to update the mouse cursor
-            In any case, flag to update the status bar message and score
+            By default also flag to update the status bar message and score
         '''
         card = self.game.get_top_card_or_slot(self.pos)
         # mouse cursor is never changed during drag, no matter what
@@ -103,7 +102,8 @@ class Gui(object):
         # moves out of dragged card
         if not self.dragcard and (force_cursor_update or card != self.card):
             self.updatecursor = True
-        self.updatestatus = True
+        if updatestatus:
+            self.updatestatus = True
         self.card = card
 
 
@@ -125,6 +125,8 @@ class Gui(object):
             and self.card):
 
             if event.button == MOUSEBUTTONS.LEFT:
+
+                self.gamestarttime = self.gamestarttime or self.ticks
 
                 if (self.card == self.doubleclickcard
                     and self.ticks < self.doubleclicktimer):
@@ -211,7 +213,7 @@ class Gui(object):
         for group in self.spritegroups:
             group.update()
 
-        if self.ticks > self.statustimer:
+        if self.gamestarttime and self.ticks > self.statustimer:
             self.updatestatus = True
             self.statustimer = self.ticks + 1000
 
@@ -262,7 +264,8 @@ class Gui(object):
 
 
     def startgame(self, new=True):
-        self.gamestarttime = self.ticks
+        self.gamestarttime = 0
+        self.updatestatus = True
         if new:
             self.game.new_game()
         else:
@@ -272,9 +275,20 @@ class Gui(object):
     def wingame(self):
         log.info("You win! Congratulations!")
 
+
     def update_statusbar(self):
+        gametime = self.gamestarttime and (self.ticks - self.gamestarttime)
+
         log.info("%s\t\tTime:%s\tScore:%5d",
                  self.game.status(),
-                 datetime.timedelta(seconds=(self.ticks -
-                                             self.gamestarttime)/1000),
+                 datetime.timedelta(seconds=gametime/1000),
                  self.game.score())
+
+
+class Widget(object):
+    pass
+
+
+class StatusBar(Widget):
+    def __init__(self, *args, *kwargs):
+        self
