@@ -67,6 +67,7 @@ class Gui(object):
         self.statustimer = 0
         self.ticks = 0
         self.gamestarttime = 0
+        self.updatestatus = False
         self.spritegroups = [self.game.deck]
 
         self.resize(g.window_size)
@@ -83,6 +84,7 @@ class Gui(object):
                               pygame.MOUSEBUTTONUP]:
                 self.pos = event.pos
                 self._update_card()
+                self.updatestatus = False
             try:
                 self._handle_event(event, self.game)
             except Quit:
@@ -93,6 +95,7 @@ class Gui(object):
     def _update_card(self, force_cursor_update=False):
         '''Get the (possibly new) card under mouse position.
             Also, if card is different, flag to update the mouse cursor
+            In any case, flag to update the status bar message and score
         '''
         card = self.game.get_top_card_or_slot(self.pos)
         # mouse cursor is never changed during drag, no matter what
@@ -100,7 +103,9 @@ class Gui(object):
         # moves out of dragged card
         if not self.dragcard and (force_cursor_update or card != self.card):
             self.updatecursor = True
+        self.updatestatus = True
         self.card = card
+
 
     def _handle_event(self, event, game):
         if (event.type == pygame.QUIT or
@@ -207,12 +212,12 @@ class Gui(object):
             group.update()
 
         if self.ticks > self.statustimer:
+            self.updatestatus = True
             self.statustimer = self.ticks + 1000
-            log.info("%s\t\tTime:%s\tScore:%5d",
-                     self.game.status(),
-                     datetime.timedelta(seconds=(self.ticks -
-                                                 self.gamestarttime)/1000),
-                     self.game.score())
+
+        if self.updatestatus:
+            self.updatestatus = False
+            self.update_statusbar()
 
 
     def set_mouse_cursor(self, cursorname):
@@ -260,3 +265,11 @@ class Gui(object):
             self.game.new_game()
         else:
             self.game.restart()
+
+
+    def update_statusbar(self):
+        log.info("%s\t\tTime:%s\tScore:%5d",
+                 self.game.status(),
+                 datetime.timedelta(seconds=(self.ticks -
+                                             self.gamestarttime)/1000),
+                 self.game.score())
