@@ -169,7 +169,8 @@ class Card(pygame.sprite.DirtySprite):
     snap_overlap = (0.2, 0.2)
 
     def __init__(self, rank, suit, deck=None,
-                 position=(0, 0), faceup=True, orientation=ORIENTATION.DOWN):
+                 position=(0, 0), faceup=True, orientation=ORIENTATION.DOWN,
+                 slot=None):
         super(Card, self).__init__()
 
         self.rank = rank
@@ -324,6 +325,7 @@ class Card(pygame.sprite.DirtySprite):
         # connect to new one
         self.parent = card
         self.parent.child = self
+        self._set_slot(self.parent.slot)
 
         # snap
         if orientation == ORIENTATION.KEEP:
@@ -332,10 +334,12 @@ class Card(pygame.sprite.DirtySprite):
         self.snap(card, orientation, overlap)
 
     def pop(self):
-        '''Disconnect from its parent, if any, slicing the stack'''
-        if self.slot:
+        '''Disconnect from its parent, if any, slicing the stack
+            Also disconnect itself and children from the current slot
+        '''
+        if self.slot and self.slot.child is self:
             self.slot.child = None
-        self.slot = None
+        self._set_slot(None)
         if self.parent:
             self.parent.child = None
         self.parent = None
@@ -355,8 +359,8 @@ class Card(pygame.sprite.DirtySprite):
             self.child.snap(self, orientation, overlap)
 
     def place(self, slot):
-        '''Set the card to <slot>, moving it there and snapping all children
-            according to slot's alignment (orientation and overlap)
+        '''Set the card and children to <slot>, moving it there and snapping
+            children according to slot's alignment (orientation and overlap)
         '''
         if slot.child and slot.child is not self:
             log.warn("Trying to place %s in a non-empty slot %s, first card is %s",
@@ -364,12 +368,23 @@ class Card(pygame.sprite.DirtySprite):
             # disconnect the former child
             slot.child.pop()
         self.pop()
-        self.slot = slot
-        self.slot.child = self
+        slot.child = self
+        self._set_slot(slot)
         self.orientation = self.slot.orientation
-        self.move((self.slot.rect.x, self.slot.rect.y))
+        self.move(self.slot.rect.topleft)
         if self.child:
             self.child.snap(self, self.orientation, self.slot.overlap)
+
+    def _set_slot(self, slot):
+        '''Set the card to <slot>, recursivelly on all children. Used internally
+            by place() and stack()
+        '''
+        # Could be merged with snap(), but for now that is a strictly graphical
+        # function, with no logical assignments, and it's not (yet) the time to
+        # break that invariant
+        self.slot = slot
+        if self.child:
+            self.child._set_slot(slot)
 
     @property
     def children(self):
