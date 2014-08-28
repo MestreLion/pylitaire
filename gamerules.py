@@ -111,7 +111,6 @@ class Klondike(Game):
 
         self.deck.create_cards(doubledeck=False, jokers=0, faceup=False)
 
-
     def reset(self):
         '''Called once per game, either new one or restart same game'''
         c = 0
@@ -126,7 +125,10 @@ class Klondike(Game):
                     card.stack(self.deck.cards[c-1])
                 c += 1
 
-        self.deck.cards[c].place(self.stock)
+        card = self.deck.cards[c]
+        card.place(self.stock)
+        card.flip(False)
+
         c += 1
         for card in self.deck.cards[c:]:
             card.stack(self.deck.cards[c-1])
@@ -239,7 +241,7 @@ class Yukon(Klondike):
         i = 0
         while not self.stock.empty:
             card = self.stock.tail
-            card.flip()
+            card.flip(True)
             card.stack(self.tableau[1 + i/e].tail)
             i += 1
 
@@ -263,6 +265,6 @@ class Pylitaire(Klondike):
         i = 0
         while not self.stock.empty:
             card = self.stock.tail
-            card.flip()
+            card.flip(True)
             card.stack(self.tableau[i/e].tail)
             i += 1
