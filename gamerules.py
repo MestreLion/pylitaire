@@ -267,6 +267,7 @@ class Backbone(Game):
         super(Backbone, self).__init__()
 
         self.grid = (8, 4)
+        self.redeals = 1
 
         self.stock = self.create_slot((5, 2))
         self.waste = self.create_slot((6, 2))
@@ -310,9 +311,14 @@ class Backbone(Game):
             card.flip(False)
             c += 1
 
+        self.redeals = 1
+
     def click(self, card):
         if card in self.slots:
-            if card is self.stock and not self.waste.empty:
+            if (card is self.stock
+                and not self.waste.empty
+                and self.redeals > 0):
+                self.redeals -= 1
                 cards = self.waste.cards[::-1]
                 for c, card in enumerate(cards):
                     if c == 0:
