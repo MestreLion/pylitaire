@@ -90,6 +90,33 @@ class Game(object):
             if slot.rect.collidepoint(pos):
                 return slot
 
+    def status(self):
+        '''Status message string that will be displayed for the game by GUI
+            at intervals. By default message is:
+                Stock left: <stock>  Redeals left: <redeals>
+            <stock> is the number of cards in self.stock slot, or the first
+            slot in self.slots, if such slot exists.
+            <redeals>
+        '''
+        messages = []
+
+        stock = (getattr(self, "stock", None)
+                 or self.slots[0] if self.slots else None)
+        if isinstance(stock, cards.Slot):
+            messages.append("Stock left: %d" % len(self.slots[0].cards))
+
+        redeals = getattr(self, "redeals", None)
+        if redeals is not None:
+            messages.append("Redeals left: %d" % redeals)
+
+        return "  ".join(messages)
+
+    def score(self):
+        score = 0
+        for slot in getattr(self, "foundations", []):
+            score += len(slot.cards)
+        return score
+
 
 class Klondike(Game):
     def __init__(self):
