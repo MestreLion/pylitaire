@@ -218,6 +218,8 @@ class Gui(object):
         if self.updatestatus:
             self.updatestatus = False
             self.update_statusbar()
+            if self.game.win():
+                self.wingame()
 
 
     def set_mouse_cursor(self, cursorname):
@@ -266,6 +268,9 @@ class Gui(object):
         else:
             self.game.restart()
 
+
+    def wingame(self):
+        log.info("You win! Congratulations!")
 
     def update_statusbar(self):
         log.info("%s\t\tTime:%s\tScore:%5d",

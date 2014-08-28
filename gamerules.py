@@ -117,6 +117,9 @@ class Game(object):
             score += len(slot.cards)
         return score
 
+    def win(self):
+        return self.score == len(self.deck.cards)
+
 
 class Klondike(Game):
     def __init__(self):
