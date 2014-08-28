@@ -232,14 +232,10 @@ class Gui(object):
         cardsize = self.game.deck.resize(maxcardsize)
 
         g.slot.resize(cardsize)
+        geometry = pygame.Rect(playarea.topleft, cellsize)
         for slot in self.game.slots:
-            position = (playarea.x + slot.cell[0] * cellsize[0],
-                        playarea.y + slot.cell[1] * cellsize[1])
-            slot.rect.topleft = position
-            slot.rect.size = cardsize
-            slot.image = g.slot.surface
-            g.background.surface.blit(g.slot.surface, slot.rect)
-            if not slot.empty:
-                slot.head.place(slot)
+            slot.resize(cardsize)
+            slot.boardmove(geometry)
+            slot.draw(g.background.surface, g.slot.surface)
 
         self.clear = True
