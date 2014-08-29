@@ -313,13 +313,13 @@ class Gui(object):
 
 class StatusBar(pygame.sprite.DirtySprite):
     def __init__(self, **params):
-        self.height     = params.pop('height', 30)
+        self.height     = params.pop('height', 25)
         self.color      = params.pop('color', COLORS.BLACK)
         self.bgcolor    = params.pop('bgcolor', COLORS.GRAY)
-        self.padding    = params.pop('padding', (5, 2))
+        self.padding    = params.pop('padding', (10, 2))
         font            = params.pop('font', None)
         font_name       = params.pop('font_name',  None)
-        font_size       = params.pop('font_size',  25)
+        font_size       = params.pop('font_size',  24)
         width, height   = params.pop('windowsize', (0, 0))
         super(StatusBar, self).__init__(**params)
 
@@ -350,7 +350,7 @@ class StatusBar(pygame.sprite.DirtySprite):
         self.image.fill(self.bgcolor)
 
         ltext = self.message
-        rtext = "Time:%s    Score:%4d" % (
+        rtext = "Time: %s    Score: %3d" % (
             datetime.timedelta(seconds=self.time/1000),
             self.score)
 

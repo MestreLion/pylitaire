@@ -276,6 +276,9 @@ class Yukon(Klondike):
             card.stack(self.tableau[j + i/e].tail)
             i += 1
 
+    def status(self):
+        return "Cards to uncover: %d" % sum((_.faceup for _ in self.deck))
+
 
 class Pylitaire(Yukon):
     '''Yukon variation: 8 tableau slots with 2 extra open cards in each
