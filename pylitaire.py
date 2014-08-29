@@ -60,7 +60,8 @@ def main(*argv):
         gui.clear = False
 
         if g.profile:
-            return True
+            if pygame.time.get_ticks() > 10000:
+                return True
 
         clock.tick(g.FPS)
 
