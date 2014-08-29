@@ -84,6 +84,11 @@ class Background(object):
                 for j in xrange(int(math.ceil(float(size[1]) / bgh))):
                     self.surface.blit(self.original, (i * bgw, j * bgh))
 
+        # Status bar area
+        rect = pygame.Rect(0, size[1] - g.SBHEIGHT, size[0], g.SBHEIGHT)
+        self.surface.fill(g.SBCOLOR, rect)
+
+
     def draw(self, destsurface=None, position=()):
         ''' Draw the background to a destination surface, defaults to g.window,
             at the specified position, defaults to (0, 0)
@@ -136,13 +141,13 @@ def resize(size):
         size = (0, 0)  # use current desktop resolution
     else:
         log.debug("Setting window size %s", size)
-        flags |= pygame.RESIZABLE
+        flags |= pygame.RESIZABLE  # FIXME: mysterious thin black bar
 
     g.window = pygame.display.set_mode(size, flags)
     g.window_size = g.window.get_size()
 
     g.background.resize(g.window_size)
-    g.background.draw()
+    g.background.draw(g.window)
 
     # Display the initial window soon as possible, as other elements may take a while
     pygame.display.update()

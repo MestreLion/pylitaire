@@ -48,6 +48,15 @@ class MOUSEBUTTONS(enum.Enum):
     WHEELDOWN = 5
 
 
+class COLORS(enum.Enum):
+    RED        = (255,   0,   0)
+    GREEN      = (  0, 255,   0)
+    BLUE       = (  0,   0, 255)
+    BLACK      = (  0,   0,   0)
+    WHITE      = (255, 255, 255)
+    GRAY       = (127, 127, 127)
+
+
 class Quit(Exception):
     pass
 
@@ -55,6 +64,10 @@ class Quit(Exception):
 class Gui(object):
     def __init__(self):
         self.game = gamerules.load_game(g.gamename)
+        self.statusbar = StatusBar(height=g.SBHEIGHT, bgcolor=g.SBCOLOR)
+        self.widgets = pygame.sprite.LayeredUpdates(self.statusbar)
+        #should be LayeredDirty, but that makes cards/sb interaction glitchy
+        self.spritegroups = [self.game.deck, self.widgets]
 
         self.pos = None
         self.card = None
@@ -68,7 +81,6 @@ class Gui(object):
         self.ticks = 0
         self.gamestarttime = 0
         self.updatestatus = False
-        self.spritegroups = [self.game.deck]
 
         self.resize(g.window_size)
         self.startgame(True)
@@ -199,8 +211,38 @@ class Gui(object):
 
 
     def update(self):
+        win = False
+
         if self.dragcard:
             self.dragcard.drag(pygame.mouse.get_pos())
+            for widget in pygame.sprite.spritecollide(self.dragcard,
+                                                      self.widgets,
+                                                      False):
+                widget.dirty = 1
+
+        if self.gamestarttime and self.ticks > self.statustimer:
+            self.updatestatus = True
+            self.statustimer = self.ticks + 1000
+
+        if self.updatestatus:
+            self.updatestatus = False
+            self.statusbar.message = self.game.status()
+            self.statusbar.time = self.gamestarttime and (self.ticks -
+                                                          self.gamestarttime)
+            self.statusbar.score = self.game.score()
+            self.statusbar.need_update = True
+            log.info("%s\t%s\t%s",
+                     self.statusbar.message,
+                     self.statusbar.time,
+                     self.statusbar.score)
+
+            if self.game.win():
+                win = True
+
+        self.game.deck.update()
+        for sprite in self.widgets:
+            if sprite.need_update:
+                sprite.update()
 
         if self.updatecursor:
             self.updatecursor = False
@@ -210,18 +252,8 @@ class Gui(object):
             else:
                 self.set_mouse_cursor('default')
 
-        for group in self.spritegroups:
-            group.update()
-
-        if self.gamestarttime and self.ticks > self.statustimer:
-            self.updatestatus = True
-            self.statustimer = self.ticks + 1000
-
-        if self.updatestatus:
-            self.updatestatus = False
-            self.update_statusbar()
-            if self.game.win():
-                self.wingame()
+        if win:
+            self.wingame()
 
 
     def set_mouse_cursor(self, cursorname):
@@ -235,16 +267,19 @@ class Gui(object):
         '''Resize and re-position all elements according to new window <size>
             Current elements are:
             - main window and background, done by graphics.resize(window_size)
+            - Status bar, by its own .resize()
             - game.deck and its cards, by Deck.resize(maxcardsize)
             - slot image, by its own .resize(cardsize)
             - game.slots. Formerly by game, now here. Also reposition them
                 and their cards
         '''
         graphics.resize(size)
+        sbheight = self.statusbar.resize(size)
 
         # Recalculate board geometry
-        playarea = pygame.Rect(g.MARGIN, (g.window_size[0] - g.MARGIN[0],
-                                          g.window_size[1] - g.MARGIN[1]))
+        playarea = pygame.Rect(g.MARGIN,
+                               (g.window_size[0] - g.MARGIN[0],
+                                g.window_size[1] - g.MARGIN[1] - sbheight))
         cellsize = (playarea.width  / self.game.grid[0],
                     playarea.height / self.game.grid[1])
         maxcardsize = (cellsize[0] - g.MARGIN[0],
@@ -273,22 +308,77 @@ class Gui(object):
 
 
     def wingame(self):
-        log.info("You win! Congratulations!")
+        log.info("YOU WIN! Congratulations! Bouncing cards soon, I promise!")
 
 
-    def update_statusbar(self):
-        gametime = self.gamestarttime and (self.ticks - self.gamestarttime)
+class StatusBar(pygame.sprite.DirtySprite):
+    def __init__(self, **params):
+        self.height     = params.pop('height', 30)
+        self.color      = params.pop('color', COLORS.BLACK)
+        self.bgcolor    = params.pop('bgcolor', COLORS.GRAY)
+        self.padding    = params.pop('padding', (5, 2))
+        font            = params.pop('font', None)
+        font_name       = params.pop('font_name',  None)
+        font_size       = params.pop('font_size',  25)
+        width, height   = params.pop('windowsize', (0, 0))
+        super(StatusBar, self).__init__(**params)
 
-        log.info("%s\t\tTime:%s\tScore:%5d",
-                 self.game.status(),
-                 datetime.timedelta(seconds=gametime/1000),
-                 self.game.score())
+        self.font = font or pygame.font.Font(font_name, font_size)
 
+        # dummy until resize()
+        self.rect = pygame.Rect(0, 0, 0, 0)
+        if width and height:
+            self.resize((width, height))
 
-class Widget(object):
-    pass
+        # All dummy until update()
+        self.image  = pygame.Surface((0, 0))
+        self.llabel = pygame.Surface((0, 0))
+        self.rlabel = pygame.Surface((0, 0))
 
+        self.message = ""
+        self.time = 0
+        self.score = 0
 
-class StatusBar(Widget):
-    def __init__(self, *args, *kwargs):
-        self
+        self.need_update = True
+        self.dirty = 1
+
+    def update(self):
+        '''Rebuild all data needed by draw()'''
+        self.need_update = False
+
+        self.image = pygame.Surface(self.rect.size)
+        self.image.fill(self.bgcolor)
+
+        ltext = self.message
+        rtext = "Time:%s    Score:%4d" % (
+            datetime.timedelta(seconds=self.time/1000),
+            self.score)
+
+        def renderfont(text):
+            return self.font.render(text, True, self.color, self.bgcolor)
+
+        llabel = renderfont(ltext)
+        rlabel = renderfont(rtext)
+
+        rrect = rlabel.get_rect()
+        rrect.bottomright = (self.rect.width  - self.padding[0],
+                             self.rect.height - self.padding[1])
+
+        lrect = llabel.get_rect()
+        lrect.bottomleft = (self.padding[0],
+                            self.rect.height - self.padding[1])
+
+        self.image.blit(llabel, lrect)
+        self.image.blit(rlabel, rrect)
+
+        self.dirty = 1
+
+    def resize(self, windowsize):
+        '''Recalculate self.rect, return self.height'''
+        width, height = windowsize
+        self.rect.topleft = (0, height - self.height)
+        self.rect.size = (width, self.height)
+
+        self.need_update = True
+        self.dirty = 1
+        return self.height

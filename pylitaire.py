@@ -45,6 +45,7 @@ def main(*argv):
         logging.root.level = logging.DEBUG
 
     pygame.display.init()
+    pygame.font.init()
     graphics.init_graphics()
     themes.init_themes()
 
