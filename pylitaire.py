@@ -46,7 +46,7 @@ def main(*argv):
 
     pygame.display.init()
     pygame.font.init()
-    graphics.init_graphics()
+    graphics.init_graphics(g.window_size)
     themes.init_themes()
 
     gui = ui.Gui()

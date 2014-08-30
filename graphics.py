@@ -112,7 +112,7 @@ class Slot(object):
         self.surface = render_vector(self.original, size)
 
 
-def init_graphics():
+def init_graphics(size=()):
     '''Initialize the game window and graphics'''
 
     log.info("Initializing graphics")
@@ -128,6 +128,9 @@ def init_graphics():
 
     g.background = Background()
     g.slot = Slot()
+
+    if size:
+        resize(size)
 
 
 def resize(size):
