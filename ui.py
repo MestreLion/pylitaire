@@ -79,6 +79,7 @@ class Gui(object):
         self.win = False
         self.clear = False
 
+        self.games = gamerules.get_games()
         self.statusbar = StatusBar(height=g.SBHEIGHT, bgcolor=g.SBCOLOR)
         self.widgets = pygame.sprite.LayeredUpdates(self.statusbar)
         #should be LayeredDirty, but that makes cards/sb interaction glitchy
@@ -99,6 +100,7 @@ class Gui(object):
 
         if self.game:
             self.spritegroups.remove(self.game.deck)
+            g.background.resize(self.size)  # clear slots
 
         self.game = gamerules.load_game(gamename)
 
@@ -157,6 +159,17 @@ class Gui(object):
                 self.startgame(new=True)
             if event.key == pygame.K_SPACE:
                 self.startgame(new=False)
+            if event.key == pygame.K_F1:
+                log.debug("HELP!\nHelp me if you can, I'm feeling down,\n"
+                          "And I do appreciate you being 'round\n"
+                          "Help me get my feet back on the ground\n"
+                          "Won't you please, please help me")
+            if event.key in xrange(pygame.K_F2, pygame.K_F12+1):
+                # A little hack for "get the n-th game"
+                i = event.key - pygame.K_F2
+                games = sorted(self.games.items())
+                if len(games) >= i + 1:
+                    self.load_game(games[i][0])
 
         if self.win or not game:
             return

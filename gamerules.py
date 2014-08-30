@@ -35,7 +35,7 @@ _games = {}
 
 def load_game(gamename):
     if not _games:
-        load_games()
+        get_games()
 
     gameclass = _games.get(gamename, None)
     if not gameclass:
@@ -47,11 +47,12 @@ def load_game(gamename):
     return game
 
 
-def load_games():
+def get_games():
     def list_classes(base):
         for cls in base.__subclasses__():
             _games[cls.__name__.lower()] = cls
             list_classes(cls)
+    _games.clear()
     list_classes(Game)
     return _games
 
@@ -125,7 +126,7 @@ class Klondike(Game):
     def __init__(self):
         super(Klondike, self).__init__()
 
-        self.grid = (7, 4)  # size of play area, measured in card "cells"
+        self.grid = (7, 3)  # size of play area, measured in card "cells"
 
         self.stock = self.create_slot((0, 0))
         self.waste = self.create_slot((1, 0))
@@ -260,6 +261,7 @@ class Klondike(Game):
 class Yukon(Klondike):
     def __init__(self):
         super(Yukon, self).__init__()
+        self.grid = (7, 4)
         self.slots.remove(self.stock)
         self.slots.remove(self.waste)
 
