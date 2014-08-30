@@ -49,7 +49,8 @@ def main(*argv):
     graphics.init_graphics(g.window_size)
     themes.init_themes()
 
-    gui = ui.Gui()
+    gui = ui.Gui(g.window_size)
+    gui.load_game(g.gamename)
 
     clock = pygame.time.Clock()
     run = True

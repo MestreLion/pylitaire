@@ -62,7 +62,8 @@ class Quit(Exception):
 
 
 class Gui(object):
-    def __init__(self):
+    def __init__(self, size=()):
+        self.size = size
         self.pos = None
         self.card = None
         self.dragcard = None
@@ -70,7 +71,7 @@ class Gui(object):
         self.doubleclickcard = None
         self.doubleclicktimer = 0
         self.updatecursor = False
-        self.cursorname = 'default'
+        self.cursorname = ""
         self.statustimer = 0
         self.ticks = 0
         self.gamestarttime = 0
@@ -85,27 +86,24 @@ class Gui(object):
 
         self.game = None
 
+        if size:
+            self.resize(size)
+
 
     def load_game(self, gamename):
-        self.pos = None
         self.card = None
         self.dragcard = None
         self.clickcard = None
         self.doubleclickcard = None
         self.doubleclicktimer = 0
-        self.updatecursor = False
-        self.cursorname = 'default'
-        self.statustimer = 0
-        self.ticks = 0
-        self.gamestarttime = 0
-        self.updatestatus = False
-        self.win = False
-        self.clear = False
+
+        if self.game:
+            self.spritegroups.remove(self.game.deck)
 
         self.game = gamerules.load_game(gamename)
 
-        self.spritegroups = [self.game.deck, self.widgets]
-        self.resize(g.window_size)
+        self.spritegroups.insert(0, self.game.deck)
+        self.resize_board(self.size)
         self.startgame(True)
 
 
@@ -151,6 +149,7 @@ class Gui(object):
             raise Quit
 
         if event.type == pygame.VIDEORESIZE:
+            graphics.resize(event.size)
             self.resize(event.size)
 
         if event.type == pygame.KEYDOWN:
@@ -293,24 +292,30 @@ class Gui(object):
 
 
     def resize(self, size):
-        '''Resize and re-position all elements according to new window <size>
-            Current elements are:
-            - main window and background, done by graphics.resize(window_size)
-            - Status bar, by its own .resize()
+        '''Resize all widgets according to new window <size>
+            Also trigger the board resize
+        '''
+        self.size = size
+        for widget in self.widgets:
+            widget.resize(size)
+        self.resize_board(size)
+
+
+    def resize_board(self, size):
+        '''Recalculate board geometry, resizing and repositioning all board
+            elements according to window <size>. Current board elements are:
             - game.deck and its cards, by Deck.resize(maxcardsize)
             - slot image, by its own .resize(cardsize)
-            - game.slots. Formerly by game, now here. Also reposition them
-                and their cards
+            - game.slots, by its own .resize(cardsize)
+            - Reposition of game.slots and its cards via .board_move()
+            - As a handy hack, draw slots as background
         '''
-        graphics.resize(size)
-        sbheight = self.statusbar.resize(size)
         if not self.game:
             return
 
-        # Recalculate board geometry
         playarea = pygame.Rect(g.MARGIN,
-                               (g.window_size[0] - g.MARGIN[0],
-                                g.window_size[1] - g.MARGIN[1] - sbheight))
+                               (size[0] - g.MARGIN[0],
+                                size[1] - g.MARGIN[1] - self.statusbar.height))
         cellsize = (playarea.width  / self.game.grid[0],
                     playarea.height / self.game.grid[1])
         maxcardsize = (cellsize[0] - g.MARGIN[0],
@@ -318,6 +323,9 @@ class Gui(object):
 
         self.game.deck.set_theme(g.theme)
         cardsize = self.game.deck.resize(maxcardsize)
+
+        log.debug("Resizing board to %r and card size to %r",
+                  playarea, cardsize)
 
         g.slot.resize(cardsize)
         geometry = pygame.Rect(playarea.topleft, cellsize)
@@ -332,6 +340,7 @@ class Gui(object):
     def startgame(self, new=True):
         if not self.game:
             return
+        self.set_mouse_cursor('default')
         self.gamestarttime = 0
         self.win = False
         self.updatestatus = True
