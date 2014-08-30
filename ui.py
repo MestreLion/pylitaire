@@ -81,6 +81,7 @@ class Gui(object):
         self.ticks = 0
         self.gamestarttime = 0
         self.updatestatus = False
+        self.win = False
 
         self.resize(g.window_size)
         self.startgame(True)
@@ -133,7 +134,10 @@ class Gui(object):
             if event.key == pygame.K_SPACE:
                 self.startgame(new=False)
 
-        elif (event.type == pygame.MOUSEBUTTONDOWN
+        if self.win:
+            return
+
+        if (event.type == pygame.MOUSEBUTTONDOWN
             and self.card):
 
             if event.button == MOUSEBUTTONS.LEFT:
@@ -211,7 +215,8 @@ class Gui(object):
 
 
     def update(self):
-        win = False
+        if self.win:
+            return
 
         if self.dragcard:
             self.dragcard.drag(pygame.mouse.get_pos())
@@ -236,8 +241,7 @@ class Gui(object):
                      self.statusbar.time,
                      self.statusbar.score)
 
-            if self.game.win():
-                win = True
+            self.win = self.game.win()
 
         self.game.deck.update()
         for sprite in self.widgets:
@@ -252,7 +256,7 @@ class Gui(object):
             else:
                 self.set_mouse_cursor('default')
 
-        if win:
+        if self.win:
             self.wingame()
 
 
@@ -300,6 +304,7 @@ class Gui(object):
 
     def startgame(self, new=True):
         self.gamestarttime = 0
+        self.win = False
         self.updatestatus = True
         if new:
             self.game.new_game()
@@ -308,7 +313,10 @@ class Gui(object):
 
 
     def wingame(self):
-        log.info("YOU WIN! Congratulations! Bouncing cards soon, I promise!")
+        log.info("YOU WIN! In %s, congratulations! Bouncing cards soon, I promise!",
+                 formattime(self.ticks - self.gamestarttime))
+        self.gamestarttime = 0
+        self.win = True
 
 
 class StatusBar(pygame.sprite.DirtySprite):
@@ -351,7 +359,7 @@ class StatusBar(pygame.sprite.DirtySprite):
 
         ltext = self.message
         rtext = "Time: %s    Score: %3d" % (
-            datetime.timedelta(seconds=self.time/1000),
+            formattime(self.time),
             self.score)
 
         def renderfont(text):
@@ -382,3 +390,7 @@ class StatusBar(pygame.sprite.DirtySprite):
         self.need_update = True
         self.dirty = 1
         return self.height
+
+
+def formattime(miliseconds):
+    return datetime.timedelta(seconds=miliseconds/1000)
