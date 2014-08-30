@@ -277,7 +277,8 @@ class Yukon(Klondike):
             i += 1
 
     def status(self):
-        return "Cards to uncover: %d" % sum((_.faceup for _ in self.deck))
+        return "Cards to uncover: %d" % sum((1 if not _.faceup else 0
+                                             for _ in self.deck))
 
 
 class Pylitaire(Yukon):
