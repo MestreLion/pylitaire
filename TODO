@@ -4,11 +4,16 @@ Brainstorm of new features and code ideas, in no particular order
 
 - Integrate cards.Slot with graphics.Slot
 
-- Expand/shrink stack height. Will require a revamp of ALIGN/ORIENTATION model. snap_offset cannot be class member
+- Expand/shrink stack height. Will perhaps require a revamp of ALIGN/ORIENTATION model.
 
 - Instructions splash
 
-- Concept idea: cards are always in a slot. will make GUI/gamerules API a LOT simpler!
+- Concept idea: cards are *always* in a slot. Can make GUI/gamerules API a LOT simpler if all operations are done
+  with slot as argument, cards being an additional argument. No more "get_top_card_or_slot()" insanity!
+  (or "if card in self.slots", for that matter). OTOH, cards library will lose a lot of freedom.
+
+- Smarter board size calculation: play area should be horizontally aligned at center and
+  vertically aligned on top
 
 - Allow drop on tail when card collide with any card of stack (highlight the tail). Will perhaps require either
 	stack/slot.rect = rect.union(*card.rect) or the "all cards have a slot" model
@@ -65,12 +70,10 @@ Brainstorm of new features and code ideas, in no particular order
 
 - Find a way to set all modules logging level without messing with root logger if main was imported
   Not sure if this is feasible (or needed) at all. Perhaps only when (and IF) I move all source to a
-  package. And that's one huge IF ;)
+  package. To be done when cards + dependencies are made a self-contained library.
 
-- create statusbar (bottom), menu+info (at right side, a la arkanoid, or perhaps as button bar on top)
+- create menu+info (at right side, a la arkanoid, or perhaps as button bar on top)
   gui module controls them, widgets register callbacks for certain events
-
-- statusbar: timer, score
 
 - double-click on foundation (slot or card) bring all possible cards
 
@@ -83,4 +86,21 @@ Brainstorm of new features and code ideas, in no particular order
 
 - "No more moves" detection
 
+- Font list/loader for a better-looking font. Arial perhaps?
+
 - Rename the project to Pyukon Solitaire. Perhaps Pyleriot, given the artwork and behavior :)
+
+
+
+
+Known bugs and glitches:
+
+- "background strip" in cards when increasing window size, as a consequence of status bar moving down
+  Can be fixed by either:
+	- making all cards always dirty. 1-line fix (Deck to LayeredUpdate instead of LayeredDirty),
+	  but huge impact on CPU usage, as expected
+	- Make cards + widgets a single Group, and use it for drawing. Easy, but cards should now use
+	  *that* group when Group.move_to_top(), in a way that is still decoupled from GUI. Perhaps
+	  if self.groups: self.groups[-1].move_to_top(). All widgets must added at another layer
+
+- widget sprite group should go back to LayeredDirty, to be less taxing on CPU.
