@@ -58,32 +58,72 @@ def get_games():
 
 
 class Game(object):
+    '''Base class for all game rules.'''
     def __init__(self):
+        '''Each of these attributes are required to exist in subclasses:
+
+        <grid>
+            The (cx, cy) size of the board, in card units. Default is (0, 0),
+            games should redefine this to its own size
+
+        <slots>
+            A list of all slots used by the game, empty by default. Games can
+            use self.create_slot() to automatically populate this.
+
+        <deck>
+            cards.Deck instance to create and handle the cards. Default is a
+            deck with no cards. Games should use deck.create_cards() with
+            arguments for single or double deck, jokers or not, etc.
+
+        <name>
+            The name of the game. By default set to the name of the class.
+            Games can redefine this.
+
+        Boilerplate for simple game:
+
+        class SuperSolitaire(Game):
+            def __init__(self):
+                super(SuperSolitaire, self).__init__()
+                self.name = "My Super Solitaire!"
+                self.grid = (2, 1)
+                self.stock = self.create_slot((0, 0))
+                self.waste = self.create_slot((1, 0))
+                self.deck.create_cards(doubledeck=True)
+
+        See Klondike for a more realistic game, and Yukon for an example on
+        how to subclass an existing game and create a variant.
+        '''
         self.grid = (0, 0)
         self.slots = []
         self.deck = cards.Deck()
         self.name = self.__class__.__name__
 
     def create_slot(self, *slotargs, **slotkwargs):
-        '''Create a game slot. See cards.Slot for arguments'''
+        '''Create a game slot. See cards.Slot for arguments.
+            A convenience wrapper to be used by subclasses that automatically
+            keeps track of all slots created by adding them to self.slots list
+        '''
         slot = cards.Slot(*slotargs, **slotkwargs)
         self.slots.append(slot)
         return slot
 
     def new_game(self):
-        self.restart(True)
+        '''Handle a New Game event. Simply shuffle cards and call restart()'''
+        log.info("New game")
+        self.deck.shuffle()
+        self.restart(log=False)
 
-    def restart(self, new=False):
-        if new:
-            log.info("New game")
-            self.deck.shuffle()
-        else:
+    def restart(self, log=True):
+        '''Handle a Restart Game event. Break all stacks and run setup()'''
+        if log:
             log.info("Restart game")
         self.deck.pop_cards()
-        self.reset()
+        self.setup()
 
-    def get_top_card_or_slot(self, pos):
-        '''Return the top card at <pos>, or a slot, if any'''
+    def get_top_item(self, pos):
+        '''Return the top item at <pos>, either card or slot, if any.
+            Called by GUI
+        '''
         card = self.deck.get_top_card(pos)
         if card:
             return card
@@ -91,13 +131,80 @@ class Game(object):
             if slot.rect.collidepoint(pos):
                 return slot
 
+    # Methods below are meant to be overwritten by subclasses to suit its rules
+
+    def setup(self):
+        '''Set up the board, called on new game and restart.
+            Games should override or extend this method.
+            By default stacks all cards on the first slot created, if any
+        '''
+        if not self.slots:
+            return
+
+        slot = self.slots[0]
+        self.deck.cards[0].place(slot)
+
+        for c, card in enumerate(self.deck.cards[1:]):
+            card.stack(self.deck.cards[c])
+
+    def click(self, item):
+        '''Handle click on <element>, either card or slot.
+            Games should override or extend this method.
+            By default flip() cards and do nothing on slots
+            Return True if card state changed.
+        '''
+        if not item in self.slots:
+            item.flip()
+            return True
+
+    def doubleclick(self, item):
+        '''Handle double click on <widget>, either card or slot.
+            Games should override this method, which do nothing by default.
+        '''
+        pass
+
+    def drop(self, card, target):
+        '''Handle drop <card> on a <target>, target may be a card or a slot.
+            By default stack() or place() on target, depending on target type.
+            This method is only triggered by GUI for a valid drop target, as
+            defined by droppable(), so the default action should suit any game.
+            Extend this only if game needs additional actions when dropping
+            cards.
+        '''
+        if target in self.slots:
+            card.place(target)
+        else:
+            card.stack(target)
+
+    def draggable(self, card):
+        '''Return True if <card> can be dragged. This just helps GUI to choose
+            which mouse cursor to use on hovering. The actual card drag is
+            performed later by GUI
+            Games should override this method, which by default return True
+            for any card that is faced up
+        '''
+        return card.faceup
+
+    def droppable(self, card, targets):
+        '''Return a subset of <targets> that are valid drop places for <card>
+            By default return all targets that are either empty slots or stack
+            tail cards.
+            Games should override or extend this method to further filter
+            target list according to game rules.
+        '''
+        return targets
+
     def status(self):
         '''Status message string that will be displayed for the game by GUI
-            at intervals. By default message is:
+            at intervals. Default message is:
+
                 Stock left: <stock>  Redeals left: <redeals>
+
             <stock> is the number of cards in self.stock slot, or the first
-            slot in self.slots, if such slot exists.
-            <redeals>
+            slot in self.slots, if such slot exists. <redeals> is a game
+            attribute, if it exists.
+
+            Games can override or extend this method to better suit them.
         '''
         messages = []
 
@@ -113,12 +220,28 @@ class Game(object):
         return "  ".join(messages)
 
     def score(self):
+        '''Return the current game score.
+            Default score is the total number of cards in all slots in
+            'foundations', if such attribute exists, is iterable and contain
+            slots.
+            Games can override or extend this method to better suit them.
+        '''
         score = 0
-        for slot in getattr(self, "foundations", []):
-            score += len(slot.cards)
+        foundations = getattr(self, "foundations", [])
+        try:
+            for slot in foundations:
+                if slot in self.slots:
+                    score += len(slot.cards)
+        except TypeError:
+            pass
         return score
 
     def win(self):
+        '''Return True if victory condition is met.
+            By default victory is achieved when score equals the number
+            of cards in the deck.
+            Games can override or extend this method to better suit them.
+        '''
         return self.score() == len(self.deck.cards)
 
 
@@ -126,7 +249,7 @@ class Klondike(Game):
     def __init__(self):
         super(Klondike, self).__init__()
 
-        self.grid = (7, 3)  # size of play area, measured in card "cells"
+        self.grid = (7, 3.2)  # size of play area, measured in card "cells"
 
         self.stock = self.create_slot((0, 0))
         self.waste = self.create_slot((1, 0))
@@ -142,8 +265,7 @@ class Klondike(Game):
 
         self.deck.create_cards(doubledeck=False, jokers=0, faceup=False)
 
-    def reset(self):
-        '''Called once per game, either new one or restart same game'''
+    def setup(self):
         c = 0
 
         for col, slot in enumerate(self.tableau):
@@ -166,12 +288,10 @@ class Klondike(Game):
             card.flip(False)
             c += 1
 
-    def click(self, card):
-        '''Handle click on <card>, which may be a slot.
-            Return True if card state changed
-        '''
-        if card in self.slots:
-            if card is self.stock and not self.waste.empty:
+    def click(self, item):
+        # Slot
+        if item in self.slots:
+            if item is self.stock and not self.waste.empty:
                 cards = self.waste.cards[::-1]
                 for c, card in enumerate(cards):
                     if c == 0:
@@ -181,18 +301,18 @@ class Klondike(Game):
                     card.flip()
                 return True
 
-        elif card.is_tail and not card.faceup:
-            if card.slot is self.stock:
+        # Card
+        elif item.is_tail and not item.faceup:
+            if item.slot is self.stock:
                 if self.waste.empty:
-                    card.place(self.waste)
+                    item.place(self.waste)
                 else:
-                    card.stack(self.waste.tail)
-            card.flip()
+                    item.stack(self.waste.tail)
+            item.flip()
             return True
 
-    def doubleclick(self, card):
-        '''Handle double click on <card>. Return True if card state changed'''
-        if card in self.slots or card.slot in self.foundations:
+    def doubleclick(self, item):
+        if item in self.slots or item.slot in self.foundations:
             return
 
         targets = []
@@ -202,23 +322,10 @@ class Klondike(Game):
             else:
                 targets.append(slot.tail)
 
-        droplist = self.droppable(card, targets)
+        droplist = self.droppable(item, targets)
         if droplist:
-            self.drop(card, droplist[0])
+            self.drop(item, droplist[0])
             return True
-
-    def drop(self, card, target):
-        '''Handle <card> dropped onto <target>'''
-        if target in self.slots:
-            card.place(target)
-        else:
-            card.stack(target)
-
-    def draggable(self, card):
-        '''Return True if card can be dragged.
-            Used to set mouse cursor. Actual drag is performed by GUI
-        '''
-        return card.faceup  # and not card.slot in self.foundations
 
     def droppable(self, card, targets):
         '''Return a subset of <targets> that are valid drop cards for <card>'''
@@ -263,12 +370,12 @@ class Yukon(Klondike):
         self.slots.remove(self.stock)
         self.slots.remove(self.waste)
 
-    def reset(self, e=4, j=1):
+    def setup(self, e=4, j=1):
         '''Parametrized to be variation-friendly:
             <e>: extra cards in each column
             <j>: start column for extra cards
         '''
-        super(Yukon, self).reset()
+        super(Yukon, self).setup()
         i = 0
         while not self.stock.empty:
             card = self.stock.tail
@@ -292,8 +399,8 @@ class Pylitaire(Yukon):
         for foundation in self.foundations:
             foundation.cell = (foundation.cell[0] + 1, 0)
 
-    def reset(self):
-        super(Pylitaire, self).reset(2, 0)
+    def setup(self):
+        super(Pylitaire, self).setup(2, 0)
 
 
 class Backbone(Game):
@@ -327,7 +434,7 @@ class Backbone(Game):
 
         self.deck.create_cards(doubledeck=True)
 
-    def reset(self):
+    def setup(self):
         c = 0
         for slot in self.tableau + self.backbone + [self.block]:
             card = self.deck.cards[c]
@@ -387,12 +494,6 @@ class Backbone(Game):
             self.drop(card, droplist[0])
             return True
 
-    def drop(self, card, target):
-        if target in self.slots:
-            card.place(target)
-        else:
-            card.stack(target)
-
     def draggable(self, card):
         return not (card.slot is self.stock
                     or (card.slot in self.backbone
@@ -430,3 +531,13 @@ class Backbone(Game):
                     droplist.append(target)
 
         return droplist
+
+
+class Test(Game):
+    def __init__(self):
+        super(Test, self).__init__()
+        self.grid = (3, 3)
+        self.deck.create_cards()
+        for i in xrange(self.grid[0]):
+            for j in xrange(self.grid[1]):
+                self.create_slot((i, j))

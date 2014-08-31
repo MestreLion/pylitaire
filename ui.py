@@ -134,7 +134,7 @@ class Gui(object):
         '''
         if not self.game:
             return
-        card = self.game.get_top_card_or_slot(self.pos)
+        card = self.game.get_top_item(self.pos)
         # mouse cursor is never changed during drag, no matter what
         # current card may be None when mouse is fast and momentarily
         # moves out of dragged card
