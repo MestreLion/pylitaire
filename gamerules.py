@@ -218,9 +218,7 @@ class Klondike(Game):
         '''Return True if card can be dragged.
             Used to set mouse cursor. Actual drag is performed by GUI
         '''
-        return (card not in self.slots
-                and card.faceup)
-                # and not card.slot in self.foundations
+        return card.faceup  # and not card.slot in self.foundations
 
     def droppable(self, card, targets):
         '''Return a subset of <targets> that are valid drop cards for <card>'''
@@ -396,10 +394,9 @@ class Backbone(Game):
             card.stack(target)
 
     def draggable(self, card):
-        return (card not in self.slots
-                and not (card.slot is self.stock
-                         or (card.slot in self.backbone
-                             and not card.slot.blockedby.empty)))
+        return not (card.slot is self.stock
+                    or (card.slot in self.backbone
+                        and not card.slot.blockedby.empty))
                 # and not card.slot in self.foundations
 
     def droppable(self, card, targets):

@@ -190,7 +190,8 @@ class Gui(object):
                         # if game lies, mouse cursor will not be updated
                         self._update_card()
                 else:
-                    if game.draggable(self.card):
+                    if (self.card not in game.slots
+                        and game.draggable(self.card)):
                         log.debug("Start dragging %s", self.card)
                         self.dragcard = self.card
                         self.dragcard.start_drag(self.pos)
@@ -288,7 +289,9 @@ class Gui(object):
         if self.updatecursor:
             self.updatecursor = False
             # 'drag' is handled directly
-            if self.card and self.game.draggable(self.card):
+            if (self.card
+                and self.card not in self.game.slots
+                and self.game.draggable(self.card)):
                 self.set_mouse_cursor('draggable')
             else:
                 self.set_mouse_cursor('default')
