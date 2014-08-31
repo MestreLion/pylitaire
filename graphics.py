@@ -109,7 +109,7 @@ class Slot(object):
             self.resize(size)
 
     def resize(self, size=()):
-        self.surface = render_vector(self.original, size)
+        self.surface = render_vector(self.original, size, proportional=False)
 
 
 def init_graphics(size=()):
