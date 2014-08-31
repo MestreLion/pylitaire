@@ -438,8 +438,7 @@ class StatusBar(pygame.sprite.DirtySprite):
         self.rect.topleft = (0, height - self.height)
         self.rect.size = (width, self.height)
 
-        self.need_update = True
-        self.dirty = 1
+        self.update()
         return self.height
 
 
