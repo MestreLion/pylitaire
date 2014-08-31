@@ -91,7 +91,7 @@ class Game(object):
                 self.deck.create_cards(doubledeck=True)
 
         See Klondike for a more realistic game, and Yukon for an example on
-        how to subclass an existing game and create a variant.
+        how to subclass an existing game to create a variant.
         '''
         self.grid = (0, 0)
         self.slots = []
@@ -136,16 +136,8 @@ class Game(object):
     def setup(self):
         '''Set up the board, called on new game and restart.
             Games should override or extend this method.
-            By default stacks all cards on the first slot created, if any
         '''
-        if not self.slots:
-            return
-
-        slot = self.slots[0]
-        self.deck.cards[0].place(slot)
-
-        for c, card in enumerate(self.deck.cards[1:]):
-            card.stack(self.deck.cards[c])
+        pass
 
     def click(self, item):
         '''Handle click on <element>, either card or slot.
@@ -187,12 +179,26 @@ class Game(object):
 
     def droppable(self, card, targets):
         '''Return a subset of <targets> that are valid drop places for <card>
-            By default return all targets that are either empty slots or stack
-            tail cards.
+            By default return all targets that are either empty slots or cards
+            that are tail of its stack.
             Games should override or extend this method to further filter
-            target list according to game rules.
+            target list according to game rules, as default is very permissive
+            and only meant as an initial, "no-brainer" filter
         '''
-        return targets
+        droplist = []
+        for target in targets:
+
+            # dropping to a slot
+            if target in self.slots:
+                if target.empty:
+                    droplist.append(target)
+
+            # dropping to card
+            else:
+                if target.is_tail:
+                    droplist.append(target)
+
+        return droplist
 
     def status(self):
         '''Status message string that will be displayed for the game by GUI
@@ -246,10 +252,10 @@ class Game(object):
 
 
 class Klondike(Game):
-    def __init__(self):
+    def __init__(self, grid=()):
         super(Klondike, self).__init__()
 
-        self.grid = (7, 3.2)  # size of play area, measured in card "cells"
+        self.grid = grid or (7, 3.2)
 
         self.stock = self.create_slot((0, 0))
         self.waste = self.create_slot((1, 0))
@@ -312,7 +318,9 @@ class Klondike(Game):
             return True
 
     def doubleclick(self, item):
-        if item in self.slots or item.slot in self.foundations:
+        if (item in self.slots
+            or item.slot in self.foundations
+            or not self.draggable(item)):
             return
 
         targets = []
@@ -328,26 +336,22 @@ class Klondike(Game):
             return True
 
     def droppable(self, card, targets):
-        '''Return a subset of <targets> that are valid drop cards for <card>'''
+        targets = super(Klondike, self).droppable(card, targets)
         droplist = []
         for target in targets:
 
             # dropping to a slot
             if target in self.slots:
-                if not target.empty:
-                    continue
                 if target in self.foundations:
                     if card.is_tail and card.rank == cards.RANK.ACE:
                         droplist.append(target)
                 elif target in self.tableau:
                     if card.rank == cards.RANK.KING:
                         droplist.append(target)
-                continue
 
             # dropping to card in foundation
-            if target.slot in self.foundations:
+            elif target.slot in self.foundations:
                 if (card.is_tail
-                    and target.is_tail
                     and target.suit == card.suit
                     and target.rank == card.rank - 1):
                     droplist.append(target)
@@ -355,7 +359,6 @@ class Klondike(Game):
             # dropping to card in tableau
             elif target.slot in self.tableau:
                 if (target.faceup
-                    and target.is_tail
                     and target.color != card.color
                     and target.rank == card.rank + 1):
                     droplist.append(target)
@@ -364,9 +367,8 @@ class Klondike(Game):
 
 
 class Yukon(Klondike):
-    def __init__(self):
-        super(Yukon, self).__init__()
-        self.grid = (7, 4)
+    def __init__(self, grid=()):
+        super(Yukon, self).__init__(grid or (7, 4))
         self.slots.remove(self.stock)
         self.slots.remove(self.waste)
 
@@ -393,11 +395,7 @@ class Pylitaire(Yukon):
         (including the first tableau slot)
     '''
     def __init__(self):
-        super(Pylitaire, self).__init__()
-        self.grid = (8, 4)
-        self.tableau.append(self.create_slot((7, 1), cards.ORIENTATION.DOWN))
-        for foundation in self.foundations:
-            foundation.cell = (foundation.cell[0] + 1, 0)
+        super(Pylitaire, self).__init__((8, 4))
 
     def setup(self):
         super(Pylitaire, self).setup(2, 0)
@@ -478,8 +476,10 @@ class Backbone(Game):
             card.flip()
             return True
 
-    def doubleclick(self, card):
-        if card in self.slots or card.slot in self.foundations:
+    def doubleclick(self, item):
+        if (item in self.slots
+            or item.slot in self.foundations
+            or not self.draggable(item)):
             return
 
         targets = []
@@ -489,9 +489,9 @@ class Backbone(Game):
             else:
                 targets.append(slot.tail)
 
-        droplist = self.droppable(card, targets)
+        droplist = self.droppable(item, targets)
         if droplist:
-            self.drop(card, droplist[0])
+            self.drop(item, droplist[0])
             return True
 
     def draggable(self, card):
@@ -501,19 +501,17 @@ class Backbone(Game):
                 # and not card.slot in self.foundations
 
     def droppable(self, card, targets):
+        targets = super(Backbone, self).droppable(card, targets)
         droplist = []
         for target in targets:
 
             # dropping to a slot
             if target in self.slots:
-                if not target.empty:
-                    continue
                 if target in self.foundations:
                     if card.is_tail and card.rank == cards.RANK.ACE:
                         droplist.append(target)
                 elif target in self.tableau:
                         droplist.append(target)
-                continue
 
             # dropping to card in foundation
             elif target.slot in self.foundations:
