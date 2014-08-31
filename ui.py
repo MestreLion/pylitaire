@@ -52,6 +52,9 @@ class COLORS(enum.Enum):
     RED        = (255,   0,   0)
     GREEN      = (  0, 255,   0)
     BLUE       = (  0,   0, 255)
+    YELLOW     = (255, 255,   0)
+    CYAN       = (  0, 255, 255)
+    MAGENTA    = (255,   0, 255)
     BLACK      = (  0,   0,   0)
     WHITE      = (255, 255, 255)
     GRAY       = (127, 127, 127)
@@ -103,6 +106,7 @@ class Gui(object):
             g.background.resize(self.size)  # clear slots
 
         self.game = gamerules.load_game(gamename)
+        self.game.deck.set_theme(g.theme)
 
         self.spritegroups.insert(0, self.game.deck)
         self.resize_board(self.size)
@@ -329,19 +333,53 @@ class Gui(object):
         if not self.game:
             return
 
-        playarea = pygame.Rect(g.MARGIN,
-                               (size[0] - g.MARGIN[0],
-                                size[1] - g.MARGIN[1] - self.statusbar.height))
-        cellsize = (playarea.width  / self.game.grid[0],
-                    playarea.height / self.game.grid[1])
-        maxcardsize = (cellsize[0] - g.MARGIN[0],
-                       cellsize[1] - g.MARGIN[1])
+        pad = margin = g.MARGIN
 
-        self.game.deck.set_theme(g.theme)
+        playarea = pygame.Rect(margin, (size[0] - 2 * margin[0],
+                                        size[1] - 2 * margin[1]
+                                                - self.statusbar.height))
+
+        maxcellsize = ((playarea.width  + pad[0]) / self.game.grid[0],
+                       (playarea.height + pad[1]) / self.game.grid[1])
+
+        maxcardsize = (maxcellsize[0] - pad[0],
+                       maxcellsize[1] - pad[1])
+
         cardsize = self.game.deck.resize(maxcardsize)
 
-        log.debug("Resizing board to %r and card size to %r",
-                  playarea, cardsize)
+        if g.debug:
+            def drawgrid(r, s=None, c=COLORS.RED, w=1):
+                if s:
+                    r = pygame.Rect(r.topleft, s)
+                pygame.draw.rect(g.background.surface, c, r, w)
+            drawgrid(playarea)
+            drawgrid(playarea, maxcellsize)
+            drawgrid(playarea, maxcardsize, w=3)
+            drawgrid(playarea, cardsize, COLORS.BLUE)
+
+        # Expand card padding horizontally up to 50% of card size
+        # and vertically up to 20% of card size, limiting minimum value
+        # to original padding and maximum value to maximum cell size
+        pad = (max(pad[0], min(maxcellsize[0] - cardsize[0], cardsize[0] / 2)),
+               max(pad[1], min(maxcellsize[1] - cardsize[1], cardsize[1] / 5)))
+
+        # Shrink cell size in terms of actual card size + padding
+        cellsize = (cardsize[0] + pad[0],
+                    cardsize[1] + pad[1])
+
+        # Trim the play area based on new cell size
+        playarea.size = ((cellsize[0] * self.game.grid[0]) - pad[0],
+                         (cellsize[1] * self.game.grid[1]) - pad[1])
+
+        # And center it horizontally
+        playarea.centerx = size[0] / 2
+
+        if g.debug:
+            drawgrid(playarea, None, COLORS.YELLOW, w=3)
+            drawgrid(playarea, cellsize, COLORS.YELLOW)
+
+        log.debug("Resizing board to %r, cell size %r and card size %r",
+                  playarea, cellsize, cardsize)
 
         g.slot.resize(cardsize)
         geometry = pygame.Rect(playarea.topleft, cellsize)

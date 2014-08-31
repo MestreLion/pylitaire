@@ -539,3 +539,14 @@ class Test(Game):
         for i in xrange(self.grid[0]):
             for j in xrange(self.grid[1]):
                 self.create_slot((i, j))
+
+    def setup(self):
+        self.deck.cards[0].place(self.slots[4])
+
+        c = 1
+        for card in self.deck.cards[c:]:
+            card.stack(self.deck.cards[c-1])
+            c += 1
+
+    def click(self, item):
+        return

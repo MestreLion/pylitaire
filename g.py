@@ -38,7 +38,7 @@ CONFIGDIR = xdg.BaseDirectory.save_config_path(GAMENAME)
 # Graphics
 FPS = 30
 BGCOLOR = (0, 80, 16)  # Dark green
-MARGIN = (20, 10)  # window margins for the playarea, in pixels
+MARGIN = (20, 10)  # Board margin and minimum card padding
 SBHEIGHT = 25  # status bar height
 SBCOLOR = (242, 241, 240)  # status bar background color
 window = None  # surface created by pygame.dsplay.set_mode()
@@ -53,7 +53,7 @@ cursors = {'default': None,
 
 # Options
 fullscreen = False
-window_size = (1300, 900)
+window_size = (960, 640)
 debug = False
 profile = False
 baize = "baize-ubuntu"
