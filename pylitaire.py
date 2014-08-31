@@ -46,10 +46,10 @@ def main(*argv):
 
     pygame.display.init()
     pygame.font.init()
-    graphics.init_graphics(g.window_size)
+    window_size = graphics.init_graphics(g.window_size)
     themes.init_themes()
 
-    gui = ui.Gui(g.window_size)
+    gui = ui.Gui(window_size)
     gui.load_game(g.gamename)
 
     clock = pygame.time.Clock()

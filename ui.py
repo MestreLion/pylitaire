@@ -155,8 +155,8 @@ class Gui(object):
             raise Quit
 
         if event.type == pygame.VIDEORESIZE:
-            graphics.resize(event.size)
-            self.resize(event.size)
+            size = graphics.resize(event.size)
+            self.resize(size)
 
         if event.type == pygame.KEYDOWN:
             if event.key in [pygame.K_RETURN, pygame.K_KP_ENTER]:

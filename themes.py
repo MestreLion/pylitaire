@@ -129,16 +129,17 @@ if __name__ == '__main__':
     # constants
     AUTO = '--auto' in sys.argv[1:]
     TESTTHEME = os.path.join(g.DATADIR, 'themes', 'anglo.svg')
+    SIZE = (800, 600)
 
     # setup
     logging.basicConfig(level=logging.DEBUG)
     pygame.display.init()
     clock = pygame.time.Clock()
-    screen = pygame.display.set_mode(g.window_size)
+    screen = pygame.display.set_mode(SIZE)
     screen.fill(g.BGCOLOR)
 
     # load_svg()
-    screen.blit(graphics.load_svg(TESTTHEME, g.window_size), (0,0))
+    screen.blit(graphics.load_svg(TESTTHEME, SIZE), (0,0))
     pause()
 
     # Theme()
@@ -151,6 +152,6 @@ if __name__ == '__main__':
     init_themes()
     for id, theme in sorted(themes.items()):
         print id, theme.card_proportion
-        screen.blit(graphics.render_vector(theme.image, size=g.window_size), (0,0))
+        screen.blit(graphics.render_vector(theme.image, size=SIZE), (0,0))
         if pause():
             break

@@ -41,11 +41,8 @@ BGCOLOR = (0, 80, 16)  # Dark green
 MARGIN = (20, 10)  # Board margin and minimum card padding
 SBHEIGHT = 25  # status bar height
 SBCOLOR = (242, 241, 240)  # status bar background color
-window = None  # surface created by pygame.dsplay.set_mode()
 background = None  # graphics.Background
 slot = None  # graphics.Slot
-playarea = None  # pygame.Rect
-cardsize = ()  # (width, height) of current card size
 cursors = {'default': None,
            'drag': None,
            'draggable': None,

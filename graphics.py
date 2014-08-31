@@ -47,7 +47,6 @@ class Background(object):
             with <color> as a fallback for solid fill. If <path> is empty,
             try to find one using an image named <title> in datadirs.
             <color> defaults to g.BGCOLOR
-            <size> defaults to g.window's size
             <title> defaults to g.baize
         '''
         self.path = path or find_image(g.datadirs('images'), title or g.baize)
@@ -89,12 +88,11 @@ class Background(object):
         self.surface.fill(g.SBCOLOR, rect)
 
 
-    def draw(self, destsurface=None, position=()):
-        ''' Draw the background to a destination surface, defaults to g.window,
-            at the specified position, defaults to (0, 0)
+    def draw(self, destsurface, position=()):
+        ''' Draw the background to a destination <surface> at <position>,
+            defaults to (0, 0)
         '''
-        surface = destsurface or g.window
-        surface.blit(self.surface, position or (0, 0))
+        destsurface.blit(self.surface, position or (0, 0))
 
 
 class Slot(object):
@@ -130,7 +128,7 @@ def init_graphics(size=()):
     g.slot = Slot()
 
     if size:
-        resize(size)
+        return resize(size)
 
 
 def resize(size):
@@ -146,26 +144,30 @@ def resize(size):
         log.debug("Setting window size %s", size)
         flags |= pygame.RESIZABLE  # FIXME: mysterious thin black bar
 
-    g.window = pygame.display.set_mode(size, flags)
-    g.window_size = g.window.get_size()
+    window = pygame.display.set_mode(size, flags)
+    size = window.get_size()
 
-    g.background.resize(g.window_size)
-    g.background.draw(g.window)
+    g.background.resize(size)
+    g.background.draw(window)
 
     # Display the initial window soon as possible, as other elements may take a while
     pygame.display.update()
 
+    # return the actual window size
+    return size
+
 
 def render(spritegroups, clear=False):
     dirty = []
+    window = pygame.display.get_surface()
 
     if clear:
-        g.background.draw(g.window)
-        dirty = [g.window.get_rect()]
+        g.background.draw(window)
+        dirty = [window.get_rect()]
 
     for group in spritegroups:
-        group.clear(g.window, g.background.surface)
-        dirty.extend(group.draw(g.window))
+        group.clear(window, g.background.surface)
+        dirty.extend(group.draw(window))
 
     pygame.display.update(dirty)
 
