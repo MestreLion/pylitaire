@@ -49,7 +49,7 @@ cursors = {'default': None,
            }
 
 # Options
-fullscreen = False
+full_screen = False
 window_size = (960, 640)
 debug = False
 profile = False

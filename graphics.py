@@ -40,7 +40,6 @@ log = logging.getLogger(__name__)
 IMAGE_EXTS = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'pcx', 'tga', 'tif', 'tiff',
               'lbm', 'pbm', 'pgm', 'ppm', 'xpm']
 
-
 class Background(object):
     def __init__(self, path="", size=(), color=None, title=""):
         '''Create a new background of <size> from a <path> image file,
@@ -110,7 +109,7 @@ class Slot(object):
         self.surface = render_vector(self.original, size, proportional=False)
 
 
-def init_graphics(size=()):
+def init_graphics(window_size=None, full_screen=None):
     '''Initialize the game window and graphics'''
 
     log.info("Initializing graphics")
@@ -127,25 +126,37 @@ def init_graphics(size=()):
     g.background = Background()
     g.slot = Slot()
 
-    if size:
-        return resize(size)
+    return resize(window_size, full_screen)
 
 
-def resize(size):
-    # Set the window
+def resize(window_size=None, full_screen=None):
+    '''Resize the window to <window_size> and set full screen mode to
+        <full_screen>, both default to current values. In full screen mode,
+        window size is ignored and desktop resolution is used instead.
+        Requested values are saved to g.
+    '''
+    if window_size is None and full_screen is None:
+        return pygame.display.get_surface().get_size()
+
+    if window_size is not None: g.window_size = window_size
+    if full_screen is not None: g.full_screen = full_screen
+
+    full_screen = g.full_screen
+    window_size = g.window_size
+
     flags = 0
-    if g.fullscreen:
+    if full_screen:
         log.debug("Setting fullscreen, desktop resolution (%s, %s)",
                   pygame.display.Info().current_w,
                   pygame.display.Info().current_h)
         flags |= pygame.FULLSCREEN | pygame.HWSURFACE
-        size = (0, 0)  # use current desktop resolution
+        window_size = (0, 0)
     else:
-        log.debug("Setting window size %s", size)
+        log.debug("Setting window size %s", window_size)
         flags |= pygame.RESIZABLE  # FIXME: mysterious thin black bar
 
-    window = pygame.display.set_mode(size, flags)
-    size = window.get_size()
+    window = pygame.display.set_mode(window_size, flags)
+    size = window.get_size()  # actual window size, regardless of mode
 
     g.background.resize(size)
     g.background.draw(window)

@@ -168,12 +168,15 @@ class Gui(object):
                           "And I do appreciate you being 'round\n"
                           "Help me get my feet back on the ground\n"
                           "Won't you please, please help me")
-            if event.key in xrange(pygame.K_F2, pygame.K_F12+1):
+            if event.key in xrange(pygame.K_F2, pygame.K_F10 + 1):
                 # A little hack for "get the n-th game"
                 i = event.key - pygame.K_F2
                 games = sorted(self.games.items())
                 if len(games) >= i + 1:
                     self.load_game(games[i][0])
+            if event.key == pygame.K_F11:
+                size = graphics.resize(full_screen=not g.full_screen)
+                self.resize(size)
 
         if self.win or not game:
             return
