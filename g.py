@@ -15,19 +15,45 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program. See <http://www.gnu.org/licenses/gpl.html>
-#
-# Global constants and common functions
+
+'''Global constants, paths, singletons and game options
+
+Globals are basically divided in 4 groups:
+
+- Constants
+    In UPPERCASE. Most are used only once, but they are better here than
+    hardcoded in some module, like the game FPS and or status bar height
+    All immutable and literal.
+
+- Paths
+    Defined here and set only once, so also in UPPERCASE
+
+- Singletons
+    For objects that are used and set in different places, like the background
+    surface, and for now it's convenient to have them here instead of passing
+    as arguments everywhere. All are initialized here as None.
+
+    Legitimate candidates for this group are lists/dicts such as the themes,
+    cursors and games rules found after their respective init(). But apart
+    from those this group should be kept as a minimum
+
+    ... and in an ideal world this group would not even exist.
+
+- Options
+    The group that gives this module a good and fair reason to exist. Options
+    are read from command line, config file, and may be changed in-game. They
+    can also be saved back to config file before exiting. Values hardcoded
+    here are just the "factory defaults"
+
+This module can be renamed as 'options' if the word 'Global' scares you.
+'''
 
 import os.path
 import xdg.BaseDirectory
 
-'''As a convention, UPPERCASE indicates a constant value, and lowercase is
-    for values that may change, either via config file, command-line arguments
-    or in-game settings
-'''
 
 # General
-VERSION = "0.1"
+VERSION = "0.5"
 GAMENAME = 'pylitaire'
 
 # Paths
