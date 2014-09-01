@@ -64,9 +64,11 @@ class ORIENTATION(enum.Enum):
     '''Stack orientation of a card in relation to its parent'''
     NONE  = None    # Do not snap
     KEEP  = ()      # Keep the same orientation of the parent
-    RIGHT = (1, 0)
-    DOWN  = (0, 1)
-    PILE  = (0, 0)  # No orientation, place on top of card
+    RIGHT = ( 1,  0)
+    LEFT  = (-1,  0)
+    DOWN  = ( 0,  1)
+    UP    = ( 0, -1)
+    PILE  = ( 0,  0)  # No orientation, place on top of card
 
 
 class Deck(pygame.sprite.LayeredDirty):
@@ -437,6 +439,7 @@ class Slot(pygame.sprite.DirtySprite):
         self.cell = cell
         self.orientation = orientation
         self.overlap = overlap
+        self.board = None
 
         self.child = None  # Card instance, set by card on place()
         self.rect = pygame.sprite.Rect(position, size)
@@ -469,6 +472,35 @@ class Slot(pygame.sprite.DirtySprite):
         if image:
             self.image = image
         destsurface.blit(self.image, self.rect)
+
+    def fit(self, board=None):
+        if board:
+            self.board = board
+
+        cards = self.cards
+        length = float(len(cards))
+        if length < 2 or self.orientation == ORIENTATION.PILE:
+            return # nothing to do
+
+        tail = cards[-1]
+
+        if   self.orientation == ORIENTATION.UP:    i=1; attrib = 'top'
+        elif self.orientation == ORIENTATION.DOWN:  i=1; attrib = 'bottom'
+        elif self.orientation == ORIENTATION.LEFT:  i=0; attrib = 'left'
+        elif self.orientation == ORIENTATION.RIGHT: i=0; attrib = 'right'
+
+        edge = getattr(self.rect, attrib)
+        dist = self.orientation[i] * self.rect.size[i] * (length - 1)
+        max_overlap  = (getattr(self.board, attrib) - edge) / dist
+        cur_overlap  = (getattr(tail.rect,  attrib) - edge) / dist
+
+        # overboard or compressed
+        if max_overlap < cur_overlap or cur_overlap < self.overlap[i]:
+            overlap = min(self.overlap[i], max_overlap)
+            log.debug("Fit slot overlap from %.3f, max %.3f, to %.3f",
+                      cur_overlap, max_overlap, overlap)
+            self.child.child.snap(self.child, self.orientation,
+                                  (overlap, overlap))
 
     @property
     def empty(self):
