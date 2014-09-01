@@ -34,15 +34,9 @@ log = logging.getLogger(__name__)
 
 
 def main(*argv):
-    """ Main Program """
+    '''Main Program, <argv> as a list of command line arguments'''
 
-    # Too lazy for argparse right now
-    if "--fullscreen" in argv: g.fullscreen = True
-    if "--debug"      in argv: g.debug = True
-    if "--profile"    in argv: g.profile = True
-
-    if g.debug:
-        logging.root.level = logging.DEBUG
+    g.load_options(*argv)
 
     pygame.display.init()
     pygame.font.init()
@@ -66,6 +60,7 @@ def main(*argv):
 
         clock.tick(g.FPS)
 
+    g.save_options()
     pygame.quit()
     return True
 

@@ -50,7 +50,11 @@ This module can be renamed as 'options' if the word 'Global' scares you.
 
 import os.path
 import xdg.BaseDirectory
+import json
+import logging
 
+
+log = logging.getLogger(__name__)
 
 # General
 VERSION = "0.5"
@@ -60,6 +64,7 @@ GAMENAME = 'pylitaire'
 GAMEDIR = os.path.abspath(os.path.dirname(__file__) or '.')
 DATADIR = os.path.join(GAMEDIR, 'data')
 CONFIGDIR = xdg.BaseDirectory.save_config_path(GAMENAME)
+WINDOWFILE = os.path.join(CONFIGDIR, 'window.json')
 
 # Graphics
 FPS = 30
@@ -67,6 +72,7 @@ BGCOLOR = (0, 80, 16)  # Dark green
 MARGIN = (20, 10)  # Board margin and minimum card padding
 SBHEIGHT = 25  # status bar height
 SBCOLOR = (242, 241, 240)  # status bar background color
+
 background = None  # graphics.Background
 slot = None  # graphics.Slot
 cursors = {'default': None,
@@ -92,3 +98,33 @@ def datadirs(dirname):
     '''
     return [os.path.join(CONFIGDIR, dirname),
             os.path.join(DATADIR, dirname)]
+
+def load_options(*argv):
+    '''Load all global options from config file and command line arguments'''
+    global window_size, full_screen, debug, profile
+    try:
+        log.debug("Loading window size from: %s", WINDOWFILE)
+        with open(WINDOWFILE) as fp:
+            # Read in 2 steps to guarantee a valid (w, h) numeric 2-tuple
+            width, height = json.load(fp)
+            window_size = (int(width),
+                           int(height))
+    except (IOError, ValueError) as e:
+        log.warn("Error reading window size, using factory default: %s", e)
+
+    # Too lazy for argparse right now
+    if "--fullscreen" in argv: full_screen = True
+    if "--debug"      in argv: debug = True
+    if "--profile"    in argv: profile = True
+
+    if debug:
+        # This is SO wrong... we really need to be a package ASAP
+        logging.root.level = logging.DEBUG
+
+def save_options():
+    try:
+        log.debug("Saving window size to: %s", WINDOWFILE)
+        with open(WINDOWFILE, 'w') as fp:
+            json.dump(window_size, fp)
+    except IOError as e:
+        log.warn("Could not write window size: %s", e)
