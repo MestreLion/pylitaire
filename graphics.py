@@ -40,6 +40,8 @@ log = logging.getLogger(__name__)
 IMAGE_EXTS = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'pcx', 'tga', 'tif', 'tiff',
               'lbm', 'pbm', 'pgm', 'ppm', 'xpm']
 
+_desktop_size = ()
+
 class Background(object):
     def __init__(self, path="", size=(), color=None, title=""):
         '''Create a new background of <size> from a <path> image file,
@@ -112,6 +114,8 @@ class Slot(object):
 def init_graphics(window_size=None, full_screen=None):
     '''Initialize the game window and graphics'''
 
+    global _desktop_size
+
     log.info("Initializing graphics")
 
     # Caption, icon and mouse cursor should be set before window is created
@@ -125,6 +129,12 @@ def init_graphics(window_size=None, full_screen=None):
 
     g.background = Background()
     g.slot = Slot()
+
+    if not _desktop_size:
+        # Save the current desktop size once and only once, as pygame only
+        # provide this information before the first call to display.set_mode()
+        _desktop_size = (pygame.display.Info().current_w,
+                         pygame.display.Info().current_h)
 
     return resize(window_size, full_screen)
 
@@ -146,11 +156,9 @@ def resize(window_size=None, full_screen=None):
 
     flags = 0
     if full_screen:
-        log.debug("Setting fullscreen, desktop resolution (%s, %s)",
-                  pygame.display.Info().current_w,
-                  pygame.display.Info().current_h)
+        log.debug("Setting fullscreen, desktop resolution %r", _desktop_size)
         flags |= pygame.FULLSCREEN | pygame.HWSURFACE
-        window_size = (0, 0)
+        window_size = _desktop_size
     else:
         log.debug("Setting window size %s", window_size)
         flags |= pygame.RESIZABLE  # FIXME: mysterious thin black bar
