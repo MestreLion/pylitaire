@@ -9,8 +9,9 @@ Brainstorm of new features and code ideas, in no particular order
 - Instructions splash
 
 - Concept idea: cards are *always* in a slot. Can make GUI/gamerules API a LOT simpler if all operations are done
-  with slot as argument, cards being an additional argument. No more "get_top_card_or_slot()" insanity!
-  (or "if card in self.slots", for that matter). OTOH, cards library will lose a lot of freedom.
+  with slot as argument, cards being an additional argument. No more "get_top_item()" insanity!
+  (or "if card in self.slots", for that matter). OTOH, cards library will lose a lot of freedom:
+  drop will always be on a slot, somewhat forcing card drop to tail
 
 - Smarter board size calculation: play area should be horizontally aligned at center and
   vertically aligned on top
@@ -77,6 +78,8 @@ Brainstorm of new features and code ideas, in no particular order
 
 - double-click on foundation (slot or card) bring all possible cards
 
+- High scores and times, and winning ratios. Per-game.
+
 - use custom exceptions to signal events from UI to Main loop/render: Quit, ClearScreen, etc.
   the ones who were formerly boolean flags such as done, clear
 
@@ -87,6 +90,9 @@ Brainstorm of new features and code ideas, in no particular order
 - "No more moves" detection
 
 - Font list/loader for a better-looking font. Arial perhaps?
+
+- Be smarter about click and drag: drop targets should not include current slot/parent ("own drop" should be considered
+  a drag abort), and a (successful) drop should abort click (and perhaps doubleclick too).
 
 - Rename the project to Pyukon Solitaire. Perhaps Pyleriot, given the artwork and behavior :)
 
