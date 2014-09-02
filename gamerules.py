@@ -70,7 +70,7 @@ class Command():
         args = [str(_) for _ in self.args]
         args.extend(("%s=%s" % (k, v) for k, v in self.kwargs.items()))
         return "<%s.%s(%s)>" % (
-            self.command.im_self,
+            getattr(self.command, 'im_self', ''),
             self.command.__name__,
             ", ".join(args))
 
@@ -164,6 +164,9 @@ class Game(object):
                 log.debug("Executing undo: %s", cmd)
                 cmd.execute()
 
+    def add_undo(self, command, *args, **kwargs):
+        self.undocmds.append(Command(command, *args, **kwargs))
+
     # Methods below are meant to be overwritten by subclasses to suit its rules
 
     def setup(self):
@@ -180,6 +183,7 @@ class Game(object):
         '''
         if not item in self.slots:
             item.flip()
+            self.add_undo(item.flip)
             return True
 
     def doubleclick(self, item):
@@ -196,7 +200,7 @@ class Game(object):
             Extend this only if game needs additional actions when dropping
             cards.
         '''
-        slot = card.slot
+        slot = card.slot  # assuming cards are always in a slot
 
         if target in self.slots:
             card.place(target)
@@ -204,9 +208,9 @@ class Game(object):
             card.stack(target)
 
         if slot.empty:
-            self.undocmds.append(Command(card.place, slot))
+            self.add_undo(card.place, slot)
         else:
-            self.undocmds.append(Command(card.stack, slot.tail))
+            self.add_undo(card.stack, slot.tail)
 
     def draggable(self, card):
         '''Return True if <card> can be dragged. This just helps GUI to choose
@@ -315,7 +319,6 @@ class Klondike(Game):
 
     def setup(self):
         c = 0
-
         for col, slot in enumerate(self.tableau):
             for row in xrange(col + 1):
                 card = self.deck.cards[c]
@@ -337,6 +340,7 @@ class Klondike(Game):
             c += 1
 
     def click(self, item):
+        undo = []
         # Slot
         if item in self.slots:
             if item is self.stock and not self.waste.empty:
@@ -346,7 +350,15 @@ class Klondike(Game):
                         card.place(self.stock)
                     else:
                         card.stack(cards[c-1])
+
+                    if self.waste.empty:
+                        undo.append(Command(card.place, self.waste))
+                    else:
+                        undo.append(Command(card.stack, cards[c+1]))
+
                     card.flip()
+                    undo.append(Command(card.flip))
+                self.undocmds.append(undo)
                 return True
 
         # Card
@@ -356,7 +368,15 @@ class Klondike(Game):
                     item.place(self.waste)
                 else:
                     item.stack(self.waste.tail)
+
+                if self.stock.empty:
+                    undo.append(Command(item.place, self.stock))
+                else:
+                    undo.append(Command(item.stack, self.stock.tail))
+
             item.flip()
+            undo.append(Command(item.flip))
+            self.undocmds.append(undo)
             return True
 
     def doubleclick(self, item):
@@ -497,9 +517,11 @@ class Backbone(Game):
 
         self.redeals = 1
 
-    def click(self, card):
-        if card in self.slots:
-            if (card is self.stock
+    def click(self, item):
+        undo = []
+
+        if item in self.slots:
+            if (item is self.stock
                 and not self.waste.empty
                 and self.redeals > 0):
                 self.redeals -= 1
@@ -509,16 +531,37 @@ class Backbone(Game):
                         card.place(self.stock)
                     else:
                         card.stack(cards[c-1])
+
+                    if self.waste.empty:
+                        undo.append(Command(card.place, self.waste))
+                    else:
+                        undo.append(Command(card.stack, cards[c+1]))
+
                     card.flip()
+                    undo.append(Command(card.flip))
+
+                def undo_redeals(self):
+                    self.redeals += 1
+                undo.append(Command(undo_redeals, self))
+
+                self.undocmds.append(undo)
                 return True
 
-        elif card.is_tail and not card.faceup:
-            if card.slot is self.stock:
+        elif item.is_tail and not item.faceup:
+            if item.slot is self.stock:
                 if self.waste.empty:
-                    card.place(self.waste)
+                    item.place(self.waste)
                 else:
-                    card.stack(self.waste.tail)
-            card.flip()
+                    item.stack(self.waste.tail)
+
+                if self.stock.empty:
+                    undo.append(Command(item.place, self.stock))
+                else:
+                    undo.append(Command(item.stack, self.stock.tail))
+
+            item.flip()
+            undo.append(Command(item.flip))
+            self.undocmds.append(undo)
             return True
 
     def doubleclick(self, item):

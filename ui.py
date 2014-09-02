@@ -190,8 +190,9 @@ class Gui(object):
         if event.type == pygame.KEYDOWN:
 
             if event.key == pygame.K_BACKSPACE:
-                if game.undoable():
+                if game.undoable() and not self.dragcard:
                     game.undo()
+                    self._update_card()
                 else:
                     log.info("Undo not available")
 
