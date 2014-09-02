@@ -436,7 +436,8 @@ class Slot(pygame.sprite.DirtySprite):
                  size=(0, 0),
                  rank=-1,
                  suit=-1,
-                 image=None):
+                 image=None,
+                 name=""):
         '''Create slot at position <cell>, a (cx, cy) tuple in game grid units
             logic units, each cell sized card size + margins. Useful for
             repositioning the slot according to board geometry.
@@ -450,6 +451,7 @@ class Slot(pygame.sprite.DirtySprite):
         '''
         super(Slot, self).__init__()
 
+        self.name = name
         self.rank = rank
         self.suit = suit
         self.cell = cell
@@ -460,6 +462,13 @@ class Slot(pygame.sprite.DirtySprite):
         self.child = None  # Card instance, set by card on place()
         self.rect = pygame.sprite.Rect(position, size)
         self.image = image
+
+    def __repr__(self):
+        if self.name:
+            return "<%s(%r, name=%r)>" % (
+                self.__class__.__name__, self.cell, self.name)
+        else:
+            return "<%s(%r)>" % (self.__class__.__name__, self.cell)
 
     def resize(self, cardsize):
         '''Resize the slot to <cardsize> (width, height)'''
