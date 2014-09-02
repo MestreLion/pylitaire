@@ -172,8 +172,24 @@ class Card(pygame.sprite.DirtySprite):
 
     def __init__(self, rank, suit, deck=None,
                  position=(0, 0), faceup=True, orientation=ORIENTATION.DOWN,
-                 slot=None):
+                 slot=None, id=""):
         super(Card, self).__init__()
+
+        if id:
+            id = id.upper()
+            rank, suit = id[:-1], id[-1]
+            if rank in ['J', 'Q', 'K', 'A']:
+                for r in RANK:
+                    if r.name[1].upper() == rank:
+                        rank = r
+                        break
+            else:
+                rank = int(rank)
+
+            for s in SUIT:
+                if s.name[1].upper() == suit:
+                    suit = s
+                    break
 
         self.rank = rank
         self.suit = suit
@@ -188,7 +204,7 @@ class Card(pygame.sprite.DirtySprite):
         suitname = SUIT.name(self.suit)
         self.name = "%s of %s" % (rankname, suitname)
 
-        if self.rank <= 10:
+        if 2 <= self.rank <= 10:
             shortrank = str(self.rank)
         else:
             shortrank = rankname[:1].upper()
@@ -209,8 +225,8 @@ class Card(pygame.sprite.DirtySprite):
         self.cardimage = None
 
     def __repr__(self):
-        return "<%s(rank=%2d, suit=%r)>" % (
-            self.__class__.__name__, self.rank, self.suit)
+        return "<%s(id=%r)>" % (
+            self.__class__.__name__, self.shortname)
 
     def resize(self, cardsize):
         # this can be smarter on resizing to same size,
