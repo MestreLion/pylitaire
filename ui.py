@@ -187,6 +187,14 @@ class Gui(object):
         if self.win or not game:
             return
 
+        if event.type == pygame.KEYDOWN:
+
+            if event.key == pygame.K_BACKSPACE:
+                if game.undoable():
+                    game.undo()
+                else:
+                    log.info("Undo not available")
+
         if (event.type == pygame.MOUSEBUTTONDOWN
             and self.card):
 

@@ -57,6 +57,24 @@ def get_games():
     return _games
 
 
+class Command():
+    def __init__(self, command, *args, **kwargs):
+        self.command = command
+        self.args    = args
+        self.kwargs  = kwargs
+
+    def execute(self):
+        self.command(*self.args, **self.kwargs)
+
+    def __repr__(self):
+        args = [str(_) for _ in self.args]
+        args.extend(("%s=%s" % (k, v) for k, v in self.kwargs.items()))
+        return "<%s.%s(%s)>" % (
+            self.command.im_self,
+            self.command.__name__,
+            ", ".join(args))
+
+
 class Game(object):
     '''Base class for all game rules.'''
     def __init__(self):
@@ -97,6 +115,7 @@ class Game(object):
         self.slots = []
         self.deck = cards.Deck()
         self.name = self.__class__.__name__
+        self.undocmds = []
 
     def create_slot(self, *slotargs, **slotkwargs):
         '''Create a game slot. See cards.Slot for arguments.
@@ -117,6 +136,7 @@ class Game(object):
         '''Handle a Restart Game event. Break all stacks and run setup()'''
         if not nolog:
             log.info("Restart game")
+        self.undocmds = []
         self.deck.pop_cards()
         self.setup()
 
@@ -130,6 +150,19 @@ class Game(object):
         for slot in self.slots:
             if slot.rect.collidepoint(pos):
                 return slot
+
+    def undoable(self):
+        return bool(self.undocmds)
+
+    def undo(self):
+        command = self.undocmds.pop()
+        if isinstance(command, Command):
+            log.debug("Executing undo: %s", command)
+            command.execute()
+        else:
+            for cmd in reversed(command):
+                log.debug("Executing undo: %s", cmd)
+                cmd.execute()
 
     # Methods below are meant to be overwritten by subclasses to suit its rules
 
@@ -163,10 +196,17 @@ class Game(object):
             Extend this only if game needs additional actions when dropping
             cards.
         '''
+        slot = card.slot
+
         if target in self.slots:
             card.place(target)
         else:
             card.stack(target)
+
+        if slot.empty:
+            self.undocmds.append(Command(card.place, slot))
+        else:
+            self.undocmds.append(Command(card.stack, slot.tail))
 
     def draggable(self, card):
         '''Return True if <card> can be dragged. This just helps GUI to choose
