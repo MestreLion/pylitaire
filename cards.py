@@ -355,8 +355,8 @@ class Card(pygame.sprite.DirtySprite):
         if not overlap:
             overlap = self.snap_overlap
         if orientation != ORIENTATION.NONE:
-            self.move((card.rect.x + orientation[0] * overlap[0] * card.rect.width,
-                       card.rect.y + orientation[1] * overlap[1] * card.rect.height))
+            self.move((card.rect.x + orientation[0] * overlap[0] * card.rect.w,
+                       card.rect.y + orientation[1] * overlap[1] * card.rect.h))
         if self.child:
             self.child.snap(self, orientation, overlap)
 
@@ -378,7 +378,7 @@ class Card(pygame.sprite.DirtySprite):
             self.child.snap(self, self.orientation, self.slot.overlap)
 
     def _set_slot(self, slot):
-        '''Set the card to <slot>, recursivelly on all children. Used internally
+        '''Set the card to <slot>, recursively on all children. Used internally
             by place() and stack()
         '''
         # Could be merged with snap(), but for now that is a strictly graphical
@@ -495,7 +495,7 @@ class Slot(pygame.sprite.DirtySprite):
         cur_overlap  = (getattr(tail.rect,  attrib) - edge) / dist
 
         # overboard or compressed
-        if max_overlap < cur_overlap or cur_overlap < self.overlap[i]:
+        if max_overlap < cur_overlap or round(cur_overlap, 2) < self.overlap[i]:
             overlap = min(self.overlap[i], max_overlap)
             log.debug("Fit slot overlap from %.3f, max %.3f, to %.3f",
                       cur_overlap, max_overlap, overlap)

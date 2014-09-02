@@ -111,11 +111,11 @@ class Game(object):
         '''Handle a New Game event. Simply shuffle cards and call restart()'''
         log.info("New game")
         self.deck.shuffle()
-        self.restart(log=False)
+        self.restart(nolog=True)
 
-    def restart(self, log=True):
+    def restart(self, nolog=False):
         '''Handle a Restart Game event. Break all stacks and run setup()'''
-        if log:
+        if not nolog:
             log.info("Restart game")
         self.deck.pop_cards()
         self.setup()
@@ -537,16 +537,19 @@ class Test(Game):
         self.grid = (3, 3)
         self.deck.create_cards()
         for i in xrange(self.grid[0]):
-            for j in xrange(self.grid[1]):
-                self.create_slot((i, j))
+            for j in xrange(self.grid[1] - 1):
+                slot = self.create_slot((i, j))
+                if j == 1:
+                    slot.orientation = cards.ORIENTATION.DOWN
 
     def setup(self):
-        self.deck.cards[0].place(self.slots[4])
+        self.deck.cards[0].place(self.slots[1])
 
         c = 1
         for card in self.deck.cards[c:]:
             card.stack(self.deck.cards[c-1])
             c += 1
+        self.slots[1].fit()
 
     def click(self, item):
         return
