@@ -160,21 +160,26 @@ class Gui(object):
             self.resize(size)
 
         if event.type == pygame.KEYDOWN:
+
             if event.key in [pygame.K_RETURN, pygame.K_KP_ENTER]:
                 self.startgame(new=True)
+
             if event.key == pygame.K_SPACE:
                 self.startgame(new=False)
+
             if event.key == pygame.K_F1:
                 log.debug("HELP!\nHelp me if you can, I'm feeling down,\n"
                           "And I do appreciate you being 'round\n"
                           "Help me get my feet back on the ground\n"
                           "Won't you please, please help me")
+
             if event.key in xrange(pygame.K_F2, pygame.K_F10 + 1):
                 # A little hack for "get the n-th game"
                 i = event.key - pygame.K_F2
                 games = sorted(self.games.items())
                 if len(games) >= i + 1:
                     self.load_game(games[i][0])
+
             if event.key == pygame.K_F11:
                 size = graphics.resize(full_screen=not g.full_screen)
                 self.resize(size)
@@ -191,7 +196,7 @@ class Gui(object):
 
                 if (self.card == self.doubleclickcard
                     and self.ticks < self.doubleclicktimer):
-                    log.debug("DOUBLE click %s", self.card)
+                    log.debug("Double click %s", self.card)
                     self.doubleclickcard = None
                     self.doubleclicktimer = 0
                     if game.doubleclick(self.card):
@@ -248,7 +253,7 @@ class Gui(object):
 
                 if self.clickcard:
                     if self.card == self.clickcard:
-                        log.debug("Click card %s", self.card)
+                        log.debug("Click %s", self.card)
                         if game.click(self.card):
                             # card may be the same, cursor may be not, hence forced
                             self._update_card(True)
