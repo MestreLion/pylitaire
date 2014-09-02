@@ -257,17 +257,19 @@ class Klondike(Game):
 
         self.grid = grid or (7, 3.2)
 
-        self.stock = self.create_slot((0, 0))
-        self.waste = self.create_slot((1, 0))
+        self.stock = self.create_slot((0, 0), name="Stock")
+        self.waste = self.create_slot((1, 0), name="Waste")
 
         self.foundations = []
         for i in xrange(self.grid[0] - 4, self.grid[0]):
-            self.foundations.append(self.create_slot((i, 0)))
+            self.foundations.append(self.create_slot((i, 0),
+                                                 name="Foundation %s" % (i-3)))
 
         self.tableau = []
         for i in xrange(self.grid[0]):
             self.tableau.append(self.create_slot((i, 1),
-                                                 cards.ORIENTATION.DOWN))
+                                                 cards.ORIENTATION.DOWN,
+                                                 name="Tableau %s" % (i+1)))
 
         self.deck.create_cards(doubledeck=False, jokers=0, faceup=False)
 
@@ -408,25 +410,28 @@ class Backbone(Game):
         self.grid = (8, 4)
         self.redeals = 1
 
-        self.stock = self.create_slot((5, 2))
-        self.waste = self.create_slot((6, 2))
+        self.stock = self.create_slot((5, 2), name="Stock")
+        self.waste = self.create_slot((6, 2), name="Waste")
 
         self.foundations = []
         for i in xrange(8):
-            self.foundations.append(self.create_slot((4 + i%4, i/4)))
+            self.foundations.append(self.create_slot((4 + i%4, i/4),
+                                                 name="Foundation %s" % (i+1)))
 
         self.tableau = []
         for i in xrange(8):
-            self.tableau.append(self.create_slot((3 * (i/4), i%4)))
+            self.tableau.append(self.create_slot((3 * (i/4), i%4),
+                                                 name="Tableau %s" % (i+1)))
 
         self.backbone = []
         for i in xrange(18):
-            self.backbone.append(self.create_slot((1 + i/9, 0.33 * (i%9))))
+            self.backbone.append(self.create_slot((1 + i/9, 0.33 * (i%9)),
+                                                  name="Backbone %s" % (i+1)))
 
         for i, slot in enumerate(self.backbone[:-1]):
             slot.blockedby = self.backbone[i+1]
 
-        self.block = self.create_slot((1.5, 3))
+        self.block = self.create_slot((1.5, 3), name="Block")
         for i in [8, 17]:
             self.backbone[i].blockedby = self.block
 
