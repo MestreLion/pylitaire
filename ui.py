@@ -280,15 +280,17 @@ class Gui(object):
 
         if self.updatestatus:
             self.updatestatus = False
-            self.statusbar.message = self.game.status()
-            self.statusbar.time = self.gamestarttime and (self.ticks -
-                                                          self.gamestarttime)
-            self.statusbar.score = self.game.score()
+            message = self.game.status()
+            time = self.gamestarttime and (self.ticks - self.gamestarttime)
+            score = self.game.score()
+            if (time == 0
+                or message != self.statusbar.message
+                or score   != self.statusbar.score):
+                log.info("%s\t%s\t%s", message, formattime(time), score)
+            self.statusbar.message = message
+            self.statusbar.time = time
+            self.statusbar.score = score
             self.statusbar.need_update = True
-            log.info("%s\t%s\t%s",
-                     self.statusbar.message,
-                     self.statusbar.time,
-                     self.statusbar.score)
 
             self.win = self.game.win()
 
