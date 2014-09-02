@@ -81,6 +81,7 @@ class Gui(object):
         self.updatestatus = False
         self.win = False
         self.clear = False
+        self.board = None
 
         self.games = gamerules.get_games()
         self.statusbar = StatusBar(height=g.SBHEIGHT, bgcolor=g.SBCOLOR)
@@ -233,9 +234,12 @@ class Gui(object):
                         log.debug("Drop %s onto %s", self.dragcard, dropcard)
                         # let the game itself drop, as GUI shall not assume card
                         # will stack, or just snap, or leave position alone
-                        # GUI job is just to end the card drop
+                        # GUI job is just to end the card drop and fit the slot
                         self.dragcard.drop()
+                        slot = self.dragcard.slot
                         self.game.drop(self.dragcard, dropcard)
+                        slot.fit()
+                        self.dragcard.slot.fit() # current slot
                     else:
                         log.debug("Abort drag %s", self.dragcard)
                         self.dragcard.abort_drag()
@@ -338,12 +342,12 @@ class Gui(object):
 
         pad = margin = g.MARGIN
 
-        playarea = pygame.Rect(margin, (size[0] - 2 * margin[0],
-                                        size[1] - 2 * margin[1]
-                                                - self.statusbar.height))
+        board = pygame.Rect(margin, (size[0] - 2 * margin[0],
+                                     size[1] - 2 * margin[1]
+                                        - self.statusbar.height))
 
-        maxcellsize = ((playarea.width  + pad[0]) / self.game.grid[0],
-                       (playarea.height + pad[1]) / self.game.grid[1])
+        maxcellsize = ((board.width  + pad[0]) / self.game.grid[0],
+                       (board.height + pad[1]) / self.game.grid[1])
 
         maxcardsize = (maxcellsize[0] - pad[0],
                        maxcellsize[1] - pad[1])
@@ -355,10 +359,10 @@ class Gui(object):
                 if s:
                     r = pygame.Rect(r.topleft, s)
                 pygame.draw.rect(g.background.surface, c, r, w)
-            drawgrid(playarea)
-            drawgrid(playarea, maxcellsize)
-            drawgrid(playarea, maxcardsize, w=3)
-            drawgrid(playarea, cardsize, COLORS.BLUE)
+            drawgrid(board)
+            drawgrid(board, maxcellsize)
+            drawgrid(board, maxcardsize, w=3)
+            drawgrid(board, cardsize, COLORS.BLUE)
 
         # Expand card padding horizontally up to 50% of card size
         # and vertically up to 20% of card size, limiting minimum value
@@ -371,24 +375,26 @@ class Gui(object):
                     cardsize[1] + pad[1])
 
         # Trim the play area based on new cell size
-        playarea.size = ((cellsize[0] * self.game.grid[0]) - pad[0],
-                         (cellsize[1] * self.game.grid[1]) - pad[1])
+        board.size = ((cellsize[0] * self.game.grid[0]) - pad[0],
+                      (cellsize[1] * self.game.grid[1]) - pad[1])
 
         # And center it horizontally
-        playarea.centerx = size[0] / 2
+        board.centerx = size[0] / 2
 
         if g.debug:
-            drawgrid(playarea, None, COLORS.YELLOW, w=3)
-            drawgrid(playarea, cellsize, COLORS.YELLOW)
+            drawgrid(board, None, COLORS.YELLOW)
+            drawgrid(board, cellsize, COLORS.YELLOW)
 
-        log.debug("Resizing board to %r, cell size %r and card size %r",
-                  playarea, cellsize, cardsize)
+        self.board = board
+        log.debug("Board resized to %r, cell size %r and card size %r",
+                  self.board, cellsize, cardsize)
 
         g.slot.resize(cardsize)
-        geometry = pygame.Rect(playarea.topleft, cellsize)
+        geometry = pygame.Rect(self.board.topleft, cellsize)
         for slot in self.game.slots:
             slot.resize(cardsize)
             slot.boardmove(geometry)
+            slot.fit(board)
             slot.draw(g.background.surface, g.slot.surface)
 
         self.clear = True
