@@ -89,6 +89,10 @@ class Deck(pygame.sprite.LayeredDirty):
         self.cards = []
         self.cardsdict = {}
 
+        # Animation-related
+        self.gravity = 0
+        self.board = None
+
     def set_theme(self, theme):
         '''Set the card theme for the deck.
             <theme> can be either an instance of themes.Theme
@@ -164,6 +168,38 @@ class Deck(pygame.sprite.LayeredDirty):
 
         return self.cardsize
 
+    def start_animation(self, board, gravity=3):
+        if not self.board:
+            log.warn("start_animation() called during an ongoing animation. "
+                     "Forgot to stop_animation() before?")
+        log.debug("Start animation in board %s, gravity %d", board, gravity)
+        self.board = board
+        self.gravity = gravity
+        self.animate_next_card()
+
+    def animate_next_card(self):
+        sprites = self.sprites()
+        if not sprites:
+            self.stop_animation()
+            return
+        card = random.choice(sprites)
+        if card.slot:
+            card.slot.tail.animate()
+        else:
+            card.animate()
+
+    def stop_animation(self):
+        if not self.board:
+            return  # already stopped by itself
+        log.debug("Animation stopped")
+        for card in self.cards:
+            self.add(card)
+            card.move(self.board.topleft)
+            card.velocity = []
+            self.dirty = 0
+        self.board = None
+        self.gravity = 0
+
 
 class Card(pygame.sprite.DirtySprite):
     ''' A sprite representing a card '''
@@ -224,9 +260,41 @@ class Card(pygame.sprite.DirtySprite):
         # to be defined in resize()
         self.cardimage = None
 
+        self.velocity = []
+
     def __repr__(self):
         return "<%s(id=%r)>" % (
             self.__class__.__name__, self.shortname)
+
+    def update(self):
+        if not self.velocity:
+            return
+
+        self.velocity = [self.velocity[0],
+                         self.velocity[1] + self.deck.gravity]
+
+        self.move((self.rect.x + self.velocity[0],
+                   self.rect.y + self.velocity[1]))
+
+        if self.rect.bottom >= self.deck.board.bottom:
+            self.rect.bottom = self.deck.board.bottom
+            self.velocity[1] *= -0.9
+
+        if not self.rect.colliderect(self.deck.board):
+            self.velocity = []
+            self.deck.remove(self)
+            self.pop()
+            self.deck.animate_next_card()
+
+    def animate(self):
+        if self.child:
+            log.warn("Trying to animate non-tail %s", self)
+            self.slot.tail.animate()
+
+        log.debug("Animating %s", self)
+        self.velocity = [random.randint( 10,  30),
+                         random.randint(-30, -10)]
+        self.velocity[0] *= random.choice([-1, 1])
 
     def resize(self, cardsize):
         # this can be smarter on resizing to same size,
