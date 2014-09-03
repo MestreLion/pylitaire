@@ -90,6 +90,7 @@ class Deck(pygame.sprite.LayeredDirty):
         self.cardsdict = {}
 
         # Animation-related
+        self.animating = False
         self.gravity = 0
         self.board = None
 
@@ -169,10 +170,11 @@ class Deck(pygame.sprite.LayeredDirty):
         return self.cardsize
 
     def start_animation(self, board, gravity=3):
-        if not self.board:
+        if self.animating:
             log.warn("start_animation() called during an ongoing animation. "
                      "Forgot to stop_animation() before?")
         log.debug("Start animation in board %s, gravity %d", board, gravity)
+        self.animating = True
         self.board = board
         self.gravity = gravity
         self.animate_next_card()
@@ -189,7 +191,7 @@ class Deck(pygame.sprite.LayeredDirty):
             card.animate()
 
     def stop_animation(self):
-        if not self.board:
+        if not self.animating:
             return  # already stopped by itself
         log.debug("Animation stopped")
         for card in self.cards:
@@ -197,6 +199,7 @@ class Deck(pygame.sprite.LayeredDirty):
             card.move(self.board.topleft)
             card.velocity = []
             self.dirty = 0
+        self.animating = False
         self.board = None
         self.gravity = 0
 
@@ -417,7 +420,7 @@ class Card(pygame.sprite.DirtySprite):
         if orientation == ORIENTATION.KEEP:
             orientation = self.parent.orientation
         self.orientation = orientation
-        self.snap(card, orientation, overlap)
+        self.snap(card, self.orientation, overlap)
 
     def pop(self):
         '''Disconnect from its parent, if any, slicing the stack
@@ -436,6 +439,7 @@ class Card(pygame.sprite.DirtySprite):
         '''
         if orientation == ORIENTATION.KEEP:
             orientation = card.orientation
+        self.orientation = orientation
         if not overlap:
             overlap = self.snap_overlap
         if orientation != ORIENTATION.NONE:
