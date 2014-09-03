@@ -65,8 +65,9 @@ class Quit(Exception):
 
 
 class Gui(object):
-    def __init__(self, size=()):
-        self.size = size
+    def __init__(self):
+        self.window = None
+        self.size = ()
         self.pos = None
         self.card = None
         self.dragcard = None
@@ -92,8 +93,26 @@ class Gui(object):
 
         self.game = None
 
-        if size:
-            self.resize(size)
+
+    def run(self, window_size, full_screen, gamename):
+        self.resize(window_size, full_screen)
+        self.load_game(gamename)
+
+        clock = pygame.time.Clock()
+        while True:
+            try:
+                self.handle_events()
+            except Quit:
+                break
+            self.update()
+            updated = self.draw()
+            pygame.display.update(updated)
+
+            if g.profile:
+                if pygame.time.get_ticks() > 10000:
+                    break
+
+            clock.tick(g.FPS)
 
 
     def load_game(self, gamename):
@@ -126,11 +145,7 @@ class Gui(object):
                               pygame.MOUSEBUTTONUP]:
                 self.pos = event.pos
                 self._update_card(updatestatus=False)
-            try:
-                self._handle_event(event, self.game)
-            except Quit:
-                return False
-        return True
+            self._handle_event(event, self.game)
 
 
     def _update_card(self, force_cursor_update=False, updatestatus=True):
@@ -157,8 +172,7 @@ class Gui(object):
             raise Quit
 
         if event.type == pygame.VIDEORESIZE:
-            size = graphics.resize(event.size)
-            self.resize(size)
+            self.resize(event.size)
 
         if event.type == pygame.KEYDOWN:
 
@@ -182,8 +196,7 @@ class Gui(object):
                     self.load_game(games[i][0])
 
             if event.key == pygame.K_F11:
-                size = graphics.resize(full_screen=not g.full_screen)
-                self.resize(size)
+                self.resize(full_screen=not g.full_screen)
 
         if self.win or not game:
             return
@@ -326,6 +339,21 @@ class Gui(object):
                 self.set_mouse_cursor('default')
 
 
+    def draw(self):
+        dirty = []
+
+        if self.clear:
+            g.background.draw(self.window)
+            dirty = [self.window.get_rect()]
+
+        for group in self.spritegroups:
+            group.clear(self.window, g.background.surface)
+            dirty.extend(group.draw(self.window))
+
+        self.clear = False
+        return dirty
+
+
     def set_mouse_cursor(self, cursorname):
         if cursorname != self.cursorname:
             pygame.mouse.set_cursor(*(g.cursors[cursorname]))
@@ -333,16 +361,19 @@ class Gui(object):
             self.cursorname = cursorname
 
 
-    def resize(self, size):
+    def resize(self, window_size=None, full_screen=None):
         '''Resize all widgets according to new window <size>
             Also trigger the board resize
         '''
-        self.size = size
-        for widget in self.widgets:
-            widget.resize(size)
+        self.window = graphics.resize(window_size, full_screen)
+        self.size = self.window.get_size()
 
-        self.fullboard = pygame.Rect((0, 0), (size[0],
-                                              size[1] - self.statusbar.height))
+        for widget in self.widgets:
+            widget.resize(self.size)
+
+        self.fullboard = pygame.Rect(0, 0,
+                                     self.size[0],
+                                     self.size[1] - self.statusbar.height)
         self.resize_board(self.fullboard)
 
 
@@ -361,8 +392,8 @@ class Gui(object):
 
         pad = margin = g.MARGIN
 
-        board = pygame.Rect(fullboard.topleft, (fullboard.w - 2 * margin[0],
-                                                fullboard.h - 2 * margin[1]))
+        board = pygame.Rect(margin, (fullboard.w - 2 * margin[0],
+                                     fullboard.h - 2 * margin[1]))
 
         maxcellsize = ((board.width  + pad[0]) / self.game.grid[0],
                        (board.height + pad[1]) / self.game.grid[1])

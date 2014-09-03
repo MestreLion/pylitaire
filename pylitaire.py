@@ -40,25 +40,11 @@ def main(*argv):
 
     pygame.display.init()
     pygame.font.init()
-    display_size = graphics.init_graphics(g.window_size, g.full_screen)
     themes.init_themes()
+    graphics.init_graphics()
 
-    gui = ui.Gui(display_size)
-    gui.load_game(g.gamename)
-
-    clock = pygame.time.Clock()
-    run = True
-    while run:
-        run = gui.handle_events()
-        gui.update()
-        graphics.render(gui.spritegroups, gui.clear)
-        gui.clear = False
-
-        if g.profile:
-            if pygame.time.get_ticks() > 10000:
-                return True
-
-        clock.tick(g.FPS)
+    gui = ui.Gui()
+    gui.run(g.window_size, g.full_screen, g.gamename)
 
     g.save_options()
     pygame.quit()

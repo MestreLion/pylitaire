@@ -146,7 +146,7 @@ def resize(window_size=None, full_screen=None):
         Requested values are saved to g.
     '''
     if window_size is None and full_screen is None:
-        return pygame.display.get_surface().get_size()
+        return pygame.display.get_surface()
 
     if window_size is not None: g.window_size = window_size
     if full_screen is not None: g.full_screen = full_screen
@@ -169,26 +169,11 @@ def resize(window_size=None, full_screen=None):
     g.background.resize(size)
     g.background.draw(window)
 
-    # Display the initial window soon as possible, as other elements may take a while
+    # Display the window soon as possible, as other elements may take a while
     pygame.display.update()
 
-    # return the actual window size
-    return size
-
-
-def render(spritegroups, clear=False):
-    dirty = []
-    window = pygame.display.get_surface()
-
-    if clear:
-        g.background.draw(window)
-        dirty = [window.get_rect()]
-
-    for group in spritegroups:
-        group.clear(window, g.background.surface)
-        dirty.extend(group.draw(window))
-
-    pygame.display.update(dirty)
+    # return the new window
+    return window
 
 
 def scale_size(original, size=(), proportional=True, multiple=(1, 1)):
