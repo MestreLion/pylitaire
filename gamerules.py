@@ -636,8 +636,12 @@ class Test(Game):
         c = 1
         for card in self.deck.cards[c:]:
             card.stack(self.deck.cards[c-1])
+            card.flip(True)
             c += 1
         self.slots[1].fit()
 
     def click(self, item):
         return
+
+    def win(self):
+        return not self.slots[-1].empty

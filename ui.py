@@ -82,6 +82,7 @@ class Gui(object):
         self.win = False
         self.clear = False
         self.board = None
+        self.fullboard = None
 
         self.games = gamerules.get_games()
         self.statusbar = StatusBar(height=g.SBHEIGHT, bgcolor=g.SBCOLOR)
@@ -110,7 +111,7 @@ class Gui(object):
         self.game.deck.set_theme(g.theme)
 
         self.spritegroups.insert(0, self.game.deck)
-        self.resize_board(self.size)
+        self.resize_board(self.fullboard)
         self.startgame(True)
 
 
@@ -278,7 +279,7 @@ class Gui(object):
 
 
     def update(self):
-        if self.win or not self.game:
+        if not self.game:
             return
 
         if self.dragcard:
@@ -306,14 +307,15 @@ class Gui(object):
             self.statusbar.score = score
             self.statusbar.need_update = True
 
-            self.win = self.game.win()
+            if self.game.win():
+                self.wingame()
 
         self.game.deck.update()
         for sprite in self.widgets:
             if sprite.need_update:
                 sprite.update()
 
-        if self.updatecursor:
+        if self.updatecursor and not self.win:
             self.updatecursor = False
             # 'drag' is handled directly
             if (self.card
@@ -322,9 +324,6 @@ class Gui(object):
                 self.set_mouse_cursor('draggable')
             else:
                 self.set_mouse_cursor('default')
-
-        if self.win:
-            self.wingame()
 
 
     def set_mouse_cursor(self, cursorname):
@@ -341,12 +340,16 @@ class Gui(object):
         self.size = size
         for widget in self.widgets:
             widget.resize(size)
-        self.resize_board(size)
+
+        self.fullboard = pygame.Rect((0, 0), (size[0],
+                                              size[1] - self.statusbar.height))
+        self.resize_board(self.fullboard)
 
 
-    def resize_board(self, size):
+    def resize_board(self, fullboard):
         '''Recalculate board geometry, resizing and repositioning all board
-            elements according to window <size>. Current board elements are:
+            elements according to available <fullboard> space.
+            Current board elements are:
             - game.deck and its cards, by Deck.resize(maxcardsize)
             - slot image, by its own .resize(cardsize)
             - game.slots, by its own .resize(cardsize)
@@ -358,9 +361,8 @@ class Gui(object):
 
         pad = margin = g.MARGIN
 
-        board = pygame.Rect(margin, (size[0] - 2 * margin[0],
-                                     size[1] - 2 * margin[1]
-                                        - self.statusbar.height))
+        board = pygame.Rect(fullboard.topleft, (fullboard.w - 2 * margin[0],
+                                                fullboard.h - 2 * margin[1]))
 
         maxcellsize = ((board.width  + pad[0]) / self.game.grid[0],
                        (board.height + pad[1]) / self.game.grid[1])
@@ -395,7 +397,7 @@ class Gui(object):
                       (cellsize[1] * self.game.grid[1]) - pad[1])
 
         # And center it horizontally
-        board.centerx = size[0] / 2
+        board.centerx = fullboard.centerx
 
         if g.debug:
             drawgrid(board, None, COLORS.YELLOW)
@@ -413,6 +415,9 @@ class Gui(object):
             slot.fit(board)
             slot.draw(g.background.surface, g.slot.surface)
 
+        if self.win:
+            self.game.deck.board = fullboard
+
         self.clear = True
 
 
@@ -421,7 +426,9 @@ class Gui(object):
             return
         self.set_mouse_cursor('default')
         self.gamestarttime = 0
-        self.win = False
+        if self.win:
+            self.win = False
+            self.game.deck.stop_animation()
         self.updatestatus = True
         if new:
             self.game.new_game()
@@ -430,10 +437,13 @@ class Gui(object):
 
 
     def wingame(self):
-        log.info("YOU WIN! In %s, congratulations! Bouncing cards soon, I promise!",
+        log.info("YOU WIN! In %s, congratulations!",
                  formattime(self.ticks - self.gamestarttime))
-        self.gamestarttime = 0
         self.win = True
+        self.dragcard = None
+        self.gamestarttime = 0
+        self.set_mouse_cursor('default')
+        self.game.deck.start_animation(self.fullboard)
 
 
 class StatusBar(pygame.sprite.DirtySprite):
