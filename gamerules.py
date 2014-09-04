@@ -117,14 +117,8 @@ class Game(object):
         self.name = self.__class__.__name__
         self.undocmds = []
 
-    def create_slot(self, *slotargs, **slotkwargs):
-        '''Create a game slot. See cards.Slot for arguments.
-            A convenience wrapper to be used by subclasses that automatically
-            keeps track of all slots created by adding them to self.slots list
-        '''
-        slot = cards.Slot(*slotargs, **slotkwargs)
-        self.slots.append(slot)
-        return slot
+    ###########################################################################
+    # API methods already implemented, subclasses should leave alone
 
     def new_game(self):
         '''Handle a New Game event. Simply shuffle cards and call restart()'''
@@ -164,14 +158,12 @@ class Game(object):
                 log.debug("Executing undo: %s", cmd)
                 cmd.execute()
 
-    def add_undo(self, command, *args, **kwargs):
-        self.undocmds.append(Command(command, *args, **kwargs))
-
-    # Methods below are meant to be overwritten by subclasses to suit its rules
+    ###########################################################################
+    # API methods subclasses must implement
 
     def setup(self):
         '''Set up the board, called on new game and restart.
-            Games should override or extend this method.
+            Games should override this method, which by default do nothing.
         '''
         pass
 
@@ -181,14 +173,14 @@ class Game(object):
             By default flip() cards and do nothing on slots
             Return True if card state changed.
         '''
-        if not item in self.slots:
+        if item not in self.slots:
             item.flip()
             self.add_undo(item.flip)
             return True
 
     def doubleclick(self, item):
         '''Handle double click on <widget>, either card or slot.
-            Games should override this method, which do nothing by default.
+            Games should override this method, which by default do nothing.
         '''
         pass
 
@@ -207,10 +199,7 @@ class Game(object):
         else:
             card.stack(target)
 
-        if slot.empty:
-            self.add_undo(card.place, slot)
-        else:
-            self.add_undo(card.stack, slot.tail)
+        self.add_undo(slot.stack, card)
 
     def draggable(self, card):
         '''Return True if <card> can be dragged. This just helps GUI to choose
@@ -234,7 +223,7 @@ class Game(object):
 
             # dropping to a slot
             if target in self.slots:
-                if target.empty:
+                if target.is_empty:
                     droplist.append(target)
 
             # dropping to card
@@ -294,6 +283,48 @@ class Game(object):
         '''
         return self.score() == len(self.deck.cards)
 
+    #########################################
+    # Utility methods that subclasses can use
+
+    def create_slot(self, *slotargs, **slotkwargs):
+        '''Create a game slot. See cards.Slot for arguments.
+            A convenience wrapper to be used by subclasses that automatically
+            keeps track of all slots created by adding them to self.slots list
+        '''
+        slot = cards.Slot(*slotargs, **slotkwargs)
+        self.slots.append(slot)
+        return slot
+
+    def add_undo(self, command, *args, **kwargs):
+        '''Add a command to the undo list'''
+        self.undocmds.append(Command(command, *args, **kwargs))
+
+    def click_stock_waste(self, stock, waste, redeals=None, maxredeals=-1):
+        '''Handle click on stock, waste, and their cards'''
+        pass
+
+    def double_click_to_foundations(self, item, foundations):
+        '''Handle double-click on <item>, stacking it to a suitable foundation
+            slot if card is draggable() from its location and droppable()
+            to any foundation slot.
+        '''
+        if (item in self.slots
+            or item.slot in foundations
+            or not self.draggable(item)):
+            return
+
+        targets = []
+        for slot in foundations:
+            if slot.is_empty:
+                targets.append(slot)
+            else:
+                targets.append(slot.tail)
+
+        droplist = self.droppable(item, targets)
+        if droplist:
+            self.drop(item, droplist[0])
+            return True
+
 
 class Klondike(Game):
     def __init__(self, grid=()):
@@ -318,61 +349,33 @@ class Klondike(Game):
         self.deck.create_cards(doubledeck=False, jokers=0, faceup=False)
 
     def setup(self):
-        c = 0
-        for col, slot in enumerate(self.tableau):
-            for row in xrange(col + 1):
-                card = self.deck.cards[c]
-                card.flip(row >= col)
-                if row == 0:
-                    card.place(slot)
-                else:
-                    card.stack(self.deck.cards[c-1])
-                c += 1
+        super(Klondike, self).setup()
 
-        card = self.deck.cards[c]
-        card.place(self.stock)
-        card.flip(False)
+        for card in self.deck.cards:
+            self.stock.stack(card)
+            card.flip(cards.TURN.FACEDOWN)
 
-        c += 1
-        for card in self.deck.cards[c:]:
-            card.stack(self.deck.cards[c-1])
-            card.flip(False)
-            c += 1
+        for i, _ in enumerate(self.tableau):
+            self.stock.deal(self.tableau[i],      cards.TURN.FACEUP)
+            self.stock.deal(self.tableau[i + 1:], cards.TURN.FACEDOWN)
 
     def click(self, item):
         undo = []
         # Slot
         if item in self.slots:
-            if item is self.stock and not self.waste.empty:
-                cards = self.waste.cards[::-1]
-                for c, card in enumerate(cards):
-                    if c == 0:
-                        card.place(self.stock)
-                    else:
-                        card.stack(cards[c-1])
-
-                    if self.waste.empty:
-                        undo.append(Command(card.place, self.waste))
-                    else:
-                        undo.append(Command(card.stack, cards[c+1]))
-
-                    card.flip()
-                    undo.append(Command(card.flip))
+            if item is self.stock:
+                while not self.waste.is_empty:
+                    self.waste.deal(self.stock, cards.TURN.FACEDOWN)
+                    undo.append(Command(self.stock.deal, self.waste,
+                                        cards.TURN.FACEUP))
                 self.undocmds.append(undo)
                 return True
 
         # Card
         elif item.is_tail and not item.faceup:
             if item.slot is self.stock:
-                if self.waste.empty:
-                    item.place(self.waste)
-                else:
-                    item.stack(self.waste.tail)
-
-                if self.stock.empty:
-                    undo.append(Command(item.place, self.stock))
-                else:
-                    undo.append(Command(item.stack, self.stock.tail))
+                self.stock.deal(self.waste)
+                undo.append(Command(self.waste.deal, self.stock))
 
             item.flip()
             undo.append(Command(item.flip))
@@ -380,22 +383,7 @@ class Klondike(Game):
             return True
 
     def doubleclick(self, item):
-        if (item in self.slots
-            or item.slot in self.foundations
-            or not self.draggable(item)):
-            return
-
-        targets = []
-        for slot in self.foundations:
-            if slot.empty:
-                targets.append(slot)
-            else:
-                targets.append(slot.tail)
-
-        droplist = self.droppable(item, targets)
-        if droplist:
-            self.drop(item, droplist[0])
-            return True
+        return self.double_click_to_foundations(item, self.foundations)
 
     def droppable(self, card, targets):
         targets = super(Klondike, self).droppable(card, targets)
@@ -434,18 +422,13 @@ class Yukon(Klondike):
         self.slots.remove(self.stock)
         self.slots.remove(self.waste)
 
-    def setup(self, e=4, j=1):
+    def setup(self, i=1):
         '''Parametrized to be variation-friendly:
-            <e>: extra cards in each column
-            <j>: start column for extra cards
+            <i>: tableau column to start dealing extra cards
         '''
         super(Yukon, self).setup()
-        i = 0
-        while not self.stock.empty:
-            card = self.stock.tail
-            card.flip(True)
-            card.stack(self.tableau[j + i/e].tail)
-            i += 1
+        while not self.stock.is_empty:
+            self.stock.deal(self.tableau[i:], cards.TURN.FACEUP)
 
     def status(self):
         return "Cards to uncover: %d" % sum((1 if not _.faceup else 0
@@ -460,7 +443,7 @@ class Pylitaire(Yukon):
         super(Pylitaire, self).__init__((8, 4))
 
     def setup(self):
-        super(Pylitaire, self).setup(2, 0)
+        super(Pylitaire, self).setup(0)
 
 
 class Backbone(Game):
@@ -498,22 +481,12 @@ class Backbone(Game):
         self.deck.create_cards(doubledeck=True)
 
     def setup(self):
-        c = 0
-        for slot in self.tableau + self.backbone + [self.block]:
-            card = self.deck.cards[c]
-            card.place(slot)
-            card.flip(True)
-            c += 1
+        for card in self.deck.cards:
+            self.stock.stack(card)
+            card.flip(cards.TURN.FACEDOWN)
 
-        card = self.deck.cards[c]
-        card.place(self.stock)
-        card.flip(False)
-
-        c += 1
-        for card in self.deck.cards[c:]:
-            card.stack(self.deck.cards[c-1])
-            card.flip(False)
-            c += 1
+        self.stock.deal(self.tableau + self.backbone + [self.block],
+                        cards.TURN.FACEUP)
 
         self.redeals = 1
 
@@ -521,71 +494,28 @@ class Backbone(Game):
         undo = []
 
         if item in self.slots:
-            if (item is self.stock
-                and not self.waste.empty
-                and self.redeals > 0):
+            if item is self.stock and self.redeals > 0:
+                while not self.waste.is_empty:
+                    self.waste.deal(self.stock, cards.TURN.FACEDOWN)
+                    undo.append(Command(self.stock.deal, self.waste,
+                                        cards.TURN.FACEUP))
                 self.redeals -= 1
-                cards = self.waste.cards[::-1]
-                for c, card in enumerate(cards):
-                    if c == 0:
-                        card.place(self.stock)
-                    else:
-                        card.stack(cards[c-1])
-
-                    if self.waste.empty:
-                        undo.append(Command(card.place, self.waste))
-                    else:
-                        undo.append(Command(card.stack, cards[c+1]))
-
-                    card.flip()
-                    undo.append(Command(card.flip))
-
                 def undo_redeals(self):
                     self.redeals += 1
                 undo.append(Command(undo_redeals, self))
 
-                self.undocmds.append(undo)
-                return True
-
-        elif item.is_tail and not item.faceup:
-            if item.slot is self.stock:
-                if self.waste.empty:
-                    item.place(self.waste)
-                else:
-                    item.stack(self.waste.tail)
-
-                if self.stock.empty:
-                    undo.append(Command(item.place, self.stock))
-                else:
-                    undo.append(Command(item.stack, self.stock.tail))
-
-            item.flip()
-            undo.append(Command(item.flip))
-            self.undocmds.append(undo)
+        elif item.slot is self.stock:
+            self.stock.deal(self.waste, cards.TURN.FACEUP)
+            self.add_undo(self.waste.deal, self.stock, cards.TURN.FACEDOWN)
             return True
 
     def doubleclick(self, item):
-        if (item in self.slots
-            or item.slot in self.foundations
-            or not self.draggable(item)):
-            return
-
-        targets = []
-        for slot in self.foundations:
-            if slot.empty:
-                targets.append(slot)
-            else:
-                targets.append(slot.tail)
-
-        droplist = self.droppable(item, targets)
-        if droplist:
-            self.drop(item, droplist[0])
-            return True
+        return self.double_click_to_foundations(item, self.foundations)
 
     def draggable(self, card):
         return not (card.slot is self.stock
                     or (card.slot in self.backbone
-                        and not card.slot.blockedby.empty))
+                        and not card.slot.blockedby.is_empty))
                 # and not card.slot in self.foundations
 
     def droppable(self, card, targets):
@@ -644,4 +574,4 @@ class Test(Game):
         return
 
     def win(self):
-        return not self.slots[-1].empty
+        return not self.slots[-1].is_empty
