@@ -347,7 +347,6 @@ class Gui(object):
             dirty = [self.window.get_rect()]
 
         for group in self.spritegroups:
-            group.clear(self.window, g.background.surface)
             dirty.extend(group.draw(self.window))
 
         self.clear = False
@@ -370,6 +369,8 @@ class Gui(object):
 
         for widget in self.widgets:
             widget.resize(self.size)
+
+        self.widgets.clear(self.window, g.background.surface)
 
         self.fullboard = pygame.Rect(0, 0,
                                      self.size[0],
@@ -448,6 +449,9 @@ class Gui(object):
 
         if self.win:
             self.game.deck.board = fullboard
+            self.game.deck.clear(self.window, self.window)
+        else:
+            self.game.deck.clear(self.window, g.background.surface)
 
         self.clear = True
 
@@ -460,6 +464,8 @@ class Gui(object):
         if self.win:
             self.win = False
             self.game.deck.stop_animation()
+            self.game.deck.clear(self.window, g.background.surface)
+            self.clear = True
         self.updatestatus = True
         if new:
             self.game.new_game()
@@ -474,6 +480,7 @@ class Gui(object):
         self.dragcard = None
         self.gamestarttime = 0
         self.set_mouse_cursor('default')
+        self.game.deck.clear(self.window, self.window)
         self.game.deck.start_animation(self.fullboard)
 
 
