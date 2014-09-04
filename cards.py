@@ -71,6 +71,13 @@ class ORIENTATION(enum.Enum):
     PILE  = ( 0,  0)  # No orientation, place on top of card
 
 
+class TURN(enum.Enum):
+    SAME     = None
+    TOGGLE   = ''
+    FACEUP   = True
+    FACEDOWN = False
+
+
 class Deck(pygame.sprite.LayeredDirty):
     ''' A collection of cards '''
 
@@ -374,9 +381,11 @@ class Card(pygame.sprite.DirtySprite):
         '''If card is faced up or down. Read-only. To change state, use flip()'''
         return self._faceup
 
-    def flip(self, faceup=None):
+    def flip(self, faceup=TURN.TOGGLE):
         '''Flip a card either face up, down, or toggle'''
-        if faceup is None:
+        if faceup == TURN.SAME:
+            return
+        if faceup == TURN.TOGGLE:
             faceup = not self._faceup
         self._faceup = faceup
         if self._faceup:
@@ -599,9 +608,34 @@ class Slot(pygame.sprite.DirtySprite):
             self.child.child.snap(self.child, self.orientation,
                                   (overlap, overlap))
 
+    def stack(self, card):
+        '''Stack <card> to the slot tail, or place it if slot is empty,
+            setting the slot for card and its children
+        '''
+        if self.is_empty:
+            card.place(self)
+        else:
+            card.stack(self.tail)
+
+    def deal(self, slots, faceup=TURN.SAME):
+        '''Stack the slot tail card, facing <faceup>, to each of the slots in
+            <slots>, which may be a single slot or any iterable that yields
+            slots. Slot should contain enough cards to deal to all <slots>.
+        '''
+        if isinstance(slots, Slot):
+            slots = [slots]
+
+        for slot in slots:
+            if self.is_empty:
+                log.warn("Trying to deal from empty slot %s to %s", self, slot)
+                return
+            card = self.tail
+            card.flip(faceup)
+            slot.stack(card)
+
     @property
-    def empty(self):
-        '''Return True if the stack is empty'''
+    def is_empty(self):
+        '''Return True if the slot is empty'''
         return not self.child
 
     @property
