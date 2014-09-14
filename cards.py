@@ -189,7 +189,7 @@ class Deck(pygame.sprite.LayeredDirty):
     def animate_next_card(self):
         sprites = self.sprites()
         if not sprites:
-            self.stop_animation()
+            #self.stop_animation()
             return
         card = random.choice(sprites)
         if card.slot:
@@ -199,11 +199,10 @@ class Deck(pygame.sprite.LayeredDirty):
 
     def stop_animation(self):
         if not self.animating:
-            return  # already stopped by itself
+            return  # already stopped
         log.debug("Animation stopped")
         for card in self.cards:
             self.add(card)
-            card.move(self.board.topleft)
             card.velocity = []
             self.dirty = 0
         self.animating = False

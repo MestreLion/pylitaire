@@ -561,14 +561,11 @@ class Test(Game):
                     slot.orientation = cards.ORIENTATION.DOWN
 
     def setup(self):
-        self.deck.cards[0].place(self.slots[1])
-
-        c = 1
-        for card in self.deck.cards[c:]:
-            card.stack(self.deck.cards[c-1])
-            card.flip(True)
-            c += 1
-        self.slots[1].fit()
+        slot = self.slots[1]
+        for card in self.deck.cards:
+            slot.stack(card)
+            card.flip(cards.TURN.FACEUP)
+        slot.fit()
 
     def click(self, item):
         return
