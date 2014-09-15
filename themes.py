@@ -28,16 +28,9 @@ import logging
 
 import pygame
 
-import g
 import graphics
 
 log = logging.getLogger(__name__)
-
-THEMEDIRS = [
-    os.path.join(g.CONFIGDIR, 'themes'),
-    os.path.join(g.DATADIR, 'themes'),
-    '/usr/share/aisleriot/cards',
-]
 
 # Dict {id: <object>} of all themes found by init_themes()
 themes = {}
@@ -74,12 +67,12 @@ class Theme(object):
 
 
 
-def init_themes():
+def init_themes(paths):
     ''' Load all themes found in THEMEDIRS and populate the global themes dict
         cardsize and keep_aspect have the same meaning as in load_svg()
     '''
 
-    for path in THEMEDIRS:
+    for path in paths:
         log.debug("Looking for card themes in: %s", path)
         try:
             for basename in os.listdir(path):
@@ -121,14 +114,16 @@ if __name__ == '__main__':
                 if event.type in [pygame.KEYDOWN, pygame.MOUSEBUTTONDOWN]:
                     done = True
             clock.tick(10)
-        screen.fill(g.BGCOLOR)
+        screen.fill(BGCOLOR)
         return exit
 
     # unit tests
 
     # constants
+    BGCOLOR = (0, 80, 16)
     AUTO = '--auto' in sys.argv[1:]
-    TESTTHEME = os.path.join(g.DATADIR, 'themes', 'anglo.svg')
+    THEME = 'anglo'
+    PATH = '/usr/share/aisleriot/cards/%s.svg' % THEME
     SIZE = (800, 600)
 
     # setup
@@ -136,14 +131,14 @@ if __name__ == '__main__':
     pygame.display.init()
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode(SIZE)
-    screen.fill(g.BGCOLOR)
+    screen.fill(BGCOLOR)
 
     # load_svg()
-    screen.blit(graphics.load_svg(TESTTHEME, SIZE), (0,0))
+    screen.blit(graphics.load_svg(PATH, SIZE), (0,0))
     pause()
 
     # Theme()
-    theme = Theme(g.GAMENAME, TESTTHEME)
+    theme = Theme(THEME, PATH)
     print theme.id, theme.name, theme.path, theme.size, theme.card_proportion
     screen.blit(graphics.render_vector(theme.image), (0,0))
     pause()

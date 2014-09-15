@@ -40,7 +40,7 @@ def main(*argv):
 
     pygame.display.init()
     pygame.font.init()
-    themes.init_themes()
+    themes.init_themes(g.datadirs('themes') + ['/usr/share/aisleriot/cards'])
     graphics.init_graphics()
 
     gui = ui.Gui()
