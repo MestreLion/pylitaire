@@ -33,10 +33,12 @@ import ui
 log = logging.getLogger(__name__)
 
 
-def main(*argv):
-    '''Main Program, <argv> as a list of command line arguments'''
+def main(args=None):
+    '''App entry point
+        <args> is a list of command line arguments, defaults to sys.argv[1:]
+    '''
 
-    g.load_options(*argv)
+    g.load_options(args)
 
     pygame.display.init()
     pygame.font.init()
@@ -57,6 +59,6 @@ if __name__ == "__main__":
     logging.basicConfig()
     log = logging.getLogger(g.GAMENAME)
     try:
-        sys.exit(0 if main(*sys.argv[1:]) else 1)
+        sys.exit(0 if main() else 1)
     except KeyboardInterrupt:
         pass

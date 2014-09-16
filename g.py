@@ -48,6 +48,7 @@ Globals are basically divided in 4 groups:
 This module can be renamed as 'options' if the word 'Global' scares you.
 '''
 
+import sys
 import os.path
 import xdg.BaseDirectory
 import json
@@ -99,7 +100,7 @@ def datadirs(dirname):
     return [os.path.join(CONFIGDIR, dirname),
             os.path.join(DATADIR, dirname)]
 
-def load_options(*argv):
+def load_options(args):
     '''Load all global options from config file and command line arguments'''
     global window_size, full_screen, debug, profile
     try:
@@ -113,9 +114,11 @@ def load_options(*argv):
         log.warn("Error reading window size, using factory default: %s", e)
 
     # Too lazy for argparse right now
-    if "--fullscreen" in argv: full_screen = True
-    if "--debug"      in argv: debug = True
-    if "--profile"    in argv: profile = True
+    if args is None:
+        args = sys.argv[1:]
+    if "--fullscreen" in args: full_screen = True
+    if "--debug"      in args: debug = True
+    if "--profile"    in args: profile = True
 
     if debug:
         # This is SO wrong... we really need to be a package ASAP
