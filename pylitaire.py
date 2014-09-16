@@ -50,7 +50,6 @@ def main(args=None):
 
     g.save_options()
     pygame.quit()
-    return True
 
 
 
@@ -59,6 +58,6 @@ if __name__ == "__main__":
     logging.basicConfig()
     log = logging.getLogger(g.GAMENAME)
     try:
-        sys.exit(0 if main() else 1)
+        sys.exit(main())
     except KeyboardInterrupt:
         pass
