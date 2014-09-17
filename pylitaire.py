@@ -1,4 +1,7 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
+#
+# pylitaire - Solitaire in Python
 #
 #    Copyright (C) 2014 Rodrigo Silva (MestreLion) <linux@rodrigosilva.com>
 #
@@ -14,35 +17,14 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program. See <http://www.gnu.org/licenses/gpl.html>
+#
+# Game launcher
 
-'''Main module and entry point'''
+import sys
+import main
 
-import logging
-
-import pygame
-
-import g
-import graphics
-import themes
-import ui
-
-log = logging.getLogger(__name__)
-
-
-def main(args=None):
-    '''App entry point
-        <args> is a list of command line arguments, defaults to sys.argv[1:]
-    '''
-
-    g.load_options(args)
-    pygame.display.init()
-    pygame.font.init()
-
-    themes.init_themes(g.datadirs('themes') + ['/usr/share/aisleriot/cards'])
-    graphics.init_graphics()
-
-    gui = ui.Gui()
-    gui.run(g.window_size, g.full_screen, g.gamename)
-
-    pygame.quit()
-    g.save_options()
+if __name__ == "__main__":
+    try:
+        sys.exit(main.main())
+    except KeyboardInterrupt:
+        pass
