@@ -21,10 +21,11 @@
 # Game launcher
 
 import sys
-import main
+
+import pylitaire.main
 
 if __name__ == "__main__":
     try:
-        sys.exit(main.main())
+        sys.exit(pylitaire.main.main())
     except KeyboardInterrupt:
         pass
