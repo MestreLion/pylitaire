@@ -1,10 +1,10 @@
 Brainstorm of new features and code ideas, in no particular order
 
+- Android support: use PNG instead of SVG for Slot and Theme
+
 - "blue mask" highlight when dragging card over a droppable area
 
 - Integrate cards.Slot with graphics.Slot
-
-- Expand/shrink stack height. Will perhaps require a revamp of ALIGN/ORIENTATION model.
 
 - Instructions splash
 
@@ -12,9 +12,6 @@ Brainstorm of new features and code ideas, in no particular order
   with slot as argument, cards being an additional argument. No more "get_top_item()" insanity!
   (or "if card in self.slots", for that matter). OTOH, cards library will lose a lot of freedom:
   drop will always be on a slot, somewhat forcing card drop to tail
-
-- Smarter board size calculation: play area should be horizontally aligned at center and
-  vertically aligned on top
 
 - Allow drop on tail when card collide with any card of stack (highlight the tail). Will perhaps require either
 	stack/slot.rect = rect.union(*card.rect) or the "all cards have a slot" model
@@ -36,8 +33,6 @@ Brainstorm of new features and code ideas, in no particular order
 - Background, Theme and Slot should handle both vector and non-vector images, and deal appropriately (original/render)
 
 - TAB to load next theme. Show off, I know :)
-
-- F1..Fn to select games
 
 - Deck.set_theme should trigger resize() if cardsize is not the same. That would require storing maxcardsize I guess
 	But if IS the same, blit on self.surface instead of re-assigning it
@@ -69,9 +64,8 @@ Brainstorm of new features and code ideas, in no particular order
 	gamename
 	game options?
 
-- Find a way to set all modules logging level without messing with root logger if main was imported
-  Not sure if this is feasible (or needed) at all. Perhaps only when (and IF) I move all source to a
-  package. To be done when cards + dependencies are made a self-contained library.
+- Make cards / themes a self-contained library. Not sure how to deal with enums (also used by ui).
+  graphics will need to be slipt: svg-support function goes to library, game-specific functions and classes stay
 
 - create menu+info (at right side, a la arkanoid, or perhaps as button bar on top)
   gui module controls them, widgets register callbacks for certain events
@@ -83,18 +77,12 @@ Brainstorm of new features and code ideas, in no particular order
 - use custom exceptions to signal events from UI to Main loop/render: Quit, ClearScreen, etc.
   the ones who were formerly boolean flags such as done, clear
 
-- Keep track of cards movements, and BACKSPACE to undo
-
-- Cards "falling/bouncing" when win, a la Windows 3.1 Solitaire. Well, *ANY* "You Win" would be great for now!
-
 - "No more moves" detection
 
 - Font list/loader for a better-looking font. Arial perhaps?
 
 - Be smarter about click and drag: drop targets should not include current slot/parent ("own drop" should be considered
   a drag abort), and a (successful) drop should abort click (and perhaps doubleclick too).
-
-- Rename the project to Pyukon Solitaire. Perhaps Pyleriot, given the artwork and behavior :)
 
 
 
@@ -110,3 +98,7 @@ Known bugs and glitches:
 	  if self.groups: self.groups[-1].move_to_top(). All widgets must added at another layer
 
 - widget sprite group should go back to LayeredDirty, to be less taxing on CPU.
+
+- Win animation has some flaws, fixing would perhaps require its own custom event/update/draw loop:
+	- Last card movement is not drawn, since win condition is checked on update() which runs before draw()
+	- Animated bouncing is drawn behind still cards
