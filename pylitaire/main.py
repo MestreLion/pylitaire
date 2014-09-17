@@ -34,6 +34,11 @@ def main(args=None):
         <args> is a list of command line arguments, defaults to sys.argv[1:]
     '''
 
+    logging.basicConfig(
+        format="[%(levelname)-8s] %(asctime)s %(module)s: %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+
     g.load_options(args)
     pygame.display.init()
     pygame.font.init()

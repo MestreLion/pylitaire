@@ -121,8 +121,7 @@ def load_options(args):
     if "--profile"    in args: profile = True
 
     if debug:
-        # This is SO wrong... we really need to be a package ASAP
-        logging.root.level = logging.DEBUG
+        logging.getLogger(__package__).setLevel(logging.DEBUG)
 
 def save_options():
     try:
