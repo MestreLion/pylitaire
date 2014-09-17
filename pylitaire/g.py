@@ -58,7 +58,7 @@ import logging
 log = logging.getLogger(__name__)
 
 # General
-VERSION = "0.5"
+VERSION = "0.9"
 APPNAME = 'pylitaire'
 
 # Paths
