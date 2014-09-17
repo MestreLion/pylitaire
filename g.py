@@ -59,12 +59,12 @@ log = logging.getLogger(__name__)
 
 # General
 VERSION = "0.5"
-GAMENAME = 'pylitaire'
+APPNAME = 'pylitaire'
 
 # Paths
 GAMEDIR = os.path.abspath(os.path.dirname(__file__) or '.')
 DATADIR = os.path.join(GAMEDIR, 'data')
-CONFIGDIR = xdg.BaseDirectory.save_config_path(GAMENAME)
+CONFIGDIR = xdg.BaseDirectory.save_config_path(APPNAME)
 WINDOWFILE = os.path.join(CONFIGDIR, 'window.json')
 
 # Graphics

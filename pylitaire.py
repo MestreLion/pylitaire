@@ -56,7 +56,7 @@ def main(args=None):
 
 if __name__ == "__main__":
     logging.basicConfig()
-    log = logging.getLogger(g.GAMENAME)
+    log = logging.getLogger(g.APPNAME)
     try:
         sys.exit(main())
     except KeyboardInterrupt:
