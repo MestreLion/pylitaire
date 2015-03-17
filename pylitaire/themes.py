@@ -38,8 +38,8 @@ themes = {}
 class Theme(object):
     ''' Represents each card theme '''
 
-    def __init__(self, id, path, name=""):
-        self.id = id
+    def __init__(self, themeid, path, name=""):
+        self.id = themeid
         self.path = path
         self.name = name or self.id.replace("_", " ").title()
         self._image = None
@@ -82,13 +82,13 @@ def init_themes(paths):
                     continue
 
                 # Check if it's already added (same basename)
-                id = os.path.splitext(basename)[0]
-                if id in themes:
+                themeid = os.path.splitext(basename)[0]
+                if themeid in themes:
                     continue
 
                 # Create the theme and add it to the dict
                 log.debug("New card theme found: %s", id)
-                themes[id] = Theme(id, os.path.join(path, basename), name="")
+                themes[themeid] = Theme(themeid, os.path.join(path, basename), name="")
 
         except OSError as e:
             # path not found
@@ -105,17 +105,17 @@ if __name__ == '__main__':
     def pause():
         pygame.display.update()
         done = False
-        exit = AUTO
+        halt = AUTO
         pygame.event.clear()
-        while not (done or exit):
+        while not (done or halt):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT or getattr(event, 'key', None) == pygame.K_ESCAPE:
-                    exit = True
+                    halt = True
                 if event.type in [pygame.KEYDOWN, pygame.MOUSEBUTTONDOWN]:
                     done = True
             clock.tick(10)
         screen.fill(BGCOLOR)
-        return exit
+        return halt
 
     # unit tests
 
@@ -145,8 +145,8 @@ if __name__ == '__main__':
 
     # init_themes()
     init_themes()
-    for id, theme in sorted(themes.items()):
-        print id, theme.card_proportion
+    for themeid, theme in sorted(themes.items()):
+        print themeid, theme.card_proportion
         screen.blit(graphics.render_vector(theme.image, size=SIZE), (0,0))
         if pause():
             break
