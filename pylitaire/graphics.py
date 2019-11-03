@@ -26,9 +26,11 @@ import math
 import array
 
 import pygame
-import rsvg
 import cairo
 import PIL.Image
+import gi
+gi.require_version('Rsvg', '2.0')
+from gi.repository import Rsvg
 
 import g
 import cursors
@@ -234,12 +236,12 @@ def load_svg(path, *scaleargs, **scalekwargs):
     ''' Load an SVG file and return a pygame.image surface
         See scale_size() for documentation on scale arguments.
     '''
-    return render_vector(rsvg.Handle(path), *scaleargs, **scalekwargs)
+    return render_vector(Rsvg.Handle.new_from_file(path), *scaleargs, **scalekwargs)
 
 
 def load_vector(path):
     ''' Load an SVG file from <path> and return a RsvgHandle instance '''
-    return rsvg.Handle(path)
+    return Rsvg.Handle.new_from_file(path)
 
 
 def render_vector(svg, *scaleargs, **scalekwargs):
@@ -254,7 +256,7 @@ def render_vector(svg, *scaleargs, **scalekwargs):
         img = PIL.Image.frombuffer(
             'RGBA', (surface.get_width(), surface.get_height()),
             surface.get_data(), 'raw', 'BGRA', 0, 1)
-        return img.tostring('raw', 'RGBA', 0, 1)
+        return img.tobytes('raw', 'RGBA', 0, 1)
 
     # Calculate size
     svgsize = (svg.props.width, svg.props.height)
@@ -274,7 +276,7 @@ def render_vector(svg, *scaleargs, **scalekwargs):
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
     else:
         dataarray = array.array('c', chr(0) * width * height * 4)
-        surface= cairo.ImageSurface.create_for_data(dataarray,
+        surface = cairo.ImageSurface.create_for_data(dataarray,
             cairo.FORMAT_ARGB32, width, height, width * 4)
 
     # Create a context, scale it, and render the SVG

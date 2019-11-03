@@ -14,17 +14,17 @@ Uses themes and background in the same format as [Gnome Aisleriot](https://wiki.
 Requirements
 ------------
 
-- [Python 2](http://www.python.org) (tested in 2.7.4)
+- [Python 2](http://www.python.org) (tested in 2.7.15+)
 - [Pygame](http://www.pygame.org), the main game engine
-- [Pycairo](http://cairographics.org/pycairo), python bindings for Cairo
-- [pyrsvg](http://cairographics.org/pyrsvg/), a python wrapper for `librsvg`
-- [PIL](http://www.pythonware.com/products/pil/)/[Pillow](http://pillow.readthedocs.org), the Python Imaging Library or its modern fork
+- [Pillow](http://pillow.readthedocs.org), the modern fork of the Python Imaging Library
+- [libRSVG](https://wiki.gnome.org/action/show/Projects/LibRsvg), for SVG image format support
+- [Pycairo](http://cairographics.org/pycairo), python and GIO bindings for Cairo, to interface libRSVG and Pygame.
 
 The above can be installed in Debian-like distros (like Ubuntu/Mint) with:
 
-	sudo apt-get install python python-{pygame,cairo,rsvg,imaging}
+	sudo apt-get install python python-{pygame,gi-cairo,pil} gir1.2-rsvg-2.0
 
-*Note on Python 3 support: On the way! While the game itself is easily ported to Python 3, the dependencies are not. Original PIL is dead, Pillow must be used; Pygame, Pycairo and Pillow were only recently ported to Python 3, which _might_ require code adjustments. Pyrsvg is dead even in Python 2, and must be replaced with its GObject introspection counterpart `gir1.2-rsvg-2.0`, which _surely_ requires changes. Bottomline: Python 2 it is... for now. :)*
+*Note on Python 3 support: On the way! While the game itself is easily ported to Python 3, the dependencies are not. Original PIL is dead, Pillow must be used; Pygame, Pycairo and Pillow were only recently ported to Python 3, which _might_ require code adjustments. Bottomline: Python 2 it is... for now. :)*
 
 
 Install and usage
