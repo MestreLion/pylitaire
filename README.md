@@ -24,7 +24,7 @@ The above can be installed in Debian-like distros (like Ubuntu/Mint) with:
 
 	sudo apt-get install python python-{pygame,cairo,rsvg,imaging}
 
-*Note on Python 3 support: while the game itself is easily ported to Python 3, the dependencies are not. The recent Pygame port to Python 3 is still buggy and not yet packaged in many distros, including Ubuntu. Also both Pycairo and pyrsvg are not available to Python 3, only their `gir` bindings. PIL does not support Python 3 at all. Pillow does, but it was not backported to older releases like Ubuntu 12.04. Bottomline: Python 2 it is :)*
+*Note on Python 3 support: On the way! While the game itself is easily ported to Python 3, the dependencies are not. Original PIL is dead, Pillow must be used; Pygame, Pycairo and Pillow were only recently ported to Python 3, which _might_ require code adjustments. Pyrsvg is dead even in Python 2, and must be replaced with its GObject introspection counterpart `gir1.2-rsvg-2.0`, which _surely_ requires changes. Bottomline: Python 2 it is... for now. :)*
 
 
 Install and usage
