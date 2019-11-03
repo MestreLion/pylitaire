@@ -436,14 +436,26 @@ class Yukon(Klondike):
 
 
 class Pylitaire(Yukon):
-    '''Yukon variation: 8 tableau slots with 2 extra open cards in each
-        (including the first tableau slot)
+    '''Yukon easier variation: 8 tableau slots with 2 extra open cards in each
+        (including the first tableau slot), and allowing any card to be dropped
+        on an empty tableau slot, not only Kings.
     '''
     def __init__(self):
         super(Pylitaire, self).__init__((8, 4))
 
     def setup(self):
         super(Pylitaire, self).setup(0)
+
+    def droppable(self, card, targets):
+        droplist = super(Pylitaire, self).droppable(card, targets)
+
+        # Allow any card to be dropped on an empty tableau slot
+        droplist.extend(_ for _ in targets if
+                        _ not in droplist and
+                        _ in self.tableau and
+                        _.is_empty)
+
+        return droplist
 
 
 class Backbone(Game):
