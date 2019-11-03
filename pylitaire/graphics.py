@@ -32,8 +32,8 @@ import gi
 gi.require_version('Rsvg', '2.0')
 from gi.repository import Rsvg
 
-import g
-import cursors
+from . import g
+from . import cursors
 
 log = logging.getLogger(__name__)
 
@@ -82,8 +82,8 @@ class Background(object):
             pygame.transform.smoothscale(self.original, size, self.surface)
         else:
             # Tile
-            for i in xrange(int(math.ceil(float(size[0]) / bgw))):
-                for j in xrange(int(math.ceil(float(size[1]) / bgh))):
+            for i in range(int(math.ceil(float(size[0]) / bgw))):
+                for j in range(int(math.ceil(float(size[1]) / bgh))):
                     self.surface.blit(self.original, (i * bgw, j * bgh))
 
         # Status bar area

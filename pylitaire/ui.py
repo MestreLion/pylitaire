@@ -30,10 +30,10 @@ import datetime
 
 import pygame
 
-import g
-import graphics
-import gamerules
-import enum
+from . import g
+from . import graphics
+from . import gamerules
+from . import enum
 
 log = logging.getLogger(__name__)
 
@@ -188,7 +188,7 @@ class Gui(object):
                           "Help me get my feet back on the ground\n"
                           "Won't you please, please help me")
 
-            if event.key in xrange(pygame.K_F2, pygame.K_F10 + 1):
+            if event.key in range(pygame.K_F2, pygame.K_F10 + 1):
                 # A little hack for "get the n-th game"
                 i = event.key - pygame.K_F2
                 games = sorted(self.games.items())

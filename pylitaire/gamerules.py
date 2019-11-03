@@ -26,7 +26,7 @@ Design notes:
 
 import logging
 
-import cards
+from . import cards
 
 log = logging.getLogger(__name__)
 
@@ -336,12 +336,12 @@ class Klondike(Game):
         self.waste = self.create_slot((1, 0), name="Waste")
 
         self.foundations = []
-        for i in xrange(self.grid[0] - 4, self.grid[0]):
+        for i in range(self.grid[0] - 4, self.grid[0]):
             self.foundations.append(self.create_slot((i, 0),
                                                  name="Foundation %s" % (i-3)))
 
         self.tableau = []
-        for i in xrange(self.grid[0]):
+        for i in range(self.grid[0]):
             self.tableau.append(self.create_slot((i, 1),
                                                  cards.ORIENTATION.DOWN,
                                                  name="Tableau %s" % (i+1)))
@@ -469,17 +469,17 @@ class Backbone(Game):
         self.waste = self.create_slot((6, 2), name="Waste")
 
         self.foundations = []
-        for i in xrange(8):
+        for i in range(8):
             self.foundations.append(self.create_slot((4 + i%4, i/4),
                                                  name="Foundation %s" % (i+1)))
 
         self.tableau = []
-        for i in xrange(8):
+        for i in range(8):
             self.tableau.append(self.create_slot((3 * (i/4), i%4),
                                                  name="Tableau %s" % (i+1)))
 
         self.backbone = []
-        for i in xrange(18):
+        for i in range(18):
             self.backbone.append(self.create_slot((1 + i/9, 0.33 * (i%9)),
                                                   name="Backbone %s" % (i+1)))
 
@@ -566,8 +566,8 @@ class Test(Game):
         super(Test, self).__init__()
         self.grid = (3, 3)
         self.deck.create_cards()
-        for i in xrange(self.grid[0]):
-            for j in xrange(self.grid[1] - 1):
+        for i in range(self.grid[0]):
+            for j in range(self.grid[1] - 1):
                 slot = self.create_slot((i, j))
                 if j == 1:
                     slot.orientation = cards.ORIENTATION.DOWN

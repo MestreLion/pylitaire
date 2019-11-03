@@ -91,8 +91,8 @@ def cursorstrings(cursor,
     masklines = layerlines(mask, width=width, char0="0", char1="1")
     buffer = ""
     strings = []
-    for i in xrange(height):
-        for j in xrange(width):
+    for i in range(height):
+        for j in range(width):
             databit = int(datalines[i][j])
             maskbit = int(masklines[i][j])
             ishot = 3 if (hot == (j, i)) else 0
@@ -125,7 +125,7 @@ def cursorcode(cursor, indent=4, tuples=True, singlequotes=True, json=False):
         is valid JSON data.
 
         Example:
-        >>> print cursorcode(pygame.mouse.get_cursor())
+        >>> print(cursorcode(pygame.mouse.get_cursor()))
         ...
         >>> code = cursorcode(pygame.cursors.arrow, json=True)
         >>> size, hot, strings = json.loads(code)
@@ -202,17 +202,17 @@ def load_json(path):
 if __name__ == "__main__":
     if sys.argv[1:]:
         if len(sys.argv) < 3:
-            print "Converts a xmb cursor file and its mask to JSON"
-            print "Usage: python cursors.py <CURSOR_FILE> <MASK_FILE>"
-            print "Or run without arguments for a demonstration"
+            print("Converts a xmb cursor file and its mask to JSON")
+            print("Usage: python cursors.py <CURSOR_FILE> <MASK_FILE>")
+            print("Or run without arguments for a demonstration")
             sys.exit()
         try:
-            print xmbcode(*sys.argv[1:3], json=True)
+            print(xmbcode(*sys.argv[1:3], json=True))
         except IOError as e:
-            print e
+            print(e)
         except Exception as e:
             if hasattr(e, 'xbmfailed'):
-                print "Error loading cursor: are those valid XMB files?"
+                print("Error loading cursor: are those valid XMB files?")
             else:
                 raise e
         sys.exit()
@@ -224,38 +224,38 @@ if __name__ == "__main__":
 
     size, hot, data, mask = cursor
 
-    print "Using pygame.cursors.arrow"
-    print "\nSize, hotspot, data and mask"
-    print size, hot
+    print("Using pygame.cursors.arrow")
+    print("\nSize, hotspot, data and mask")
+    print(size, hot)
 
     for layer in [data, mask]:
         for line in layerlines(layer):
-            print line
+            print(line)
 
-    print "\nImage (with hotspot)"
+    print("\nImage (with hotspot)")
     for stringline in cursorstrings(cursor, black="x", hottransparent="O"):
-        print stringline
+        print(stringline)
 
-    print "\nImage (as JSON)"
+    print("\nImage (as JSON)")
     # The is actualy the REAL test for this module:
     jsoncode = cursorcode(cursor, json=True)
     triplet = json.loads(jsoncode)  # No exceptions raised, so we have valid JSON :)
     pygame.mouse.set_cursor(*load_cursor(triplet))  # No exceptions either, hooray! :D
-    print jsoncode
+    print(jsoncode)
 
-    print "\nImage (as tuples)"
-    print cursorcode(cursor)
+    print("\nImage (as tuples)")
+    print(cursorcode(cursor))
 
-    print "\nDefault pygame cursor. It is NOT pygame.cursors.arrow !!!!!!!"
-    print cursorcode(pygame.mouse.get_cursor())
+    print("\nDefault pygame cursor. It is NOT pygame.cursors.arrow !!!!!!!")
+    print(cursorcode(pygame.mouse.get_cursor()))
 
-    print "\nRoundtrip: get_cursor(set_cursor(get_cursor())) works fine, as expected"
-    print cursorcode(pygame.mouse.get_cursor(pygame.mouse.set_cursor(*pygame.mouse.get_cursor())))
+    print("\nRoundtrip: get_cursor(set_cursor(get_cursor())) works fine, as expected")
+    print(cursorcode(pygame.mouse.get_cursor(pygame.mouse.set_cursor(*pygame.mouse.get_cursor()))))
 
-    print "\npygame.cursors.compile() IS BUGGY: BY DEFAULT IT SWAPS BLACK AND WHITE!!!!"
+    print("\npygame.cursors.compile() IS BUGGY: BY DEFAULT IT SWAPS BLACK AND WHITE!!!!")
     data, mask = pygame.cursors.compile(cursorstrings(cursor))
-    print cursorcode((size, hot, data, mask))
+    print(cursorcode((size, hot, data, mask)))
 
-    print "\ninvert_cursor() comes in to save the day. (so would compile() wrapper)"
+    print("\ninvert_cursor() comes in to save the day. (so would compile() wrapper)")
     data, mask = pygame.cursors.compile(cursorstrings(invert_cursor(cursor)))
-    print cursorcode((size, hot, data, mask))
+    print(cursorcode((size, hot, data, mask)))

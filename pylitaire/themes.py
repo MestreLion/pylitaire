@@ -28,7 +28,7 @@ import logging
 
 import pygame
 
-import graphics
+from . import graphics
 
 log = logging.getLogger(__name__)
 
@@ -139,14 +139,14 @@ if __name__ == '__main__':
 
     # Theme()
     theme = Theme(THEME, PATH)
-    print theme.id, theme.name, theme.path, theme.size, theme.card_proportion
+    print(theme.id, theme.name, theme.path, theme.size, theme.card_proportion)
     screen.blit(graphics.render_vector(theme.image), (0,0))
     pause()
 
     # init_themes()
     init_themes()
     for themeid, theme in sorted(themes.items()):
-        print themeid, theme.card_proportion
+        print(themeid, theme.card_proportion)
         screen.blit(graphics.render_vector(theme.image, size=SIZE), (0,0))
         if pause():
             break

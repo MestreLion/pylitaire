@@ -23,8 +23,8 @@ import random
 
 import pygame
 
-import themes
-import enum
+from . import themes
+from . import enum
 
 log = logging.getLogger(__name__)
 
@@ -142,7 +142,7 @@ class Deck(pygame.sprite.LayeredDirty):
             decks = 2
         else:
             decks = 1
-        for _ in xrange(decks):
+        for _ in range(decks):
             for suit in SUIT:
                 for rank in RANK:
                     card = Card(rank=rank, suit=suit, deck=self, **cardkwargs)
@@ -675,14 +675,14 @@ if __name__ == '__main__':
 
     # Card
     card = Card(RANK.QUEEN, SUIT.HEARTS)
-    print card, card.shortname, card.name
+    print(card, card.shortname, card.name)
     window.blit(card.image, (0, 0))
     pygame.display.update()
 
     # Deck
     deck = Deck()
-    print len(deck.cards)
-    print deck.card(RANK.ACE, SUIT.SPADES)
-    print deck.cards[:5]
+    print(len(deck.cards))
+    print(deck.card(RANK.ACE, SUIT.SPADES))
+    print(deck.cards[:5])
     deck.shuffle()
-    print deck.cards[:5]
+    print(deck.cards[:5])

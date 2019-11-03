@@ -21,10 +21,10 @@ import logging
 
 import pygame
 
-import g
-import graphics
-import themes
-import ui
+from . import g
+from . import graphics
+from . import themes
+from . import ui
 
 log = logging.getLogger(__name__)
 
