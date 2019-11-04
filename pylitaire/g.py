@@ -103,6 +103,17 @@ def datadirs(dirname):
 def load_options(args):
     '''Load all global options from config file and command line arguments'''
     global window_size, full_screen, debug, profile
+
+    # Too lazy for argparse right now
+    if args is None:
+        args = sys.argv[1:]
+    if "--fullscreen" in args: full_screen = True
+    if "--debug"      in args: debug       = True
+    if "--profile"    in args: profile     = True
+
+    if debug:
+        logging.getLogger(__package__).setLevel(logging.DEBUG)
+
     try:
         log.debug("Loading window size from: %s", WINDOWFILE)
         with open(WINDOWFILE) as fp:
@@ -112,16 +123,6 @@ def load_options(args):
                            int(height))
     except (IOError, ValueError) as e:
         log.warn("Error reading window size, using factory default: %s", e)
-
-    # Too lazy for argparse right now
-    if args is None:
-        args = sys.argv[1:]
-    if "--fullscreen" in args: full_screen = True
-    if "--debug"      in args: debug = True
-    if "--profile"    in args: profile = True
-
-    if debug:
-        logging.getLogger(__package__).setLevel(logging.DEBUG)
 
 def save_options():
     try:
