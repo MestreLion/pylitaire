@@ -102,7 +102,7 @@ class Slot(object):
     '''Represents a slot image'''
 
     def __init__(self, path="", size=()):
-        self.path = path or find_image(g.datadirs('images'), g.slotname, ['svg'])
+        self.path = path or find_image(g.datadirs('images'), g.slotname, ['svg', 'svgz'])
         self.original = load_vector(self.path)
         self.surface = None
 

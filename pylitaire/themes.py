@@ -77,8 +77,8 @@ def init_themes(paths):
         try:
             for basename in os.listdir(path):
 
-                # Check if it's an SVG
-                if not os.path.splitext(basename)[1].lower() == '.svg':
+                # Check if it's an SVG or SVGZ
+                if os.path.splitext(basename)[1].lower() not in ('.svg', '.svgz'):
                     continue
 
                 # Check if it's already added (same basename)
@@ -122,8 +122,8 @@ if __name__ == '__main__':
     # constants
     BGCOLOR = (0, 80, 16)
     AUTO = '--auto' in sys.argv[1:]
-    THEME = 'anglo'
-    PATH = '/usr/share/aisleriot/cards/%s.svg' % THEME
+    THEME = 'bonded'  # the only one that ships with Aisleriot without gnome-cards
+    PATH = '/usr/share/aisleriot/cards/%s.svgz' % THEME
     SIZE = (800, 600)
 
     # setup

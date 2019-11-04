@@ -17,7 +17,7 @@ Requirements
 - [Python 2](http://www.python.org) (tested in 2.7.15+)
 - [Pygame](http://www.pygame.org), the main game engine
 - [Pillow](http://pillow.readthedocs.org), the modern fork of the Python Imaging Library
-- [libRSVG](https://wiki.gnome.org/action/show/Projects/LibRsvg), for SVG image format support
+- [libRSVG](https://wiki.gnome.org/action/show/Projects/LibRsvg), for SVG/SVGZ image format support
 - [Pycairo](http://cairographics.org/pycairo), python and GIO bindings for Cairo, to interface libRSVG and Pygame.
 
 The above can be installed in Debian-like distros (like Ubuntu/Mint) with:
