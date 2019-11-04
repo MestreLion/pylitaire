@@ -87,7 +87,7 @@ def init_themes(paths):
                     continue
 
                 # Create the theme and add it to the dict
-                log.debug("New card theme found: %s", id)
+                log.debug("New card theme found: %s", themeid)
                 themes[themeid] = Theme(themeid, os.path.join(path, basename), name="")
 
         except OSError as e:

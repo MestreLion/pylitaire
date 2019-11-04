@@ -217,12 +217,12 @@ class Card(pygame.sprite.DirtySprite):
 
     def __init__(self, rank, suit, deck=None,
                  position=(0, 0), faceup=True, orientation=ORIENTATION.DOWN,
-                 slot=None, id=""):
+                 slot=None, card_id=""):
         super(Card, self).__init__()
 
-        if id:
-            id = id.upper()
-            rank, suit = id[:-1], id[-1]
+        if card_id:
+            card_id = card_id.upper()
+            rank, suit = card_id[:-1], card_id[-1]
             if rank in ['J', 'Q', 'K', 'A']:
                 for r in RANK:
                     if r.name[1].upper() == rank:

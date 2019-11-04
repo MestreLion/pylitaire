@@ -35,7 +35,7 @@ def invert_cursor(cursor):
     return size, hot, tuple(inv), mask
 
 
-def compile(strings, black="X", white=".", xor="o"):
+def compile(strings, black="X", white=".", xor="o"):  # @ReservedAssignment
     ''' Convenience wrapper to pygame.cursors.compile() with swapped black and
         white arguments, to workaround pygame arguments swap bug.
     '''
