@@ -82,9 +82,8 @@ def cursorstrings(cursor,
         manipulate its image, or as input to pygame.cursors.compile().
         Default output format is compatible with its <string> argument.
 
-        IMPORTANT NOTE!!! pygame.cursors.compile() has a bug that with default
-        options it swaps black and white. You may use compile() wrapper as a
-        workaround
+        NOTE: On Python 2 / Pygame 1.91, pygame.cursors.compile() has a bug that
+        swaps black and white. Use compile() wrapper or invert_cursor()
     '''
     size, hot, data, mask = cursor
     width, height = size
@@ -131,11 +130,16 @@ def cursorcode(cursor, indent=4, tuples=True, singlequotes=True, json=False):
         ...
         >>> code = cursorcode(pygame.cursors.arrow, json=True)
         >>> size, hot, strings = json.loads(code)
-        >>> data, mask = pygame.cursors.compile(strings, black=".", white="X")
+        >>> data, mask = pygame.cursors.compile(strings, black="X", white=".")
         >>> pygame.mouse.set_cursor(size, hot, data, mask)
 
-        Note that (black=".", white="X") arguments are swapped as a workaround
-        to the bug in pygame.cursors.compile()
+        Note: On Python 2 / Pygame 1.91, swap black and white values to
+        workaround a bug in pygame.cursors.compile(), or use compile() wrapper:
+        >>> data, mask = pygame.cursors.compile(strings, black=".", white="X")
+        >>> data, mask =                compile(strings, black="X", white=".")
+        Or use invert_cursor() on strings:
+        >>> data, mask = pygame.cursors.compile(invert_cursor(strings),
+                                                         black="X", white=".")
     '''
     if json:
         tuples = False
@@ -254,10 +258,15 @@ if __name__ == "__main__":
     print("\nRoundtrip: get_cursor(set_cursor(get_cursor())) works fine, as expected")
     print(cursorcode(pygame.mouse.get_cursor(pygame.mouse.set_cursor(*pygame.mouse.get_cursor()))))
 
-    print("\npygame.cursors.compile() IS BUGGY: BY DEFAULT IT SWAPS BLACK AND WHITE!!!!")
-    data, mask = pygame.cursors.compile(cursorstrings(cursor))
-    print(cursorcode((size, hot, data, mask)))
+    if pygame.version.vernum < (1, 9, 2):
+        print("\npygame.cursors.compile() is buggy on 1.91 / Python 2, swapping black and white")
+        data, mask = pygame.cursors.compile(cursorstrings(cursor))
+        print(cursorcode((size, hot, data, mask)))
 
-    print("\ninvert_cursor() comes in to save the day. (so would compile() wrapper)")
-    data, mask = pygame.cursors.compile(cursorstrings(invert_cursor(cursor)))
+        print("\ninvert_cursor() can be used to save the day for Python 2 users!")
+        data, mask = pygame.cursors.compile(cursorstrings(invert_cursor(cursor)))
+        print(cursorcode((size, hot, data, mask)))
+
+    print("\ncompile() works regardless of Pygame / Python version:")
+    data, mask = compile(cursorstrings(cursor))
     print(cursorcode((size, hot, data, mask)))
