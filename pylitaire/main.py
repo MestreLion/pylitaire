@@ -17,8 +17,12 @@
 
 '''Main module and entry point'''
 
+import os
 import logging
 
+# Disable Pygame advertisement
+# https://github.com/pygame/pygame/commit/18a31449de93866b369893057f1e60330b53da95
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = ""  # the key just need to exist
 import pygame
 
 from . import g
