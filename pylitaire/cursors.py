@@ -36,10 +36,12 @@ def invert_cursor(cursor):
 
 
 def compile(strings, black="X", white=".", xor="o"):  # @ReservedAssignment
-    ''' Convenience wrapper to pygame.cursors.compile() with swapped black and
-        white arguments, to workaround pygame arguments swap bug.
+    ''' Convenience wrapper to pygame.cursors.compile() to accommodate for the
+        bug prior to pygame 1.92 / python 2 that swaps black and white.
     '''
-    return pygame.cursors.compile(strings, black=white, white=black, xor=xor)
+    if pygame.version.vernum < (1, 9, 2):
+        black, white = white, black
+    return pygame.cursors.compile(strings, black=black, white=white, xor=xor)
 
 
 def layerlines(bytelist, width=0, char0=".", char1="X"):

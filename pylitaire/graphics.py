@@ -253,9 +253,15 @@ def render_vector(svg, *scaleargs, **scalekwargs):
         ''' Convert a Cairo surface in BGRA format to a RBGA string
             Only needed for little-endian architectures.
         '''
+        # PIL generates a memoryview in Python 3+, so we convert to bytes
+        data = surface.get_data()
+        if sys.version_info >= (3, 0):
+            data = data.tobytes()
+
         img = PIL.Image.frombuffer(
             'RGBA', (surface.get_width(), surface.get_height()),
-            surface.get_data(), 'raw', 'BGRA', 0, 1)
+            data, 'raw', 'BGRA', 0, 1)
+
         return img.tobytes('raw', 'RGBA', 0, 1)
 
     # Calculate size
