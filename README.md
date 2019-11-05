@@ -14,7 +14,7 @@ Uses themes and background in the same format as [Gnome Aisleriot](https://wiki.
 Requirements
 ------------
 
-- [Python 2](http://www.python.org) (tested in 2.7.15+)
+- [Python](http://www.python.org) (tested in 3.6 and 2.7)
 - [Pygame](http://www.pygame.org), the main game engine
 - [Pillow](http://pillow.readthedocs.org), the modern fork of the Python Imaging Library
 - [libRSVG](https://wiki.gnome.org/action/show/Projects/LibRsvg), for SVG/SVGZ image format support
@@ -22,15 +22,17 @@ Requirements
 
 The above can be installed in Debian-like distros (like Ubuntu/Mint) with:
 
-	sudo apt-get install python python-{pygame,gi-cairo,pil} gir1.2-rsvg-2.0
+	sudo apt-get install python3 python3-{pygame,gi-cairo,pil} gir1.2-rsvg-2.0
 
-*Note on Python 3 support: On the way! While the game itself is easily ported to Python 3, the dependencies are not. Original PIL is dead, Pillow must be used; Pygame, Pycairo and Pillow were only recently ported to Python 3, which _might_ require code adjustments. Bottomline: Python 2 it is... for now. :)*
+For Python 2:
+
+	sudo apt-get install python python-{pygame,gi-cairo,pil} gir1.2-rsvg-2.0
 
 
 Install and usage
 -----------------
 
-Clone the repository, install the dependencies, and run the executable `pylitaire`
+Clone the repository, install the dependencies, and run `python3 -m pylitaire` or `python2 -m pylitaire`
 
 An install script, along with a proper `.desktop` file will be available soon. Icons are already available in `data/icons`
 
