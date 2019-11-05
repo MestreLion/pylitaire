@@ -1,22 +1,8 @@
-# -*- coding: utf-8 -*-
-#
-#    Copyright (C) 2014 Rodrigo Silva (MestreLion) <linux@rodrigosilva.com>
-#    This file is part of Pylitaire game
-#
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with this program. See <http://www.gnu.org/licenses/gpl.html>
+# This file is part of Pylitaire
+# Copyright (C) 2014 Rodrigo Silva (MestreLion) <linux@rodrigosilva.com>
+# License: GPLv3 or later, at your choice. See <http://www.gnu.org/licenses/gpl>
 
-'''Global constants, paths, singletons and game options
+"""Global constants, paths, singletons and game options
 
 Globals are basically divided in 4 groups:
 
@@ -46,7 +32,7 @@ Globals are basically divided in 4 groups:
     here are just the "factory defaults"
 
 This module can be renamed as 'options' if the word 'Global' scares you.
-'''
+"""
 
 import sys
 import os.path

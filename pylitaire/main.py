@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# pylitaire - Solitaire in Python
 #
 #    Copyright (C) 2014 Rodrigo Silva (MestreLion) <linux@rodrigosilva.com>
 #
@@ -15,7 +15,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program. See <http://www.gnu.org/licenses/gpl.html>
 
-'''Main module and entry point'''
+"""Main module and entry point"""
 
 import os
 import logging
