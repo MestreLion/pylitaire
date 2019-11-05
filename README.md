@@ -14,11 +14,11 @@ Uses themes and background in the same format as [Gnome Aisleriot](https://wiki.
 Requirements
 ------------
 
-- [Python](http://www.python.org) (tested in 3.6 and 2.7)
-- [Pygame](http://www.pygame.org), the main game engine
-- [Pillow](http://pillow.readthedocs.org), the modern fork of the Python Imaging Library
-- [libRSVG](https://wiki.gnome.org/action/show/Projects/LibRsvg), for SVG/SVGZ image format support
-- [Pycairo](http://cairographics.org/pycairo), python and GIO bindings for Cairo, to interface libRSVG and Pygame.
+- [Python](https://www.python.org) (tested in 3.6 and 2.7)
+- [Pygame](https://www.pygame.org), the main game engine
+- [Pillow](https://pillow.readthedocs.org), the modern fork of the Python Imaging Library
+- [libRSVG](https://wiki.gnome.org/Projects/LibRsvg), for SVG/SVGZ image format support
+- [Pycairo](https://cairographics.org/pycairo), python and GIO bindings for Cairo, to bridge libRSVG to Pygame.
 
 The above can be installed in Debian-like distros (like Ubuntu/Mint) with:
 
@@ -43,7 +43,7 @@ Contributing
 
 Patches are welcome! Fork, hack, request pull! See the `TODO` file for a "roadmap" of priorities and most-wanted features.
 
-If you find a bug or have any enhacement request, please to open a [new issue](https://github.com/MestreLion/pylitaire/issues/new)
+If you find a bug or have any enhancement request, please to open a [new issue](https://github.com/MestreLion/pylitaire/issues/new)
 
 
 Written by
