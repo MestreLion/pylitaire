@@ -2,36 +2,32 @@
 # Copyright (C) 2014 Rodrigo Silva (MestreLion) <linux@rodrigosilva.com>
 # License: GPLv3 or later, at your choice. See <http://www.gnu.org/licenses/gpl>
 
-"""Global constants, paths, singletons and game options
+"""Global constants, paths, singletons and game options.
 
 Globals are basically divided in 4 groups:
 
-- Constants
-    In UPPERCASE. Most are used only once, but they are better here than
-    hardcoded in some module, like the game FPS and or status bar height
-    All immutable and literal.
+- Constants:
+    In UPPERCASE. Most are used only once, but they are better here than hardcoded in
+    some module, like the game FPS and or status bar height. All immutable and literal.
 
-- Paths
-    Defined here and set only once, so also in UPPERCASE
+- Paths:
+    Defined here and set only once, so also in UPPERCASE.
 
-- Singletons
-    For objects that are used and set in different places, like the background
-    surface, and for now it's convenient to have them here instead of passing
-    as arguments everywhere. All are initialized here as None.
+- Singletons:
+    Objects that are used and set in different places, like the background surface,
+    and for now it's convenient to have them here instead of passing  as arguments
+    everywhere. All are initialized here as None.
 
-    Legitimate candidates for this group are lists/dicts such as the themes,
-    cursors and games rules found after their respective init(). But apart
-    from those this group should be kept as a minimum
+    Legitimate candidates for this group are lists/dicts such as the themes, cursors
+    and games rules found after their respective init(). But apart from those this group
+    should be kept as a minimum, and in an ideal world this group would not even exist.
 
-    ... and in an ideal world this group would not even exist.
+- Options:
+    The group that gives this module a good and fair reason to exist. Options are read
+    from command line, config file, and may be changed in-game. They can also be saved back
+    to config file before exiting. Values hardcoded here are just the "factory defaults"
 
-- Options
-    The group that gives this module a good and fair reason to exist. Options
-    are read from command line, config file, and may be changed in-game. They
-    can also be saved back to config file before exiting. Values hardcoded
-    here are just the "factory defaults"
-
-This module can be renamed as 'options' if the word 'Global' scares you.
+This module can be renamed as 'options' if the word 'Global' is so frowned upon.
 """
 
 import sys
@@ -62,10 +58,11 @@ SBCOLOR = (242, 241, 240)  # status bar background color
 
 background = None  # graphics.Background
 slot = None  # graphics.Slot
-cursors = {'default': None,
-           'drag': None,
-           'draggable': None,
-           }
+cursors = {
+    'default': None,
+    'drag': None,
+    'draggable': None,
+}
 
 # Options
 full_screen = False
@@ -80,14 +77,15 @@ gamename = "pylitaire"
 
 
 def datadirs(dirname):
-    '''Return a list of game relevant data directories, useful for finding data
-        files such as themes and images
-    '''
+    """List of game relevant data directories.
+
+    Useful for finding data files such as themes and images.
+    """
     return [os.path.join(CONFIGDIR, dirname),
             os.path.join(DATADIR, dirname)]
 
 def load_options(args):
-    '''Load all global options from config file and command line arguments'''
+    """Load all global options from config file and command line arguments."""
     global window_size, full_screen, debug, profile
 
     # Too lazy for argparse right now

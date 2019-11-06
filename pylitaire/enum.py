@@ -2,7 +2,7 @@
 # Copyright (C) 2014 Rodrigo Silva (MestreLion) <linux@rodrigosilva.com>
 # License: GPLv3 or later, at your choice. See <http://www.gnu.org/licenses/gpl>
 
-"""Basic implementation of enum module for Python 2 and 3"""
+"""Basic implementation of enum module for Python 2 and 3."""
 
 __all__ = ['Enum']  # not necessary as Enum is the only non-__*__ name
 
@@ -16,11 +16,11 @@ class _meta(type):
                 and not self._callable(getattr(self, k))}
 
     def __iter__(self):
-        '''Yield members sorted by value, not declaration order'''
+        """Yield members sorted by value, not declaration order."""
         return iter(sorted(self.__members__.values()))
 
     def __reversed__(self):
-        '''Yield members sorted by descending value order'''
+        """Yield members sorted by descending value order."""
         return reversed(tuple(self))
         # tuple() is required to create a sequence out of the Enum
 
@@ -42,7 +42,7 @@ class _meta(type):
 class _base(object):
     @staticmethod
     def _callable(obj):
-        '''Helper wrapper for callable() that works on Python 3.0 and 3.1'''
+        """Helper wrapper for callable() that works on Python 3.0 and 3.1."""
         try:
             return callable(obj)
         except NameError:
@@ -52,12 +52,14 @@ class _base(object):
 
     @classmethod
     def name(cls, value):
-        '''
-        Fallback for getting a friendly member name
-        Return a titled string with underscores replaced by spaces
-            AnEnum.name(AnEnum.AN_ORDINARY_MEMBER) => "An Ordinary Member"
-        Enums can customize member names by overriding this method
-        '''
+        """Fallback for getting a friendly member name.
+
+        Return a titled string with underscores replaced by spaces:
+        >>> AnEnum.name(AnEnum.AN_ORDINARY_MEMBER)
+        "An Ordinary Member"
+
+        Enums can customize member names by overriding this method.
+        """
         # value not handled in subclass name()
         for k, v in cls.__members__.items():
             if v == value:
@@ -69,24 +71,24 @@ class _base(object):
 
     @classmethod
     def members(cls):
-        '''
-        Return a list of member attribute names (strings),
-        ordered by value to make it consistent with class iterator
-        '''
+        """List of member names, taken from .name().
+
+        Sorted by member value to make it consistent with class iterator.
+        """
         return sorted(cls.__members__, key=cls.__members__.get)
 
 
 # Python 2
 if sys.version_info[0] < 3:
     class Enum(_base):
-        '''A basic implementation of Enums for Python 2'''
+        """A basic implementation of Enums for Python 2."""
         __metaclass__ = _meta
 
 # Python 3
 else:
     # Python 2 see Python 3 metaclass declaration as SyntaxError, hence exec()
-    exec("class Enum(_base, metaclass=_meta):"
-         "'''A basic implementation of Enums for Python 3'''")
+    exec('class Enum(_base, metaclass=_meta):'
+         '"""A basic implementation of Enums for Python 3."""')
 
 del sys, _base, _meta
 
@@ -95,7 +97,7 @@ if __name__ == '__main__':
     # Usage and Examples
 
     class Color(Enum):
-        '''Enum class example'''
+        """Enum class example"""
 
         # Declaration order is irrelevant, sorting will always be by value
         # Values can be any non-callable, and in Python 3 must be comparable
@@ -114,7 +116,7 @@ if __name__ == '__main__':
 
         @classmethod
         def name(cls, v):
-            '''Optional custom name function'''
+            """Optional custom name function."""
             if v == cls.BLACK: return "is back!"
             if v == cls.WHITE: return "Delight"
 
@@ -123,7 +125,7 @@ if __name__ == '__main__':
 
         @classmethod
         def counterpart(cls, v):
-            '''Custom method example'''
+            """Custom method example."""
             if v == cls.DEFAULT: return v
             if v == cls.BLACK:   return cls.WHITE
             if v == cls.WHITE:   return cls.BLACK

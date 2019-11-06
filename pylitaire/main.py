@@ -15,7 +15,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program. See <http://www.gnu.org/licenses/gpl.html>
 
-"""Main module and entry point"""
+"""Main module and entry point."""
 
 import os
 import logging
@@ -34,9 +34,10 @@ log = logging.getLogger(__name__)
 
 
 def main(args=None):
-    '''App entry point
-        <args> is a list of command line arguments, defaults to sys.argv[1:]
-    '''
+    """App entry point.
+
+    <args> is a list of command line arguments, defaults to sys.argv[1:]
+    """
 
     logging.basicConfig(
         format="[%(levelname)-8s] %(asctime)s %(module)s: %(message)s",

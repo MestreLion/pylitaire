@@ -2,7 +2,7 @@
 # Copyright (C) 2014 Rodrigo Silva (MestreLion) <linux@rodrigosilva.com>
 # License: GPLv3 or later, at your choice. See <http://www.gnu.org/licenses/gpl>
 
-"""Card handling, game rules independent"""
+"""Card handling, game rules independent."""
 
 import logging
 import random
@@ -16,7 +16,7 @@ log = logging.getLogger(__name__)
 
 
 class RANK(enum.Enum):
-    '''Card ranks'''
+    """Cards rank."""
     ACE   =  1
     TWO   =  2
     THREE =  3
@@ -33,7 +33,7 @@ class RANK(enum.Enum):
 
 
 class SUIT(enum.Enum):
-    '''Card suits'''
+    """Cards suit."""
     CLUBS    = 1
     DIAMONDS = 2
     HEARTS   = 3
@@ -41,13 +41,16 @@ class SUIT(enum.Enum):
 
 
 class COLORS(enum.Enum):
-    '''Card "color". Black for Clubs and Spades, Red for Diamonds and Hearts'''
+    """Cards color.
+
+    Black for Clubs and Spades, Red for Diamonds and Hearts.
+    """
     BLACK = 1
     RED   = 2
 
 
 class ORIENTATION(enum.Enum):
-    '''Stack orientation of a card in relation to its parent'''
+    """Stack orientation of a card relative to its parent."""
     NONE  = None    # Do not snap
     KEEP  = ()      # Keep the same orientation of the parent
     RIGHT = ( 1,  0)
@@ -58,14 +61,16 @@ class ORIENTATION(enum.Enum):
 
 
 class TURN(enum.Enum):
-    SAME     = None
+    """Cards facing."""
+    #TODO: Should be FACING
+    SAME     = None  # Used as default no-op card.flip() in Slot.deal()
     TOGGLE   = ''
     FACEUP   = True
     FACEDOWN = False
 
 
 class Deck(pygame.sprite.LayeredDirty):
-    ''' A collection of cards '''
+    """Collection of Cards."""
 
     def __init__(self, theme=None):
         super(Deck, self).__init__()
@@ -88,11 +93,11 @@ class Deck(pygame.sprite.LayeredDirty):
         self.board = None
 
     def set_theme(self, theme):
-        '''Set the card theme for the deck.
-            <theme> can be either an instance of themes.Theme
-            or a key name, looked up in themes.themes dict,
-            theme attribute will always be set as instance, if any
-        '''
+        """Set the card theme for the deck.
+
+        <theme> can be either an instance of themes.Theme() or a key name, looked up in
+        themes.themes dictionary. Theme attribute will always be set as instance, if any.
+        """
         # FIXME: changing theme could trigger a .resize()
         if isinstance(theme, themes.Theme):
             self.theme = theme
@@ -103,14 +108,15 @@ class Deck(pygame.sprite.LayeredDirty):
             log.warn("Theme '%s' not found. Cards will not be drawn", theme)
 
     def card(self, rank=0, suit=0):
-        '''Return a Card of the given rank and suit
-            For double decks it may return either card, as they distinct
-            instances but otherwise indistinguishable
-        '''
+        """Return a Card of the given rank and suit.
+
+        For double decks it may return either card, as they are distinct instances
+        but are otherwise indistinguishable.
+        """
         return self.cardsdict[(rank, suit)]
 
     def shuffle(self):
-        ''' Shuffle the deck cards in-place. Return None '''
+        """Shuffle the deck's cards in-place. Return None."""
         self.empty()
         random.shuffle(self.cards)
         self.add(*self.cards)
@@ -137,7 +143,7 @@ class Deck(pygame.sprite.LayeredDirty):
                     self.cardsdict[(rank, suit)] = card
 
     def pop_cards(self):
-        '''Break all stacks, pop()'ing each card'''
+        """Break all stacks, pop()'ing each card."""
         for card in self.cards:
             card.pop()
 
@@ -197,7 +203,7 @@ class Deck(pygame.sprite.LayeredDirty):
 
 
 class Card(pygame.sprite.DirtySprite):
-    ''' A sprite representing a card '''
+    """Sprite representing a card."""
 
     snap_overlap = (0.2, 0.2)
 
@@ -314,9 +320,11 @@ class Card(pygame.sprite.DirtySprite):
         self.dirty = 1
 
     def start_drag(self, mouse_pos):
-        '''Start dragging card and its children. Save the current position
-            and mouse offset, so drag() and abort_drag() act as expected.
-        '''
+        """Start dragging card and its children.
+
+        Save the current position and mouse offset, so drag() and abort_drag()
+        act as expected.
+        """
         if self._drag_start_pos:
             log.warn("start_drag() called during an ongoing drag. "
                      "Forgot to drop() or abort_drag()?")
@@ -328,27 +336,24 @@ class Card(pygame.sprite.DirtySprite):
             self.child.start_drag(mouse_pos)
 
     def drag(self, mouse_pos):
-        '''Drag a card to current mouse position, recursively dragging
-            its children.
-        '''
+        """Drag a card to current mouse position, recursively dragging its children."""
         self.move((mouse_pos[0] - self._drag_offset[0],
                    mouse_pos[1] - self._drag_offset[1]))
         if self.child:
             self.child.drag(mouse_pos)
 
     def abort_drag(self):
-        '''Abort a drag, moving the card and its children back to its original
-            position
-        '''
+        """Abort a drag, moving the card and its children back to its original position"""
         self.move(self._drag_start_pos)
         if self.child:
             self.child.abort_drag()
         self.drop()
 
     def drop(self):
-        '''Drop the card at its current position.
-            Actually a No-Op, just discard the values saved by start_drag()
-        '''
+        """Drop the card at its current position.
+
+        Actually a No-Op, just discard the values saved by start_drag().
+        """
         self._drag_offset = self._drag_start_pos = ()
         if self.child:
             self.child.drop()
@@ -356,18 +361,21 @@ class Card(pygame.sprite.DirtySprite):
     stop_drag = drop
 
     def move(self, pos):
-        '''Move the card to <pos>, a (x, y) tuple'''
+        """Move the card to <pos>, a (x, y) tuple."""
         self.dirty = 1
         self.rect.topleft = pos
         self.deck.move_to_front(self)
 
     @property
     def faceup(self):
-        '''If card is faced up or down. Read-only. To change state, use flip()'''
+        """Is card faced up or down?
+
+        Read-only. To change state, use flip().
+        """
         return self._faceup
 
     def flip(self, faceup=TURN.TOGGLE):
-        '''Flip a card either face up, down, or toggle'''
+        """Flip a card either face up, down, or toggle"""
         if faceup == TURN.SAME:
             return
         if faceup == TURN.TOGGLE:
@@ -380,15 +388,15 @@ class Card(pygame.sprite.DirtySprite):
         self.dirty = 1
 
     def start_peep(self):
-        '''Temporarily show this card above all others'''
+        """Temporarily show this card above all others."""
         pass
 
     def stop_peep(self):
-        '''Send the card back to its original Z-Order'''
+        """Send the card back to its original Z-Order."""
         pass
 
     def stack(self, card, orientation=ORIENTATION.KEEP, overlap=()):
-        '''Snap to <card> as a child, forming a stack'''
+        """Snap to <card> as a child, forming a stack."""
         if card is self:
             log.warn("Trying to stack %s with itself", self)
             return
@@ -417,9 +425,10 @@ class Card(pygame.sprite.DirtySprite):
         self.snap(card, self.orientation, overlap)
 
     def pop(self):
-        '''Disconnect from its parent, if any, slicing the stack
-            Also disconnect itself and children from the current slot
-        '''
+        """Disconnect from its parent, if any, slicing the stack.
+
+        Also disconnect itself and children from the current slot.
+        """
         if self.slot and self.slot.child is self:
             self.slot.child = None
         self._set_slot(None)
@@ -428,9 +437,10 @@ class Card(pygame.sprite.DirtySprite):
         self.parent = None
 
     def snap(self, card, orientation=ORIENTATION.KEEP, overlap=()):
-        '''Move the card to a position relative to another card,
-            also recursively snap all children
-        '''
+        """Move the card to a position relative to another card.
+
+        Also recursively snap all children.
+        """
         if orientation == ORIENTATION.KEEP:
             orientation = card.orientation
         self.orientation = orientation
@@ -443,9 +453,11 @@ class Card(pygame.sprite.DirtySprite):
             self.child.snap(self, orientation, overlap)
 
     def place(self, slot):
-        '''Set the card and children to <slot>, moving it there and snapping
-            children according to slot's alignment (orientation and overlap)
-        '''
+        """Set the card and children to <slot>.
+
+        Move card there and snap children according to slot's alignment
+        (orientation and overlap).
+        """
         if slot.child and slot.child is not self:
             log.warn("Trying to place %s in a non-empty slot %s, first card is %s",
                      self, slot, slot.child)
@@ -460,19 +472,19 @@ class Card(pygame.sprite.DirtySprite):
             self.child.snap(self, self.orientation, self.slot.overlap)
 
     def _set_slot(self, slot):
-        '''Set the card to <slot>, recursively on all children. Used internally
-            by place() and stack()
-        '''
-        # Could be merged with snap(), but for now that is a strictly graphical
-        # function, with no logical assignments, and it's not (yet) the time to
-        # break that invariant
+        """Set the card to <slot>, recursively on all children.
+
+        Used internally by place() and stack().
+        """
+        # Could be merged with snap(), but for now that is a strictly graphical function,
+        # with no logical assignments, and it's not (yet) the time to break that invariant
         self.slot = slot
         if self.child:
             self.child._set_slot(slot)
 
     @property
     def children(self):
-        '''List all descendants, in order, not including itself'''
+        """List all descendants, in order, not including itself."""
         if self.child:
             return [self.child] + self.child.children
         else:
@@ -480,41 +492,48 @@ class Card(pygame.sprite.DirtySprite):
 
     @property
     def is_tail(self):
-        '''Return True if card is the tail (leaf) of its current stack'''
+        """Is card the tail (leaf) of its current stack?"""
         return not self.child
 
     @property
     def is_head(self):
-        '''Return True if card is the head (root) of its current stack'''
+        """Is card is the head (root) of its current stack?"""
         return not self.parent
 
 
 class Slot(pygame.sprite.DirtySprite):
-    '''A sprite-like object representing a slot
-        It has a <rect> for positioning but no <image> since all slots share
-        the same image that is only drawn onto background once per resize
-    '''
+    """Sprite-like object representing a slot.
+
+    It has a <rect> for positioning but no <image> since all slots share the same image
+    that is only drawn onto background once per resize.
+    """
     def __init__(self,
-                 cell=(0, 0),
-                 orientation=ORIENTATION.PILE,
-                 overlap=(0.2, 0.2),
-                 position=(0, 0),
-                 size=(0, 0),
-                 rank=-1,
-                 suit=-1,
-                 image=None,
-                 name=""):
-        '''Create slot at position <cell>, a (cx, cy) tuple in game grid units
-            logic units, each cell sized card size + margins. Useful for
-            repositioning the slot according to board geometry.
-            <position>, as opposed to <cell>, is an absolute (x, y) position
-            inside the window. <size> is (x, y), should be set to card size.
-            Cards dropped will stack with <orientation> and <overlap>.
-            <rank> and <suit> can be useful when creating rules for dropping
-            cards: usually rank is RANK.ACE - 1 for foundation and
-            RANK.KING + 1 for tableau
-            <image> is a pygame.Surface that can be used to draw() the slot
-        '''
+        cell=(0, 0),
+        orientation=ORIENTATION.PILE,
+        overlap=(0.2, 0.2),
+        position=(0, 0),
+        size=(0, 0),
+        rank=-1,
+        suit=-1,
+        image=None,
+        name=""
+    ):
+        """Create slot at position <cell>, a (cx, cy) tuple in game grid units logic units.
+
+        Each cell sized card size + margins. Useful for repositioning the slot according
+        to board geometry.
+
+        <position>, as opposed to <cell>, is an absolute (x, y) position inside the window.
+
+        <size> is (x, y), should be set to card size.
+
+        Cards dropped will stack with <orientation> and <overlap>.
+
+        <rank> and <suit> can be useful when creating rules for dropping cards: usually
+        rank is RANK.ACE - 1 for foundation and RANK.KING + 1 for tableau.
+
+        <image> is a pygame.Surface that can be used to draw() the slot.
+        """
         super(Slot, self).__init__()
 
         self.name = name
@@ -537,29 +556,32 @@ class Slot(pygame.sprite.DirtySprite):
             return "<%s(%r)>" % (self.__class__.__name__, self.cell)
 
     def resize(self, cardsize):
-        '''Resize the slot to <cardsize> (width, height)'''
+        """Resize the slot to <cardsize> (width, height)."""
         self.rect.size = cardsize
 
     def move(self, position):
-        '''Move the slot to an absolute (x, y) window position'''
+        """Move the slot to an absolute (x, y) window position."""
         self.rect.topleft = position
 
     def boardmove(self, geometry):
-        '''Reposition according to board <geometry> and current (logical) cell
-            grid position, moving its cards accordingly.
-            <geometry> is a pygame.Rect indicating the top left cell, ie, the
-            absolute position of cell (0, 0) and the board cell size.
-        '''
+        """Reposition according to board <geometry> and current (logical) cell grid position.
+
+        Move its cards accordingly.
+
+        <geometry> is a pygame.Rect indicating the top left cell, ie, the absolute position
+        of cell (0, 0) and the board cell size.
+        """
         self.move((geometry.x + self.cell[0] * geometry.size[0],
                    geometry.y + self.cell[1] * geometry.size[1]))
         if self.child:
             self.child.place(self)
 
     def draw(self, destsurface, image=None):
-        '''Blit the slot to a destination <surface>.
-            If <image> is given, it will be used as the slot surface
-            and saved for future drawings
-        '''
+        """Blit the slot to a destination <surface>.
+
+        If <image> is given, it will be used as the slot surface and saved
+        for future drawings.
+        """
         if image:
             self.image = image
         destsurface.blit(self.image, self.rect)
@@ -594,19 +616,23 @@ class Slot(pygame.sprite.DirtySprite):
                                   (overlap, overlap))
 
     def stack(self, card):
-        '''Stack <card> to the slot tail, or place it if slot is empty,
-            setting the slot for card and its children
-        '''
+        """Stack <card> to the slot tail, or place it if slot is empty.
+
+        Also set the slot for card and its children.
+        """
         if self.is_empty:
             card.place(self)
         else:
             card.stack(self.tail)
 
     def deal(self, slots, faceup=TURN.SAME):
-        '''Stack the slot tail card, facing <faceup>, to each of the slots in
-            <slots>, which may be a single slot or any iterable that yields
-            slots. Slot should contain enough cards to deal to all <slots>.
-        '''
+        """Stack the slot tail card.
+
+        Face <faceup> each of the slots in <slots>, which may be a single slot or
+        any iterable that yields slots.
+
+        Slot should contain enough cards to deal to all <slots>.
+        """
         if isinstance(slots, Slot):
             slots = [slots]
 
@@ -620,25 +646,25 @@ class Slot(pygame.sprite.DirtySprite):
 
     @property
     def is_empty(self):
-        '''Return True if the slot is empty'''
+        """Is the slot empty?"""
         return not self.child
 
     @property
     def head(self):
-        '''Return the stack top card (ie, bottom layer), if any'''
+        """Stack top card (ie, bottom layer), if any."""
         return self.child
     top = head
 
     @property
     def tail(self):
-        '''Return the stack tip card (ie, topmost layer), if any'''
+        """Stack tip card (ie, topmost layer), if any."""
         if self.child:
             return self.cards[-1]
     tip = tail
 
     @property
     def cards(self):
-        '''Return a list of all cards in this slot, in stack order'''
+        """List of all cards in this slot, in stack order."""
         if self.child:
             return [self.child] + self.child.children
         else:

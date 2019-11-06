@@ -2,7 +2,7 @@
 # Copyright (C) 2014 Rodrigo Silva (MestreLion) <linux@rodrigosilva.com>
 # License: GPLv3 or later, at your choice. See <http://www.gnu.org/licenses/gpl>
 
-"""Graphics-related functions"""
+"""Graphics-related functions."""
 
 
 import os
@@ -32,12 +32,14 @@ _desktop_size = ()
 
 class Background(object):
     def __init__(self, path="", size=(), color=None, title=""):
-        '''Create a new background of <size> from a <path> image file,
-            with <color> as a fallback for solid fill. If <path> is empty,
-            try to find one using an image named <title> in datadirs.
-            <color> defaults to g.BGCOLOR
-            <title> defaults to g.baize
-        '''
+        """Create a new background of <size> from a <path> image file.
+
+        Use <color> as a fallback for solid fill. If <path> is empty, try to find one
+        using an image named <title> in datadirs.
+
+        <color> defaults to g.BGCOLOR.
+        <title> defaults to g.baize.
+        """
         self.path = path or find_image(g.datadirs('images'), title or g.baize)
         self.color = color or g.BGCOLOR
         self.original = None
@@ -47,10 +49,11 @@ class Background(object):
             self.resize(size)
 
     def resize(self, size):
-        ''' Creates a background surface of <size> and render the original
-            background image to that new surface. If original image is smaller
-            than (800, 600) tile (repeat) it, otherwise rescale (stretch/shrink)
-        '''
+        """Return surface of <size> rendered with original background image.
+
+        If original image is smaller than (800, 600) then tile it (repeat),
+        otherwise re-scale to fit (stretch/shrink).
+        """
         self.surface = pygame.Surface(size)
 
         if not self.original and self.path:
@@ -78,14 +81,15 @@ class Background(object):
 
 
     def draw(self, destsurface, position=()):
-        ''' Draw the background to a destination <surface> at <position>,
-            defaults to (0, 0)
-        '''
+        """Draw the background to a destination <surface> at <position>.
+
+        <position> defaults to (0, 0).
+        """
         destsurface.blit(self.surface, position or (0, 0))
 
 
 class Slot(object):
-    '''Represents a slot image'''
+    """Slot image."""
 
     def __init__(self, path="", size=()):
         self.path = path or find_image(g.datadirs('images'), g.slotname, ['svg', 'svgz'])
@@ -100,7 +104,7 @@ class Slot(object):
 
 
 def init_graphics(window_size=None, full_screen=None):
-    '''Initialize the game window and graphics'''
+    """Initialize the game window and graphics."""
 
     global _desktop_size
 
@@ -128,11 +132,13 @@ def init_graphics(window_size=None, full_screen=None):
 
 
 def resize(window_size=None, full_screen=None):
-    '''Resize the window to <window_size> and set full screen mode to
-        <full_screen>, both default to current values. In full screen mode,
-        window size is ignored and desktop resolution is used instead.
-        Requested values are saved to g.
-    '''
+    """Resize the window to <window_size> and optionally set <full_screen> mode.
+
+    Both default to current values, so may be set independently. In full screen
+    mode, window size is ignored and desktop resolution is used instead.
+
+    Requested values are saved for future runs.
+    """
     if window_size is None and full_screen is None:
         return pygame.display.get_surface()
 
@@ -165,19 +171,19 @@ def resize(window_size=None, full_screen=None):
 
 
 def scale_size(original, size=(), proportional=True, multiple=(1, 1)):
-    ''' Enlarge or shrink <original> size so it fits a <size>
+    """Enlarge or shrink <original> size so it fits a <size>.
 
-        If <proportional>, rescaled size will maintain the original width and
-        height proportions, so resulting size may be smaller than requested in
-        either dimension.
+    If <proportional>, rescaled size will maintain the original width and
+    height proportions, so resulting size may be smaller than requested in
+    either dimension.
 
-        <multiple> rounds down size to be a multiple of given integers. It
-        allow themes to ensure cards have integer size, but may slightly change
-        image aspect ratio.
+    <multiple> rounds down size to be a multiple of given integers. It
+    allow themes to ensure cards have integer size, but may slightly change
+    image aspect ratio.
 
-        <original>, <size>, <multiple> and the return value are 2-tuple
-        (width, height). Returned width and height are rounded to integers
-    '''
+    <original>, <size>, <multiple> and the return value are 2-tuple
+    (width, height). Returned width and height are rounded to integers.
+    """
     def round_to_multiple(size, multiple):
         return (int(size[0] / multiple[0]) * multiple[0],
                 int(size[1] / multiple[1]) * multiple[1])
@@ -194,14 +200,13 @@ def scale_size(original, size=(), proportional=True, multiple=(1, 1)):
 
 
 def load_image(path, size=(), proportional=True, multiple=(1, 1)):
-    ''' Wrapper for pygame.image.load, adding support for SVG images
+    """Wrapper for pygame.image.load, adding support for SVG images.
 
-        See scale_size() for documentation on arguments.
+    See scale_size() for documentation on arguments.
 
-        For regular images, requesting a <size> different than the
-        original (after processing aspect, multiple and roundings)
-        will use pygame.transform.smoothscale()
-    '''
+    For regular images, requesting a <size> different than the original (after processing
+    aspect, multiple and roundings) will use pygame.transform.smoothscale().
+    """
     if os.path.splitext(path.lower())[1] == ".svg":
         return load_svg(path, size, proportional, multiple)
 
@@ -219,26 +224,29 @@ def load_image(path, size=(), proportional=True, multiple=(1, 1)):
 
 
 def load_svg(path, *scaleargs, **scalekwargs):
-    ''' Load an SVG file and return a pygame.image surface
-        See scale_size() for documentation on scale arguments.
-    '''
+    """Load an SVG file and return a pygame.image surface.
+
+    See scale_size() for documentation on scale arguments.
+    """
     return render_vector(Rsvg.Handle.new_from_file(path), *scaleargs, **scalekwargs)
 
 
 def load_vector(path):
-    ''' Load an SVG file from <path> and return a RsvgHandle instance '''
+    """Load an SVG file from <path> and return a RsvgHandle instance."""
     return Rsvg.Handle.new_from_file(path)
 
 
 def render_vector(svg, *scaleargs, **scalekwargs):
-    ''' Render a vector surface, such as the one returned from load_vector(),
-        to a pygame surface and return it
-    '''
+    """Render a vector surface to a pygame surface and return it.
+
+    Vector surfaces are such as the one returned from load_vector().
+    """
 
     def bgra_to_rgba(surface):
-        ''' Convert a Cairo surface in BGRA format to a RBGA string
-            Only needed for little-endian architectures.
-        '''
+        """Convert a Cairo surface in BGRA format to a RBGA string.
+
+        Only needed for little-endian architectures.
+        """
         # PIL generates a memoryview in Python 3+, so we convert to bytes
         data = surface.get_data()
         if sys.version_info >= (3, 0):
@@ -287,10 +295,11 @@ def render_vector(svg, *scaleargs, **scalekwargs):
 
 
 def find_image(dirs, title="", exts=()):
-    '''Find the first suitable image file in <dirs> and return its full path.
-        "Suitable" means being a supported image file, its extension in <exts>,
-        and, if <title>, with file title (basename sans extension) matching it.
-    '''
+    """Find the first suitable image file in <dirs> and return its full path.
+
+    "Suitable" means being a supported image file, its extension in <exts>, and,
+    if <title>, with file title (basename sans extension) matching it.
+    """
     for path in dirs:
         try:
             for basename in os.listdir(path):

@@ -22,7 +22,7 @@ log = logging.getLogger(__name__)
 themes = {}
 
 class Theme(object):
-    ''' Represents each card theme '''
+    """Each cards theme."""
 
     def __init__(self, themeid, path, name=""):
         self.id = themeid
@@ -33,7 +33,7 @@ class Theme(object):
 
     @property
     def image(self):
-        ''' Lazy image load '''
+        """Lazy image load."""
         if not self._image:
             self._image = graphics.load_vector(self.path)
             self.size = (self.image.props.height,
@@ -42,11 +42,11 @@ class Theme(object):
 
     @property
     def card_proportion(self):
-        ''' Defined as card height / width '''
+        """Defined as card height / width."""
         return (self.image.props.height / 5.) / (self.image.props.width / 13.)
 
     def render(self, cardsize=(), proportional=True):
-        ''' Render the theme image into a pygame surface and return it '''
+        """Render the theme image into a pygame surface and return it."""
         size = cardsize and (cardsize[0] * 13,
                              cardsize[1] *  5)
         return graphics.render_vector(self.image, size, proportional, multiple=(13, 5))
@@ -54,9 +54,7 @@ class Theme(object):
 
 
 def init_themes(paths):
-    ''' Load all themes found in THEMEDIRS and populate the global themes dict
-        cardsize and keep_aspect have the same meaning as in load_svg()
-    '''
+    """Load all themes found in <paths> and populate the global themes dictionary."""
 
     for path in paths:
         log.debug("Looking for card themes in: %s", path)

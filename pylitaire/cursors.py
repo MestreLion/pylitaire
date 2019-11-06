@@ -2,7 +2,7 @@
 # Copyright (C) 2014 Rodrigo Silva (MestreLion) <linux@rodrigosilva.com>
 # License: GPLv3 or later, at your choice. See <http://www.gnu.org/licenses/gpl>
 
-"""Mouse cursor utility functions"""
+"""Mouse cursor utility functions."""
 
 import sys
 import math
@@ -12,8 +12,7 @@ import pygame
 
 
 def invert_cursor(cursor):
-    ''' Invert the colors of a cursor, ie, swap black and white bits
-    '''
+    """Invert the colors of a cursor, ie, swap black and white bits."""
     size, hot, data, mask = cursor
     inv = []
     for i, byte in enumerate(data):
@@ -22,22 +21,25 @@ def invert_cursor(cursor):
 
 
 def compile(strings, black="X", white=".", xor="o"):  # @ReservedAssignment
-    ''' Convenience wrapper to pygame.cursors.compile() to accommodate for the
-        bug prior to pygame 1.92 / python 2 that swaps black and white.
-    '''
+    """Convenience wrapper to pygame.cursors.compile().
+
+    Fix the bug prior to pygame 1.92 / python 2 that swaps black and white.
+    """
     if pygame.version.vernum < (1, 9, 2):
         black, white = white, black
     return pygame.cursors.compile(strings, black=black, white=white, xor=xor)
 
 
 def layerlines(bytelist, width=0, char0=".", char1="X"):
-    ''' Read the byte list of an icon "layer" (the data or its mask, icon
-        index 2 or 3) and return a sequence of strings, one for each layer
-        line, where each char represents a layer bit.
-        Example:
-        >>> layerlines(pygame.cursors.arrow[3])  # the arrow mask
-        >>> ['.X..............', 'XXX.............', 'XXXX............', ...]
-    '''
+    """Read the byte list of an icon "layer" and return a sequence of strings.
+
+    An icon layer is the data or its mask, icon index 2 or 3. Return one for
+    each layer line, where each char represents a layer bit.
+
+    Example:
+    >>> layerlines(pygame.cursors.arrow[3])  # the arrow mask
+    >>> ['.X..............', 'XXX.............', 'XXXX............', ...]
+    """
     if not width:
         # Assume square icon
         width = math.sqrt(8 * len(bytelist))
@@ -56,21 +58,25 @@ def layerlines(bytelist, width=0, char0=".", char1="X"):
     return lines
 
 
-def cursorstrings(cursor,
-                     black="X",    white=".",    transparent=" ",
-                  hotblack="X", hotwhite=".", hottransparent=" "):
-    ''' Return a list of strings, each string representing a cursor image line,
-        and each char a cursor pixel. A pixel can have one of 3 possible values,
-        interpreted as "black", "white" and "transparent". One of the pixels
-        is also marked as the "hotspot" of the cursor.
+def cursorstrings(
+    cursor,
+       black="X",    white=".",    transparent=" ",
+    hotblack="X", hotwhite=".", hottransparent=" "
+):
+    """Return a list of strings, each string representing a cursor image line.
 
-        Can be used to view the icon as "ASCII art", dump its data and easily
-        manipulate its image, or as input to pygame.cursors.compile().
-        Default output format is compatible with its <string> argument.
+    Each char represent a cursor pixel. A pixel can have one of 3 possible values,
+    interpreted as "black", "white" and "transparent". One of the pixels is also marked
+    as the "hotspot" of the cursor.
 
-        NOTE: On Python 2 / Pygame 1.91, pygame.cursors.compile() has a bug that
-        swaps black and white. Use compile() wrapper or invert_cursor()
-    '''
+    Can be used to view the icon as "ASCII art", dump its data and easily manipulate
+    its image, or as input to pygame.cursors.compile().
+
+    Default output format is compatible with its <string> argument.
+
+    NOTE: On Python 2 / Pygame 1.91, pygame.cursors.compile() has a bug that swaps
+    black and white. Use compile() wrapper or invert_cursor().
+    """
     size, hot, data, mask = cursor
     width, height = size
     chars = black + white + transparent + hotblack + hotwhite + hottransparent
@@ -96,37 +102,36 @@ def cursorstrings(cursor,
 
 
 def cursorcode(cursor, indent=4, tuples=True, singlequotes=True, json=False):
-    ''' Return a string that is a textual representation of all information in
-        a cursor: a 3-tuple (or list) with size, hotspot and image strings.
+    """Return a textual representation of all information in a cursor as 3-tuple.
 
-        Output can be directly pasted in code for manual editing of image data,
-        or dumped to a json file. The image strings tuple is compatible with
-        pygame.cursors.compile(), so the cursor can be easily re-created.
+    Items are size, hotspot and image strings. If <tuples> is falsy, return a list instead.
 
-        By default output delimiters are single quotes `'` and parenthesis `()`,
-        as would the repr() of a tuple of strings be. Delimiter format is set
-        by <tuples> and <singlequotes>.
+    Output can be directly pasted in code for manual editing of image data, or dumped to
+    a json file. The image strings tuple is compatible with pygame.cursors.compile(),
+    so the cursor can be easily re-created.
 
-        If <json> is True, delimiters are forced to double quotes `"` and
-        brackets `[]` (ie, values as lists instead of tuples), so the output
-        is valid JSON data.
+    By default output delimiters are single quotes `'` and parenthesis `()`, as would the
+    repr() of a tuple of strings be. Delimiter format is set by <tuples> and <singlequotes>.
 
-        Example:
-        >>> print(cursorcode(pygame.mouse.get_cursor()))
-        ...
-        >>> code = cursorcode(pygame.cursors.arrow, json=True)
-        >>> size, hot, strings = json.loads(code)
-        >>> data, mask = pygame.cursors.compile(strings, black="X", white=".")
-        >>> pygame.mouse.set_cursor(size, hot, data, mask)
+    If <json> is True, delimiters are forced to double quotes `"` and brackets `[]`
+    (ie, values as lists instead of tuples), so the output is valid JSON data.
 
-        Note: On Python 2 / Pygame 1.91, swap black and white values to
-        workaround a bug in pygame.cursors.compile(), or use compile() wrapper:
-        >>> data, mask = pygame.cursors.compile(strings, black=".", white="X")
-        >>> data, mask =                compile(strings, black="X", white=".")
-        Or use invert_cursor() on strings:
-        >>> data, mask = pygame.cursors.compile(invert_cursor(strings),
-                                                         black="X", white=".")
-    '''
+    Example:
+    >>> print(cursorcode(pygame.mouse.get_cursor()))
+    ...
+    >>> code = cursorcode(pygame.cursors.arrow, json=True)
+    >>> size, hot, strings = json.loads(code)
+    >>> data, mask = pygame.cursors.compile(strings, black="X", white=".")
+    >>> pygame.mouse.set_cursor(size, hot, data, mask)
+
+    Note: On Python 2 / Pygame 1.91, swap black and white values to  workaround a bug in
+    pygame.cursors.compile(), or use compile() wrapper:
+    >>> data, mask = pygame.cursors.compile(strings, black=".", white="X")
+    >>> data, mask =                compile(strings, black="X", white=".")
+    Or use invert_cursor() on strings:
+    >>> data, mask = pygame.cursors.compile(invert_cursor(strings),
+                                                     black="X", white=".")
+    """
     if json:
         tuples = False
         singlequotes=False
@@ -147,9 +152,10 @@ def cursorcode(cursor, indent=4, tuples=True, singlequotes=True, json=False):
 
 
 def xmbcode(xmbfile, maskfile, *args, **kwargs):
-    ''' A convenience wrapper to cursorcode() to generate code
-        from a xmb cursor file and its mask file.
-    '''
+    """Convenience wrapper to cursorcode().
+
+    Generate code from a xmb cursor file and its mask file.
+    """
     try:
         cursor = pygame.cursors.load_xbm(xmbfile, maskfile)
     except Exception as e:
@@ -161,30 +167,31 @@ def xmbcode(xmbfile, maskfile, *args, **kwargs):
 
 
 def load_cursor(triplet):
-    ''' Return a cursor from a 3-tuple (size, hotspot, cursor strings)
+    """Return a cursor from a 3-tuple (size, hotspot, cursor strings).
 
-        Output is compatible as input to pygame.mouse.set_cursor(*cursor)
+    Output is compatible as input to pygame.mouse.set_cursor(*cursor).
 
-        Input triplet is compatible with cursorcode() output when it is
-        parsed by eval() or json.loads()
+    Input triplet is compatible with cursorcode() output when it is parsed by
+    eval() or json.loads()
 
-        Note: as a triplet is NOT a cursor, this function name is a bit of a
-        misnomer, but a convenient one to use in code.
+    Note: as a triplet is NOT a cursor, this function's name is a bit of a misnomer, but
+    a convenient one to use in code.
 
-        Example:
-        triplet = json.loads(cursorcode(pygame.cursors.arrow))
-        pygame.mouse.set_cursor(*load_cursor(triplet))
-    '''
+    Example:
+    >>> triplet = json.loads(cursorcode(pygame.cursors.arrow))
+    >>> pygame.mouse.set_cursor(*load_cursor(triplet))
+    """
     size, hot, strings = triplet
     data, mask = compile(strings)
     return size, hot, data, mask
 
 
 def load_json(path):
-    ''' Convenience wrapper for load_cursor() that reads triplet from a JSON-
-        formatted file and return a cursor compatible for use as input to
-        pygame.mouse.set_cursor(*cursor)
-    '''
+    """Convenience wrapper for load_cursor().
+
+    Read a triplet from a JSON-formatted file and return a cursor compatible for use as
+    input to pygame.mouse.set_cursor(*cursor).
+    """
     with open(path) as fp:
         return load_cursor(json.load(fp))
 
