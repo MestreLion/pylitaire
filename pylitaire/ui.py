@@ -317,13 +317,17 @@ class Gui(object):
 
         if self.updatestatus:
             self.updatestatus = False
+            title = self.game.title()
             message = self.game.status()
             time = self.gamestarttime and (self.ticks - self.gamestarttime)
             score = self.game.score()
             if (time == 0
                 or message != self.statusbar.message
-                or score   != self.statusbar.score):
-                log.info("%s\t%s\t%s", message, formattime(time), score)
+                or score   != self.statusbar.score
+                or title   != self.statusbar.title
+            ):
+                log.info("%s\t%s\t%s\t%s", title, message, formattime(time), score)
+            self.statusbar.title = title
             self.statusbar.message = message
             self.statusbar.time = time
             self.statusbar.score = score
@@ -515,8 +519,10 @@ class StatusBar(pygame.sprite.DirtySprite):
         # All dummy until update()
         self.image  = pygame.Surface((0, 0))
         self.llabel = pygame.Surface((0, 0))
+        self.mlabel = pygame.Surface((0, 0))
         self.rlabel = pygame.Surface((0, 0))
 
+        self.title = ""
         self.message = ""
         self.time = 0
         self.score = 0
@@ -532,6 +538,7 @@ class StatusBar(pygame.sprite.DirtySprite):
         self.image.fill(self.bgcolor)
 
         ltext = self.message
+        mtext = self.title
         rtext = "Time: %s    Score: %3d" % (
             formattime(self.time),
             self.score)
@@ -540,17 +547,23 @@ class StatusBar(pygame.sprite.DirtySprite):
             return self.font.render(text, True, self.color, self.bgcolor)
 
         llabel = renderfont(ltext)
+        mlabel = renderfont(mtext)
         rlabel = renderfont(rtext)
-
-        rrect = rlabel.get_rect()
-        rrect.bottomright = (self.rect.width  - self.padding[0],
-                             self.rect.height - self.padding[1])
 
         lrect = llabel.get_rect()
         lrect.bottomleft = (self.padding[0],
                             self.rect.height - self.padding[1])
 
+        mrect = mlabel.get_rect()
+        mrect.midbottom = (self.rect.width / 2,
+                           self.rect.height - self.padding[1])
+
+        rrect = rlabel.get_rect()
+        rrect.bottomright = (self.rect.width  - self.padding[0],
+                             self.rect.height - self.padding[1])
+
         self.image.blit(llabel, lrect)
+        self.image.blit(mlabel, mrect)
         self.image.blit(rlabel, rrect)
 
         self.dirty = 1

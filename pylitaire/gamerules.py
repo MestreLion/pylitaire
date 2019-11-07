@@ -148,6 +148,11 @@ class Game(object):
                 log.debug("Executing undo: %s", cmd)
                 cmd.execute()
 
+    def title(self):
+        """Game Title for Statusbar."""
+        return "%s game #%s" % (self.name, self.seed)
+
+
     ###########################################################################
     # API methods subclasses must implement
 
