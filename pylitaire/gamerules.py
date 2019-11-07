@@ -150,7 +150,7 @@ class Game(object):
 
     def title(self):
         """Game Title for Statusbar."""
-        return "%s game #%s" % (self.name, self.seed)
+        return "%s #%s" % (self.name, self.seed)
 
 
     ###########################################################################
@@ -464,19 +464,17 @@ class Yukon(Klondike):
 class Pylitaire(Yukon):
     """Yukon easier variation.
 
-    8 tableau slots with 2 extra open cards in each one, including the first tableau slot,
-    and allowing not only Kings but any card to be dropped on an empty tableau slot.
+    Allow any card to be dropped on an empty tableau slot, not only Kings
     """
     def __init__(self):
-        super(Pylitaire, self).__init__((8, 4))
+        super(Pylitaire, self).__init__()  # (8, 4)
 
     def setup(self):
-        super(Pylitaire, self).setup(0)
+        super(Pylitaire, self).setup()
 
     def droppable(self, card, targets):
         droplist = super(Pylitaire, self).droppable(card, targets)
 
-        # Allow any card to be dropped on an empty tableau slot
         droplist.extend(_ for _ in targets if
                         _ not in droplist and
                         _ in self.tableau and
