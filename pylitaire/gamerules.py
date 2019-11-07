@@ -553,9 +553,9 @@ class Backbone(Game):
 
     def draggable(self, card):
         return not (card.slot is self.stock
+                    or card.slot in self.foundations
                     or (card.slot in self.backbone
                         and not card.slot.blockedby.is_empty))
-                # and not card.slot in self.foundations
 
     def droppable(self, card, targets):
         targets = super(Backbone, self).droppable(card, targets)
@@ -568,6 +568,9 @@ class Backbone(Game):
                     if card.is_tail and card.rank == cards.RANK.ACE:
                         droplist.append(target)
                 elif target in self.tableau:
+                    if ((card.slot not in self.backbone + [self.block])
+                         or card.rank == cards.RANK.KING
+                    ):
                         droplist.append(target)
 
             # dropping to card in foundation
