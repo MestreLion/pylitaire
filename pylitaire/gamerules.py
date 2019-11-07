@@ -11,6 +11,7 @@ Design notes:
 """
 
 import logging
+import random
 
 from . import cards
 
@@ -102,15 +103,20 @@ class Game(object):
         self.deck = cards.Deck()
         self.name = self.__class__.__name__
         self.undocmds = []
+        self.seed = 0
 
     ###########################################################################
     # API methods already implemented, subclasses should leave alone
 
-    def new_game(self):
+    def new_game(self, seed=0):
         """Handle a New Game event. Simply shuffle cards and call restart()."""
-        log.info("New game")
-        self.deck.shuffle()
+        if not seed:
+            seed = random.randrange(2**32)
+        self.seed = seed
+        log.info("New game #%d", self.seed)
+        self.deck.shuffle(self.seed)
         self.restart(nolog=True)
+        return self.seed
 
     def restart(self, nolog=False):
         """Handle a Restart Game event. Break all stacks and run setup()."""

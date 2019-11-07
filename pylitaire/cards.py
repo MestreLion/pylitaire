@@ -115,10 +115,14 @@ class Deck(pygame.sprite.LayeredDirty):
         """
         return self.cardsdict[(rank, suit)]
 
-    def shuffle(self):
+    def shuffle(self, seed=0):
         """Shuffle the deck's cards in-place. Return None."""
+        if seed:
+            shuffle = random.Random(seed).shuffle
+        else:
+            shuffle = random.shuffle
         self.empty()
-        random.shuffle(self.cards)
+        shuffle(self.cards)
         self.add(*self.cards)
 
     def get_top_card(self, pos):
