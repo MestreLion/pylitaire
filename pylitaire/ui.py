@@ -198,11 +198,18 @@ class Gui(object):
             if event.key in (pygame.K_BACKSPACE,):  # TODO: Add XF86Back / SDLK_AC_BACK
                 self._action_undo(event, game)
 
+            else:
+                log.debug("Key down: %s key=%r, scan=%r",
+                          pygame.key.name(event.key),
+                          event.key,
+                          event.scancode)
+
         if (event.type == pygame.MOUSEBUTTONDOWN
             and self.card):
 
             if event.button == MOUSEBUTTONS.LEFT:
 
+                # Time only starts when user clicks a card
                 self.gamestarttime = self.gamestarttime or self.ticks
 
                 if (self.card == self.doubleclickcard
@@ -226,6 +233,9 @@ class Gui(object):
             elif event.button == MOUSEBUTTONS.RIGHT:
                 # Reserved for start peep
                 pass
+
+            else:
+                log.debug("Pressed mouse button %d", event.button)
 
         elif event.type == pygame.MOUSEBUTTONUP:
 

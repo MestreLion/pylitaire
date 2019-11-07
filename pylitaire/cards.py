@@ -548,12 +548,17 @@ class Slot(pygame.sprite.DirtySprite):
         self.rect = pygame.sprite.Rect(position, size)
         self.image = image
 
+        log.debug("Created slot %r", self)
+
     def __repr__(self):
+        def rcell(cell):
+            return '(%s)' %(', '.join(("%d" if isinstance(_, int) else "%.2f") % (_,)
+                                      for _ in cell),)
         if self.name:
-            return "<%s(%r, name=%r)>" % (
-                self.__class__.__name__, self.cell, self.name)
+            return "<%s(%s, name=%r)>" % (
+                self.__class__.__name__, rcell(self.cell), self.name)
         else:
-            return "<%s(%r)>" % (self.__class__.__name__, self.cell)
+            return "<%s(%r)>" % (self.__class__.__name__, rcell(self.cell))
 
     def resize(self, cardsize):
         """Resize the slot to <cardsize> (width, height)."""
