@@ -102,7 +102,7 @@ class Gui(object):
                 if pygame.time.get_ticks() > 10000:
                     break
 
-            clock.tick(g.FPS)
+            clock.tick(g.FPS * (3 if self.win else 1))
 
 
     def load_game(self, gamename):

@@ -168,7 +168,7 @@ class Deck(pygame.sprite.LayeredDirty):
 
         return self.cardsize
 
-    def start_animation(self, board, gravity=3):
+    def start_animation(self, board, gravity=4):
         if self.animating:
             log.warn("start_animation() called during an ongoing animation. "
                      "Forgot to stop_animation() before?")
