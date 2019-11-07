@@ -26,12 +26,16 @@ log = logging.getLogger(__name__)
 
 class MOUSEBUTTONS(enum.Enum):
     """Pygame mouse buttons."""
-    NONE      = None
-    LEFT      = 1
-    MIDDLE    = 2
-    RIGHT     = 3
-    WHEELUP   = 4
-    WHEELDOWN = 5
+    NONE          = None
+    LEFT          = 1
+    MIDDLE        = 2  # Wheel click button down
+    RIGHT         = 3
+    WHEEL_UP      = 4  # Rotating upwards
+    WHEEL_DOWN    = 5  # Rotating downwards
+    WHEEL_LEFT    = 6  # Wheel click sidewards
+    WHEEL_RIGHT   = 7  # Wheel click sidewards
+    THUMB_BACK    = 8  # Possibly bound to XF86Back key
+    THUMB_FORWARD = 9  # Possibly bound to XF86Forward key
 
 
 class COLORS(enum.Enum):
@@ -191,12 +195,8 @@ class Gui(object):
 
         if event.type == pygame.KEYDOWN:
 
-            if event.key == pygame.K_BACKSPACE:
-                if game.undoable() and not self.dragcard:
-                    game.undo()
-                    self._update_card()
-                else:
-                    log.info("Undo not available")
+            if event.key in (pygame.K_BACKSPACE,):  # TODO: Add XF86Back / SDLK_AC_BACK
+                self._action_undo(event, game)
 
         if (event.type == pygame.MOUSEBUTTONDOWN
             and self.card):
@@ -277,6 +277,17 @@ class Gui(object):
             elif event.button == MOUSEBUTTONS.RIGHT:
                 # Reserved for end peep
                 pass
+
+            elif event.button == MOUSEBUTTONS.THUMB_BACK:
+                self._action_undo(event, game)
+
+
+    def _action_undo(self, event, game):  # @UnusedVariable
+        if game.undoable() and not self.dragcard:
+            game.undo()
+            self._update_card()
+        else:
+            log.info("Undo not available")
 
 
     def update(self):
