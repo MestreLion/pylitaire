@@ -424,6 +424,23 @@ class Klondike(Game):
         return droplist
 
 
+class Win(Klondike):
+    def __init__(self, grid=()):
+        super(Win, self).__init__(grid or (7, 4))
+        self.slots.remove(self.stock)
+        self.slots.remove(self.waste)
+
+    def setup(self):
+        super(Win, self).setup()
+        for slot in self.tableau + [self.stock]:
+            while not slot.is_empty:
+                slot.deal(self.foundations[0], cards.TURN.FACEUP)
+
+    def status(self):
+        return "Cards to uncover: %d" % sum((1 if not _.faceup else 0
+                                             for _ in self.deck))
+
+
 class Yukon(Klondike):
     def __init__(self, grid=()):
         super(Yukon, self).__init__(grid or (7, 4))

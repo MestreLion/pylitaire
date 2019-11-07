@@ -190,6 +190,9 @@ class Gui(object):
             if event.key == pygame.K_F11:
                 self.resize(full_screen=not g.full_screen)
 
+            if event.key == pygame.K_F12:
+                self.wingame()
+
         if self.win or not game:
             return
 
