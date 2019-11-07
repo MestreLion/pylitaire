@@ -579,4 +579,4 @@ class StatusBar(pygame.sprite.DirtySprite):
 
 
 def formattime(miliseconds):
-    return datetime.timedelta(seconds=miliseconds/1000)
+    return datetime.timedelta(seconds=int(miliseconds/1000))

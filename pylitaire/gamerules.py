@@ -57,7 +57,7 @@ class Command():
         args = [str(_) for _ in self.args]
         args.extend(("%s=%s" % (k, v) for k, v in self.kwargs.items()))
         return "<%s.%s(%s)>" % (
-            getattr(self.command, 'im_self', ''),
+            getattr(self.command, '__self__', ''),
             self.command.__name__,
             ", ".join(args))
 
@@ -480,17 +480,17 @@ class Backbone(Game):
 
         self.foundations = []
         for i in range(8):
-            self.foundations.append(self.create_slot((4 + i%4, i/4),
+            self.foundations.append(self.create_slot((4 + i%4, i//4),
                                                  name="Foundation %s" % (i+1)))
 
         self.tableau = []
         for i in range(8):
-            self.tableau.append(self.create_slot((3 * (i/4), i%4),
+            self.tableau.append(self.create_slot((3 * (i//4), i%4),
                                                  name="Tableau %s" % (i+1)))
 
         self.backbone = []
         for i in range(18):
-            self.backbone.append(self.create_slot((1 + i/9, 0.33 * (i%9)),
+            self.backbone.append(self.create_slot((1 + i//9, 1.0/3 * (i%9)),
                                                   name="Backbone %s" % (i+1)))
 
         for i, slot in enumerate(self.backbone[:-1]):
