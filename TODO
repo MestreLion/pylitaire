@@ -1,8 +1,17 @@
 Brainstorm of new features and code ideas, in no particular order
 
+- Drop Python 2 support, to add Python 3-exclusive syntax:
+  - Annotations for Type Hints (3.0), possibly using `typing` module (3.5)
+  - Enums (3.4)
+  - Formatted string literals, as in f"{name!r}" (3.6)
+  - Dataclasses (3.7)
+
+- Revamp SVG/Z rendering code, it's waaaayyy too slow on default life_and_smooth theme
+  2019 might have a better way to use librsvg/cairo. Drop code for Big-Endian rendering
+
 - Android support: use PNG instead of SVG for Slot and Theme
 
-- "blue mask" highlight when dragging card over a droppable area
+- "blue mask" highlight when dragging card over a droppable area, possibly changing cursor to crosshair (see Aisleriot)
 
 - Integrate cards.Slot with graphics.Slot
 
@@ -14,7 +23,7 @@ Brainstorm of new features and code ideas, in no particular order
   drop will always be on a slot, somewhat forcing card drop to tail
 
 - Allow drop on tail when card collide with any card of stack (highlight the tail). Will perhaps require either
-	stack/slot.rect = rect.union(*card.rect) or the "all cards have a slot" model
+  stack/slot.rect = rect.union(*card.rect) or the "all cards have a slot" model
 
 - Idea for Enum: metaclass special *value* NONE (==None). Any member with this value is excluded from iterations.
   Enums define their own NONE *member*, if they want to, as NONE = Enum.NONE
@@ -37,7 +46,8 @@ Brainstorm of new features and code ideas, in no particular order
 - Deck.set_theme should trigger resize() if cardsize is not the same. That would require storing maxcardsize I guess
 	But if IS the same, blit on self.surface instead of re-assigning it
 
-- create install: .desktop, shell script, setup.py, debian/ dir, PPA
+- create installers: .desktop, shell script, setuptools setup.py, debian/ dir, PPA
+  For setup.py: entry_points = {'gui_scripts': ['pylitaire = pylitaire.main:main']
 
 - Change iconset due to conflicting licensing
 
