@@ -1,8 +1,11 @@
-Brainstorm of new features and code ideas, in no particular order
+Brainstorm of new features and code ideas, in no particular order:
+
+- Use Calendar Versioning. v1.0 was just to indicate first public release. v20YY-MM from now on
 
 - Drop Python 2 support, to add Python 3-exclusive syntax:
-  - Annotations for Type Hints (3.0), possibly using `typing` module (3.5)
+  - Change Launcher shebang to '#!/usr/bin/env python3' to indicate
   - Enums (3.4)
+  - Annotations for Type Hints (3.0), possibly using `typing` module (3.5)
   - Formatted string literals, as in f"{name!r}" (3.6)
   - Dataclasses (3.7)
 

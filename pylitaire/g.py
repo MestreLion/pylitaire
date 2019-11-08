@@ -40,7 +40,7 @@ import logging
 log = logging.getLogger(__name__)
 
 # General
-VERSION = "0.9"
+VERSION = "1.0"
 APPNAME = 'pylitaire'
 
 # Paths
