@@ -54,7 +54,7 @@ class Command():
         self.command(*self.args, **self.kwargs)
 
     def __repr__(self):
-        args = [str(_) for _ in self.args]
+        args = map(str, self.args)
         args.extend(("%s=%s" % (k, v) for k, v in self.kwargs.items()))
         return "<%s.%s(%s)>" % (
             getattr(self.command, '__self__', ''),
@@ -363,7 +363,7 @@ class Klondike(Game):
             self.stock.stack(card)
             card.flip(cards.TURN.FACEDOWN)
 
-        for i, _ in enumerate(self.tableau):
+        for i, __ in enumerate(self.tableau):
             self.stock.deal(self.tableau[i],      cards.TURN.FACEUP)
             self.stock.deal(self.tableau[i + 1:], cards.TURN.FACEDOWN)
 
@@ -423,6 +423,10 @@ class Klondike(Game):
 
         return droplist
 
+    def status(self):
+        return "Cards to uncover: %d" % sum(1 if not c.faceup else 0
+                                            for c in self.deck)
+
 
 class Win(Klondike):
     def __init__(self, grid=()):
@@ -435,10 +439,6 @@ class Win(Klondike):
         for slot in self.tableau + [self.stock]:
             while not slot.is_empty:
                 slot.deal(self.foundations[0], cards.TURN.FACEUP)
-
-    def status(self):
-        return "Cards to uncover: %d" % sum((1 if not _.faceup else 0
-                                             for _ in self.deck))
 
 
 class Yukon(Klondike):
@@ -456,10 +456,6 @@ class Yukon(Klondike):
         while not self.stock.is_empty:
             self.stock.deal(self.tableau[i:], cards.TURN.FACEUP)
 
-    def status(self):
-        return "Cards to uncover: %d" % sum((1 if not _.faceup else 0
-                                             for _ in self.deck))
-
 
 class Pylitaire(Yukon):
     """Yukon easier variation.
@@ -475,10 +471,10 @@ class Pylitaire(Yukon):
     def droppable(self, card, targets):
         droplist = super(Pylitaire, self).droppable(card, targets)
 
-        droplist.extend(_ for _ in targets if
-                        _ not in droplist and
-                        _ in self.tableau and
-                        _.is_empty)
+        droplist.extend(__ for __ in targets if
+                        __ not in droplist and
+                        __ in self.tableau and
+                        __.is_empty)
 
         return droplist
 
