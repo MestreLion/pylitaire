@@ -41,10 +41,11 @@ coverage.xml
 # Translations
 *.mo
 
-# Mr Developer
+# IDEs
 .mr.developer.cfg
 .project
 .pydevproject
+.idea
 
 # Rope
 .ropeproject
