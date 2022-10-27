@@ -56,3 +56,10 @@ def main(args=None):
 
     pygame.quit()
     g.save_options()
+
+
+def cli():
+    try:
+        main()
+    except KeyboardInterrupt:
+        pass

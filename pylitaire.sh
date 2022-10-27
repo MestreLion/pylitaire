@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/bin/sh
 #
 # pylitaire - Solitaire in Python
 #
@@ -17,14 +17,8 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program. See <http://www.gnu.org/licenses/gpl.html>
 
-"""Game launcher"""
+# Game launcher
 
-import sys
+cd -- "${0%/*}" || exit 1
 
-import pylitaire.main
-
-if __name__ == "__main__":
-    try:
-        sys.exit(pylitaire.main.main())
-    except KeyboardInterrupt:
-        pass
+python3 -m pylitaire

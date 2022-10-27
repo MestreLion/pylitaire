@@ -6,7 +6,4 @@
 
 from . import main
 
-try:
-    main.main()
-except KeyboardInterrupt:
-    pass
+main.cli()
