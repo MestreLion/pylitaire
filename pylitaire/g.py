@@ -30,12 +30,12 @@ Globals are basically divided in 4 groups:
 This module can be renamed as 'options' if the word 'Global' is so frowned upon.
 """
 
-import sys
-import os.path
-import xdg.BaseDirectory
 import json
 import logging
+import os.path
+import sys
 
+import xdg.BaseDirectory
 
 log = logging.getLogger(__name__)
 
