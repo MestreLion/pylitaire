@@ -5,7 +5,7 @@ description = "Solitaire in Python"
 authors = [
     {name = "Rodrigo Silva (MestreLion)", email = "linux@rodrigosilva.com"}
 ]
-keywords = ["game", "solitaire", "cards"]
+keywords = ["game", "cards", "solitaire"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: End Users/Desktop",
@@ -23,16 +23,16 @@ classifiers = [
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
 ]
 readme = "README.md"
-# When PEP 639 lands, review and possibly change this:
-# SPDX: GPL-3.0-or-later
-license = {file = "LICENSE"}
+# Pre-PEP 639: 'license' table with either 'file' or 'text' key
+#license.file = "LICENSE"  # No new info, and setuptools includes by default
+license.text = "GPL-3.0-or-later"  # Free text, so using SPDX
+# PEP 639 (still draft as of oct-2022): 'license' string (SPDX), 'license-files'
+#license = "GPL-3.0-or-later"
+#license-files.paths = ["LICENSE"]  # already covered by the default .globs
 
-# Not yet, as it still works with Python 2
-# requires-python = ">=3.6"
+# Not enabled yet, as it still works with Python 2 (good luck with dependencies!)
+#requires-python = ">=3.6"
 
-# Debian/Ubuntu packages that might be needed:
-# PyGObject (gi and cairo): python3-gi gir1.2-gtk-3.0  # python3-gi-cairo
-# Pillow (PIL): python3-pil
 dependencies = [
     "Pillow",
     "pycairo",
@@ -40,6 +40,16 @@ dependencies = [
     "PyGObject",
     "pyxdg",
 ]
+# Debian/Ubuntu packages needed for apt-installing dependencies:
+# PyGObject (gi and cairo): python3-gi python3-gi-cairo gir1.2-gtk-3.0
+# Pillow (PIL): python3-pil
+# XDG: python3-xdg
+
+# Debian/Ubuntu packages needed for pip-installing dependencies:
+# PyGObject from pip: libgirepository1.0-dev libcairo2-dev python3-dev pkg-config gcc
+# https://pygobject.readthedocs.io/en/latest/getting_started.html#ubuntu-getting-started
+# Pycairo from pip (all icluded in PyGObject): libcairo2-dev python3-dev pkg-config
+# https://pycairo.readthedocs.io/en/latest/getting_started.html
 
 [project.gui-scripts]
 pylitaire = "pylitaire.main:run"
@@ -48,6 +58,13 @@ pylitaire = "pylitaire.main:run"
 Homepage = "https://github.com/MestreLion/pylitaire"
 Source = "https://github.com/MestreLion/pylitaire"
 Tracker = "https://github.com/MestreLion/issues"
+
+# needed for flat layout projects containing non-package dirs
+[tool.setuptools.packages.find]
+exclude = ["refs*"]
+
+[tool.setuptools.package-data]
+"*" = ["data/*/*"]  # or "data/**/*" when bumped to v62.3.0 (May 2022)
 
 # Syntax and semantics for current recommended practices taken from:
 # https://packaging.python.org/en/latest/tutorials/packaging-projects/
@@ -68,11 +85,6 @@ Tracker = "https://github.com/MestreLion/issues"
 #include-package-data = true
 #license-files = ["LICENSE"]
 
-#[tool.setuptools.packages]
-#find = {namespaces = false}
-# Default:
-#find = {}
-
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=61.0"]  # March 2022, but not in Ubuntu 22.04 LTS
 build-backend = "setuptools.build_meta"
