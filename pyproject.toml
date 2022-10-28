@@ -1,3 +1,78 @@
+[project]
+name = "pylitaire"
+version = "0.1"
+description = "Solitaire in Python"
+authors = [
+    {name = "Rodrigo Silva (MestreLion)", email = "linux@rodrigosilva.com"}
+]
+keywords = ["game", "solitaire", "cards"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: End Users/Desktop",
+    "Topic :: Games/Entertainment",
+    "Topic :: Software Development :: Libraries :: pygame",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 2.7",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    # Remove License classifier when PEP 639 lands
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+]
+readme = "README.md"
+# When PEP 639 lands, review and possibly change this:
+# SPDX: GPL-3.0-or-later
+license = {file = "LICENSE"}
+
+# Not yet, as it still works with Python 2
+# requires-python = ">=3.6"
+
+# Debian/Ubuntu packages that might be needed:
+# PyGObject (gi and cairo): python3-gi gir1.2-gtk-3.0  # python3-gi-cairo
+# Pillow (PIL): python3-pil
+dependencies = [
+    "Pillow",
+    "pycairo",
+    "pygame",
+    "PyGObject",
+    "pyxdg",
+]
+
+[project.gui-scripts]
+pylitaire = "pylitaire.main:run"
+
+[project.urls]
+Homepage = "https://github.com/MestreLion/pylitaire"
+Source = "https://github.com/MestreLion/pylitaire"
+Tracker = "https://github.com/MestreLion/issues"
+
+# Syntax and semantics for current recommended practices taken from:
+# https://packaging.python.org/en/latest/tutorials/packaging-projects/
+# Adhering to PEP 621 landed in Setuptools 61.
+
+# Most or all of the settings below are already the default for pyproject.toml
+
+#[project.readme]
+#file = "README.md"
+#content-type = "text/markdown; charset=UTF-8"
+
+#[tool.distutils.bdist_wheel]
+#universal = 1
+
+#[tool.setuptools]
+#zip-safe = false
+#platforms = "any"
+#include-package-data = true
+#license-files = ["LICENSE"]
+
+#[tool.setuptools.packages]
+#find = {namespaces = false}
+# Default:
+#find = {}
+
 [build-system]
-requires = ["setuptools>=40.6.0", "wheel"]
+requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
