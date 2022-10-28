@@ -1,6 +1,6 @@
 # Project-specific
 pylitaire/data/themes/*.png
-referencias/
+refs/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -11,7 +11,6 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-env/
 bin/
 build/
 develop-eggs/
@@ -42,18 +41,18 @@ coverage.xml
 *.mo
 
 # IDEs
-.mr.developer.cfg
-.project
-.pydevproject
+.settings
+.*project
 .idea
 
-# Rope
-.ropeproject
-
-# Django stuff:
-*.log
-*.pot
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
 
 # Sphinx documentation
 docs/_build/
-
