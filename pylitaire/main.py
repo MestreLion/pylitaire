@@ -17,8 +17,9 @@
 
 """Main module and entry point."""
 
-import os
 import logging
+import os
+import sys
 
 # Disable Pygame advertisement
 # https://github.com/pygame/pygame/commit/18a31449de93866b369893057f1e60330b53da95
@@ -58,8 +59,9 @@ def main(args=None):
     g.save_options()
 
 
-def cli():
+def run():
+    """Wrapper to main() for graceful exit on KeyboardInterrupt (CTRL+C)"""
     try:
-        main()
+        sys.exit(main())
     except KeyboardInterrupt:
         pass
