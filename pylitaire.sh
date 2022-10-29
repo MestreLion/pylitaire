@@ -22,4 +22,4 @@
 here=$(dirname "$(readlink -f "$0")")
 cd -- "$here" || exit 1
 
-python3 -m pylitaire
+python3 -m pylitaire "$@"
