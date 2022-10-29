@@ -17,8 +17,8 @@ from . import cards
 
 log = logging.getLogger(__name__)
 
-
 _games = {}
+
 
 def load_game(gamename):
     if not _games:
@@ -44,7 +44,7 @@ def get_games():
     return _games
 
 
-class Command():
+class Command(object):
     def __init__(self, command, *args, **kwargs):
         self.command = command
         self.args    = args
@@ -54,7 +54,7 @@ class Command():
         self.command(*self.args, **self.kwargs)
 
     def __repr__(self):
-        args = map(str, self.args)
+        args = list(map(str, self.args))
         args.extend(("%s=%s" % (k, v) for k, v in self.kwargs.items()))
         return "<%s.%s(%s)>" % (
             getattr(self.command, '__self__', ''),
@@ -78,10 +78,10 @@ class Game(object):
         <deck>
             cards.Deck instance to create and handle the cards. Default is a
             deck with no cards. Games should use deck.create_cards() with
-            arguments for single or double deck, jokers or not, etc.
+            arguments for single or double-deck, jokers or not, etc.
 
         <name>
-            The name of the game. By default set to the name of the class.
+            The name of the game. By default, set to the name of the class.
             Games can redefine this.
 
         Boilerplate for a simple game:
@@ -152,7 +152,6 @@ class Game(object):
         """Game Title for Statusbar."""
         return "%s #%s" % (self.name, self.seed)
 
-
     ###########################################################################
     # API methods subclasses must implement
 
@@ -167,7 +166,7 @@ class Game(object):
         """Handle click on <element>, either card or slot.
 
         Games should override or extend this method.
-        By default flip() cards and do nothing on slots.
+        By default, flip() cards and do nothing on slots.
 
         Return True if card state changed.
         """
@@ -186,7 +185,7 @@ class Game(object):
     def drop(self, card, target):
         """Handle drop <card> on a <target>, target may be a card or a slot.
 
-        By default stack() or place() on target, depending on target type.
+        By default, stack() or place() on target, depending on target type.
 
         This is only triggered by GUI for a valid drop target, as defined by droppable(),
         so the default action should suit any game. Extend this only if game needs
@@ -215,7 +214,7 @@ class Game(object):
     def droppable(self, card, targets):
         """Return a subset of <targets> that are valid drop places for <card>.
 
-        By default return all targets that are either empty slots or cards that are
+        By default, return all targets that are either empty slots or cards that are
         the tail of its stack.
 
         Games should override or extend this method to further filter target list
@@ -243,8 +242,8 @@ class Game(object):
         Default message is:
                 "Stock left: <stock>  Redeals left: <redeals>"
 
-        <stock> is the number of cards in self.stock slot, or the first slot in self.slots,
-        if such slot exists.
+        <stock> is the number of cards in `self.stock` slot,
+        or the first slot in `self.slots` if such slot exists.
         <redeals> is a game attribute, if it exists.
 
         Games can override or extend this method to better suit them.
@@ -283,7 +282,7 @@ class Game(object):
     def win(self):
         """Has the victory condition been met?
 
-        By default victory is achieved when score equals the number of cards in the deck.
+        By default, victory is achieved when score equals the number of cards in the deck.
 
         Games can override or extend this method to better suit them.
         """
@@ -296,7 +295,7 @@ class Game(object):
         """Create a game slot. See cards.Slot class for arguments.
 
         A convenience wrapper to be used by subclasses that automatically keeps track of
-        all slots created by adding them to self.slots list.
+        all slots created by adding them to `self.slots` list.
         """
         slot = cards.Slot(*slotargs, **slotkwargs)
         self.slots.append(slot)
@@ -316,9 +315,11 @@ class Game(object):
         Stack it to a suitable foundation slot if card is draggable() from its location
         and droppable() to any foundation slot.
         """
-        if (item in self.slots
+        if (
+            item in self.slots
             or item.slot in foundations
-            or not self.draggable(item)):
+            or not self.draggable(item)
+        ):
             return
 
         targets = []
@@ -345,8 +346,8 @@ class Klondike(Game):
 
         self.foundations = []
         for i in range(self.grid[0] - 4, self.grid[0]):
-            self.foundations.append(self.create_slot((i, 0),
-                                                 name="Foundation %s" % (i-3)))
+            self.foundations.append(self.create_slot(
+                (i, 0), name="Foundation %s" % (i-3)))
 
         self.tableau = []
         for i in range(self.grid[0]):
@@ -409,16 +410,20 @@ class Klondike(Game):
 
             # dropping to card in foundation
             elif target.slot in self.foundations:
-                if (card.is_tail
+                if (
+                    card.is_tail
                     and target.suit == card.suit
-                    and target.rank == card.rank - 1):
+                    and target.rank == card.rank - 1
+                ):
                     droplist.append(target)
 
             # dropping to card in tableau
             elif target.slot in self.tableau:
-                if (target.faceup
+                if (
+                    target.faceup
                     and target.color != card.color
-                    and target.rank == card.rank + 1):
+                    and target.rank == card.rank + 1
+                ):
                     droplist.append(target)
 
         return droplist
@@ -465,7 +470,7 @@ class Pylitaire(Yukon):
     def __init__(self):
         super(Pylitaire, self).__init__()  # (8, 4)
 
-    def setup(self):
+    def setup(self, i=1):
         super(Pylitaire, self).setup()
 
     def droppable(self, card, targets):
@@ -491,18 +496,18 @@ class Backbone(Game):
 
         self.foundations = []
         for i in range(8):
-            self.foundations.append(self.create_slot((4 + i%4, i//4),
-                                                 name="Foundation %s" % (i+1)))
+            self.foundations.append(self.create_slot((4 + i % 4, i // 4),
+                                                     name="Foundation %s" % (i + 1)))
 
         self.tableau = []
         for i in range(8):
-            self.tableau.append(self.create_slot((3 * (i//4), i%4),
-                                                 name="Tableau %s" % (i+1)))
+            self.tableau.append(self.create_slot((3 * (i // 4), i % 4),
+                                                 name="Tableau %s" % (i + 1)))
 
         self.backbone = []
         for i in range(18):
-            self.backbone.append(self.create_slot((1 + i//9, 1.0/3 * (i%9)),
-                                                  name="Backbone %s" % (i+1)))
+            self.backbone.append(self.create_slot((1 + i // 9, 1.0 / 3 * (i % 9)),
+                                                  name="Backbone %s" % (i + 1)))
 
         for i, slot in enumerate(self.backbone[:-1]):
             slot.blockedby = self.backbone[i+1]
@@ -533,8 +538,9 @@ class Backbone(Game):
                     undo.append(Command(self.stock.deal, self.waste,
                                         cards.TURN.FACEUP))
                 self.redeals -= 1
-                def undo_redeals(self):
-                    self.redeals += 1
+
+                def undo_redeals(_self):
+                    _self.redeals += 1
                 undo.append(Command(undo_redeals, self))
 
         elif item.slot is self.stock:
@@ -562,24 +568,29 @@ class Backbone(Game):
                     if card.is_tail and card.rank == cards.RANK.ACE:
                         droplist.append(target)
                 elif target in self.tableau:
-                    if ((card.slot not in self.backbone + [self.block])
-                         or card.rank == cards.RANK.KING
+                    if (
+                        (card.slot not in self.backbone + [self.block])
+                        or card.rank == cards.RANK.KING
                     ):
                         droplist.append(target)
 
             # dropping to card in foundation
             elif target.slot in self.foundations:
-                if (card.is_tail
+                if (
+                    card.is_tail
                     and target.is_tail
                     and target.suit == card.suit
-                    and target.rank == card.rank - 1):
+                    and target.rank == card.rank - 1
+                ):
                     droplist.append(target)
 
             # dropping to card in tableau
             elif target.slot in self.tableau:
-                if (target.is_tail
+                if (
+                    target.is_tail
                     and target.suit == card.suit
-                    and target.rank == card.rank + 1):
+                    and target.rank == card.rank + 1
+                ):
                     droplist.append(target)
 
         return droplist

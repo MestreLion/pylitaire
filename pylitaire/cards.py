@@ -62,7 +62,7 @@ class ORIENTATION(enum.Enum):
 
 class TURN(enum.Enum):
     """Cards facing."""
-    #TODO: Should be FACING
+    # TODO: Should be FACING
     SAME     = None  # Used as default no-op card.flip() in Slot.deal()
     TOGGLE   = ''
     FACEUP   = True
@@ -92,11 +92,15 @@ class Deck(pygame.sprite.LayeredDirty):
         self.gravity = 0
         self.board = None
 
+        # pygame.sprite.LayeredDirty requirements
+        self.dirty = 0
+
     def set_theme(self, theme):
         """Set the card theme for the deck.
 
-        <theme> can be either an instance of themes.Theme() or a key name, looked up in
-        themes.themes dictionary. Theme attribute will always be set as instance, if any.
+        <theme> can be either an instance of themes.Theme() or a key name,
+        looked up in `themes.themes` dictionary.
+        Theme attribute will always be set as instance, if any.
         """
         # FIXME: changing theme could trigger a .resize()
         if isinstance(theme, themes.Theme):
@@ -105,7 +109,7 @@ class Deck(pygame.sprite.LayeredDirty):
             self.theme = themes.themes.get(theme, None)
 
         if not self.theme:
-            log.warn("Theme '%s' not found. Cards will not be drawn", theme)
+            log.warning("Theme '%s' not found. Cards will not be drawn", theme)
 
     def card(self, rank=0, suit=0):
         """Return a Card of the given rank and suit.
@@ -130,6 +134,7 @@ class Deck(pygame.sprite.LayeredDirty):
         if cards:
             return cards[-1]  # last card is top card
 
+    # noinspection PyUnusedLocal
     def create_cards(self, doubledeck=False, jokers=0, **cardkwargs):
         self.remove(*self)
         self.cardsdict.clear()
@@ -174,8 +179,8 @@ class Deck(pygame.sprite.LayeredDirty):
 
     def start_animation(self, board, gravity=4):
         if self.animating:
-            log.warn("start_animation() called during an ongoing animation. "
-                     "Forgot to stop_animation() before?")
+            log.warning("start_animation() called during an ongoing animation. "
+                        "Forgot to stop_animation() before?")
         log.debug("Start animation in board %s, gravity %d", board, gravity)
         self.animating = True
         self.board = board
@@ -185,7 +190,7 @@ class Deck(pygame.sprite.LayeredDirty):
     def animate_next_card(self):
         sprites = self.sprites()
         if not sprites:
-            #self.stop_animation()
+            # self.stop_animation()
             return
         card = random.choice(sprites)
         if card.slot:
@@ -211,6 +216,7 @@ class Card(pygame.sprite.DirtySprite):
 
     snap_overlap = (0.2, 0.2)
 
+    # noinspection PyUnusedLocal
     def __init__(self, rank, suit, deck=None,
                  position=(0, 0), faceup=True, orientation=ORIENTATION.DOWN,
                  slot=None, card_id=""):
@@ -264,6 +270,7 @@ class Card(pygame.sprite.DirtySprite):
 
         # to be defined in resize()
         self.cardimage = None
+        self.image = None
 
         self.velocity = []
 
@@ -293,7 +300,7 @@ class Card(pygame.sprite.DirtySprite):
 
     def animate(self):
         if self.child:
-            log.warn("Trying to animate non-tail %s", self)
+            log.warning("Trying to animate non-tail %s", self)
             self.slot.tail.animate()
 
         log.debug("Animating %s", self)
@@ -330,8 +337,8 @@ class Card(pygame.sprite.DirtySprite):
         act as expected.
         """
         if self._drag_start_pos:
-            log.warn("start_drag() called during an ongoing drag. "
-                     "Forgot to drop() or abort_drag()?")
+            log.warning("start_drag() called during an ongoing drag. "
+                        "Forgot to drop() or abort_drag()?")
         self._drag_start_pos = self.rect.topleft
         self._drag_offset = (mouse_pos[0] - self.rect[0],
                              mouse_pos[1] - self.rect[1])
@@ -402,15 +409,15 @@ class Card(pygame.sprite.DirtySprite):
     def stack(self, card, orientation=ORIENTATION.KEEP, overlap=()):
         """Snap to <card> as a child, forming a stack."""
         if card is self:
-            log.warn("Trying to stack %s with itself", self)
+            log.warning("Trying to stack %s with itself", self)
             return
         if card in self.children:
-            log.warn("Trying to stack %s with its descendant %s", self, card)
+            log.warning("Trying to stack %s with its descendant %s", self, card)
             # disconnect the descendant
             card.pop()
         if card.child:
-            log.warn("Trying to stack %s to %s which already have a child %s",
-                     self, card, card.child)
+            log.warning("Trying to stack %s to %s which already have a child %s",
+                        self, card, card.child)
             # disconnect the former child
             card.child.pop()
 
@@ -443,7 +450,7 @@ class Card(pygame.sprite.DirtySprite):
     def snap(self, card, orientation=ORIENTATION.KEEP, overlap=()):
         """Move the card to a position relative to another card.
 
-        Also recursively snap all children.
+        Also, recursively snap all children.
         """
         if orientation == ORIENTATION.KEEP:
             orientation = card.orientation
@@ -463,8 +470,8 @@ class Card(pygame.sprite.DirtySprite):
         (orientation and overlap).
         """
         if slot.child and slot.child is not self:
-            log.warn("Trying to place %s in a non-empty slot %s, first card is %s",
-                     self, slot, slot.child)
+            log.warning("Trying to place %s in a non-empty slot %s, first card is %s",
+                        self, slot, slot.child)
             # disconnect the former child
             slot.child.pop()
         self.pop()
@@ -484,6 +491,7 @@ class Card(pygame.sprite.DirtySprite):
         # with no logical assignments, and it's not (yet) the time to break that invariant
         self.slot = slot
         if self.child:
+            # noinspection PyProtectedMember
             self.child._set_slot(slot)
 
     @property
@@ -511,7 +519,8 @@ class Slot(pygame.sprite.DirtySprite):
     It has a <rect> for positioning but no <image> since all slots share the same image
     that is only drawn onto background once per resize.
     """
-    def __init__(self,
+    def __init__(
+        self,
         cell=(0, 0),
         orientation=ORIENTATION.PILE,
         overlap=(0.2, 0.2),
@@ -551,13 +560,14 @@ class Slot(pygame.sprite.DirtySprite):
         self.child = None  # Card instance, set by card on place()
         self.rect = pygame.sprite.Rect(position, size)
         self.image = image
+        self.blockedby = None
 
         log.debug("Created slot %r", self)
 
     def __repr__(self):
         def rcell(cell):
-            return '(%s)' %(', '.join(("%d" if isinstance(_, int) else "%.2f") % (_,)
-                                      for _ in cell),)
+            return '(%s)' % (', '.join(("%d" if isinstance(_, int) else "%.2f") % (_,)
+                                       for _ in cell),)
         if self.name:
             return "<%s(%s, name=%r)>" % (
                 self.__class__.__name__, rcell(self.cell), self.name)
@@ -602,14 +612,15 @@ class Slot(pygame.sprite.DirtySprite):
         cards = self.cards
         length = float(len(cards))
         if length < 2 or self.orientation == ORIENTATION.PILE:
-            return # nothing to do
+            return  # nothing to do
 
         tail = cards[-1]
 
-        if   self.orientation == ORIENTATION.UP:    i=1; attrib = 'top'
-        elif self.orientation == ORIENTATION.DOWN:  i=1; attrib = 'bottom'
-        elif self.orientation == ORIENTATION.LEFT:  i=0; attrib = 'left'
-        elif self.orientation == ORIENTATION.RIGHT: i=0; attrib = 'right'
+        i = 0; attrib = ''
+        if   self.orientation == ORIENTATION.UP:    i = 1; attrib = 'top'
+        elif self.orientation == ORIENTATION.DOWN:  i = 1; attrib = 'bottom'
+        elif self.orientation == ORIENTATION.LEFT:  i = 0; attrib = 'left'
+        elif self.orientation == ORIENTATION.RIGHT: i = 0; attrib = 'right'
 
         edge = getattr(self.rect, attrib)
         dist = self.orientation[i] * self.rect.size[i] * (length - 1)
@@ -647,7 +658,7 @@ class Slot(pygame.sprite.DirtySprite):
 
         for slot in slots:
             if self.is_empty:
-                log.warn("Trying to deal from empty slot %s to %s", self, slot)
+                log.warning("Trying to deal from empty slot %s to %s", self, slot)
                 return
             card = self.tail
             card.flip(faceup)
@@ -680,8 +691,6 @@ class Slot(pygame.sprite.DirtySprite):
             return []
 
 
-
-
 if __name__ == '__main__':
     # unit tests
 
@@ -692,18 +701,18 @@ if __name__ == '__main__':
     window = pygame.display.set_mode((800, 600))
     window.fill((0, 80, 16))
     pygame.display.update()
-    themes.init_themes()
+    themes.init_themes('/usr/share/aisleriot/cards')
 
     # Card
-    card = Card(RANK.QUEEN, SUIT.HEARTS)
-    print(card, card.shortname, card.name)
-    window.blit(card.image, (0, 0))
+    _card = Card(RANK.QUEEN, SUIT.HEARTS)
+    print(_card, _card.shortname, _card.name)
+    window.blit(_card.image, (0, 0))
     pygame.display.update()
 
     # Deck
-    deck = Deck()
-    print(len(deck.cards))
-    print(deck.card(RANK.ACE, SUIT.SPADES))
-    print(deck.cards[:5])
-    deck.shuffle()
-    print(deck.cards[:5])
+    _deck = Deck()
+    print(len(_deck.cards))
+    print(_deck.card(RANK.ACE, SUIT.SPADES))
+    print(_deck.cards[:5])
+    _deck.shuffle()
+    print(_deck.cards[:5])

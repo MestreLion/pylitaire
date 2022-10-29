@@ -21,6 +21,7 @@ log = logging.getLogger(__name__)
 # Dict {id: <object>} of all themes found by init_themes()
 themes = {}
 
+
 class Theme(object):
     """Each cards theme."""
 
@@ -52,9 +53,8 @@ class Theme(object):
         return graphics.render_vector(self.image, size, proportional, multiple=(13, 5))
 
 
-
 def init_themes(paths):
-    """Load all themes found in <paths> and populate the global themes dictionary."""
+    """Load all themes found in <paths> and populate the global `themes` dictionary."""
 
     for path in paths:
         log.debug("Looking for card themes in: %s", path)
@@ -82,10 +82,7 @@ def init_themes(paths):
                 raise
 
 
-
-
 if __name__ == '__main__':
-
     def pause():
         pygame.display.update()
         done = False
@@ -107,7 +104,8 @@ if __name__ == '__main__':
     BGCOLOR = (0, 80, 16)
     AUTO = '--auto' in sys.argv[1:]
     THEME = 'bonded'  # the only one that ships with Aisleriot without gnome-cards
-    PATH = '/usr/share/aisleriot/cards/%s.svgz' % THEME
+    DIR  = '/usr/share/aisleriot/cards'
+    PATH = DIR + '/%s.svgz' % THEME
     SIZE = (800, 600)
 
     # setup
@@ -118,19 +116,19 @@ if __name__ == '__main__':
     screen.fill(BGCOLOR)
 
     # load_svg()
-    screen.blit(graphics.load_svg(PATH, SIZE), (0,0))
+    screen.blit(graphics.load_svg(PATH, SIZE), (0, 0))
     pause()
 
     # Theme()
     theme = Theme(THEME, PATH)
     print(theme.id, theme.name, theme.path, theme.size, theme.card_proportion)
-    screen.blit(graphics.render_vector(theme.image), (0,0))
+    screen.blit(graphics.render_vector(theme.image), (0, 0))
     pause()
 
     # init_themes()
-    init_themes()
-    for themeid, theme in sorted(themes.items()):
-        print(themeid, theme.card_proportion)
-        screen.blit(graphics.render_vector(theme.image, size=SIZE), (0,0))
+    init_themes(DIR)
+    for tid, theme in sorted(themes.items()):
+        print(tid, theme.card_proportion)
+        screen.blit(graphics.render_vector(theme.image, size=SIZE), (0, 0))
         if pause():
             break

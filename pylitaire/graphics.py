@@ -30,6 +30,7 @@ IMAGE_EXTS = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'pcx', 'tga', 'tif', 'tiff',
 
 _desktop_size = ()
 
+
 class Background(object):
     def __init__(self, path="", size=(), color=None, title=""):
         """Create a new background of <size> from a <path> image file.
@@ -78,7 +79,6 @@ class Background(object):
         # Status bar area
         rect = pygame.Rect(0, size[1] - g.SBHEIGHT, size[0], g.SBHEIGHT)
         self.surface.fill(g.SBCOLOR, rect)
-
 
     def draw(self, destsurface, position=()):
         """Draw the background to a destination <surface> at <position>.
@@ -150,7 +150,7 @@ def resize(window_size=None, full_screen=None):
 
     flags = 0
     if full_screen:
-        log.debug("Setting fullscreen, desktop resolution %r", _desktop_size)
+        log.debug("Setting full-screen, desktop resolution %r", _desktop_size)
         flags |= pygame.FULLSCREEN | pygame.HWSURFACE
         window_size = _desktop_size
     else:
@@ -177,16 +177,16 @@ def scale_size(original, size=(), proportional=True, multiple=(1, 1)):
     height proportions, so resulting size may be smaller than requested in
     either dimension.
 
-    <multiple> rounds down size to be a multiple of given integers. It
-    allow themes to ensure cards have integer size, but may slightly change
+    <multiple> rounds down <size> to be a multiple of given integers. It
+    allows themes to ensure cards have integer size, but may slightly change
     image aspect ratio.
 
     <original>, <size>, <multiple> and the return value are 2-tuple
     (width, height). Returned width and height are rounded to integers.
     """
-    def round_to_multiple(size, multiple):
-        return (int(size[0] / multiple[0]) * multiple[0],
-                int(size[1] / multiple[1]) * multiple[1])
+    def round_to_multiple(s, m):
+        return (int(s[0] / m[0]) * m[0],
+                int(s[1] / m[1]) * m[1])
 
     if not size or size == original:
         return round_to_multiple(original, multiple)
@@ -194,8 +194,8 @@ def scale_size(original, size=(), proportional=True, multiple=(1, 1)):
     if not proportional:
         return round_to_multiple(size, multiple)
 
-    rect = pygame.Rect((0,0), original)
-    result = rect.fit(pygame.Rect((0,0), size))
+    rect = pygame.Rect((0, 0), original)
+    result = rect.fit(pygame.Rect((0, 0), size))
     return round_to_multiple((result.width, result.height), multiple)
 
 
@@ -204,8 +204,8 @@ def load_image(path, size=(), proportional=True, multiple=(1, 1)):
 
     See scale_size() for documentation on arguments.
 
-    For regular images, requesting a <size> different than the original (after processing
-    aspect, multiple and roundings) will use pygame.transform.smoothscale().
+    For regular images, requesting a <size> different from the original (after
+    processing aspect, multiple and roundings) will use pygame.transform.smoothscale().
     """
     if os.path.splitext(path.lower())[1] == ".svg":
         return load_svg(path, size, proportional, multiple)
@@ -228,11 +228,13 @@ def load_svg(path, *scaleargs, **scalekwargs):
 
     See scale_size() for documentation on scale arguments.
     """
+    # noinspection PyArgumentList
     return render_vector(Rsvg.Handle.new_from_file(path), *scaleargs, **scalekwargs)
 
 
 def load_vector(path):
     """Load an SVG file from <path> and return a RsvgHandle instance."""
+    # noinspection PyArgumentList
     return Rsvg.Handle.new_from_file(path)
 
 
@@ -242,27 +244,25 @@ def render_vector(svg, *scaleargs, **scalekwargs):
     Vector surfaces are such as the one returned from load_vector().
     """
 
-    def bgra_to_rgba(surface):
+    def bgra_to_rgba(s):
         """Convert a Cairo surface in BGRA format to a RBGA string.
 
         Only needed for little-endian architectures.
         """
         # PIL generates a memoryview in Python 3+, so we convert to bytes
-        data = surface.get_data()
+        d = s.get_data()
         if sys.version_info >= (3, 0):
-            data = data.tobytes()
-
+            d = d.tobytes()
         img = PIL.Image.frombuffer(
-            'RGBA', (surface.get_width(), surface.get_height()),
-            data, 'raw', 'BGRA', 0, 1)
-
+            'RGBA', (s.get_width(), s.get_height()),
+            d, 'raw', 'BGRA', 0, 1)
         return img.tobytes('raw', 'RGBA', 0, 1)
 
     # Calculate size
     svgsize = (svg.props.width, svg.props.height)
     width, height = scale_size(svgsize, *scaleargs, **scalekwargs)
 
-    # If new size is different than original, calculate the scale factor
+    # If new size is different from original, calculate the scale factor
     scale = (1, 1)
     if not (width, height) == svgsize:
         scale = (float(width)/svgsize[0], float(height)/svgsize[1])
@@ -273,11 +273,12 @@ def render_vector(svg, *scaleargs, **scalekwargs):
     # Create a Cairo surface. Architecture endianess determines if cairo surface
     # pixel format will be RGBA or BGRA
     if sys.byteorder == 'little':
+        dataarray = None
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
     else:
         dataarray = array.array('c', chr(0) * width * height * 4)
-        surface = cairo.ImageSurface.create_for_data(dataarray,
-            cairo.FORMAT_ARGB32, width, height, width * 4)
+        surface = cairo.ImageSurface.create_for_data(
+            dataarray, cairo.FORMAT_ARGB32, width, height, width * 4)
 
     # Create a context, scale it, and render the SVG
     context = cairo.Context(surface)
@@ -304,9 +305,11 @@ def find_image(dirs, title="", exts=()):
         try:
             for basename in os.listdir(path):
                 filetitle, ext = os.path.splitext(basename.lower())
-                if ((not title or title == filetitle) and
+                if (
+                    (not title or title == filetitle) and
                     (not exts or ext[1:] in exts) and
-                    (ext[1:] in IMAGE_EXTS+['svg'])):
+                    (ext[1:] in IMAGE_EXTS+['svg'])
+                ):
                     return os.path.join(path, basename)
         except OSError as e:
             # path not found
