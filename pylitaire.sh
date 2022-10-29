@@ -19,6 +19,7 @@
 
 # Game launcher
 
-cd -- "${0%/*}" || exit 1
+here=$(dirname "$(readlink -f "$0")")
+cd -- "$here" || exit 1
 
 python3 -m pylitaire

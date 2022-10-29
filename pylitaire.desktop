@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Pylitaire
+Comment=Solitaire in Python!
+# See http://standards.freedesktop.org/menu-spec/latest/apa.html
+Categories=Game;
+Terminal=false
+StartupNotify=true
+StartupWMClass=__main__.py
+Icon=pylitaire
+Exec=pylitaire %U

@@ -33,6 +33,15 @@ license.text = "GPL-3.0-or-later"  # Free text, so using SPDX
 # Not enabled yet, as it still works with Python 2 (good luck with dependencies!)
 #requires-python = ">=3.6"
 
+# PyGObject and Pycairo via pip require system packages not installable by pip:
+# On Debian/Ubuntu: libgirepository1.0-dev gcc libcairo2-dev python3-dev pkg-config
+# Or simply install PyGObject and Pycairo themselves via package manager and not pip:
+# On Debian/Ubuntu: python3-gi python3-gi-cairo gir1.2-gtk-3.0
+# https://pygobject.readthedocs.io/en/latest/getting_started.html
+# https://pycairo.readthedocs.io/en/latest/getting_started.html
+# Aditionally, Rsvg bindings to librsvg is not available on pypi at all
+# On Debian/Ubuntu: gir1.2-rsvg-2.0
+# Use install.sh to apt-install dependencies, plus desktop integration (menu entry and icons)
 dependencies = [
     "Pillow",
     "pycairo",
@@ -40,16 +49,6 @@ dependencies = [
     "PyGObject",
     "pyxdg",
 ]
-# Debian/Ubuntu packages needed for apt-installing dependencies:
-# PyGObject (gi and cairo): python3-gi python3-gi-cairo gir1.2-gtk-3.0
-# Pillow (PIL): python3-pil
-# XDG: python3-xdg
-
-# Debian/Ubuntu packages needed for pip-installing dependencies:
-# PyGObject from pip: libgirepository1.0-dev libcairo2-dev python3-dev pkg-config gcc
-# https://pygobject.readthedocs.io/en/latest/getting_started.html#ubuntu-getting-started
-# Pycairo from pip (all icluded in PyGObject): libcairo2-dev python3-dev pkg-config
-# https://pycairo.readthedocs.io/en/latest/getting_started.html
 
 [project.gui-scripts]
 pylitaire = "pylitaire.main:run"
