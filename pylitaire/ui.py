@@ -178,12 +178,13 @@ class Gui(object):
                           "Help me get my feet back on the ground\n"
                           "Won't you please, please help me")
 
-            if event.key in range(pygame.K_F2, pygame.K_F10 + 1):
-                # A little hack for "get the n-th game"
-                i = event.key - pygame.K_F2
-                games = sorted(self.games.items())
-                if len(games) >= i + 1:
-                    self.load_game(games[i][0])
+            if event.key == pygame.K_F2:
+                # Load the next game (in lexicographical order)
+                self.load_game(gamerules.get_next(self.game))
+
+            if event.key == pygame.K_F3:
+                # Load the previous game (in lexicographical order)
+                self.load_game(gamerules.get_next(self.game, reverse=True))
 
             if event.key == pygame.K_F11:
                 self.resize(full_screen=not g.full_screen)

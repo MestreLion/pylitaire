@@ -20,27 +20,37 @@ log = logging.getLogger(__name__)
 _games = {}
 
 
-def load_game(gamename):
-    if not _games:
-        get_games()
-
-    gameclass = _games.get(gamename, None)
+def load_game(slug):
+    gameclass = get_games().get(slug, None)
     if not gameclass:
-        log.error("Game '%s' not found", gamename)
+        log.error("Game '%s' not found", slug)
         return
 
     game = gameclass()
-    log.info("Loading game '%s'", game.name)
+    log.info("Loading game '%s' [%s]", game.name, slug)
     return game
 
 
+def get_next(game, reverse=False):
+    games = get_games()
+    slugs = sorted(games, reverse=reverse)
+    slug = game.__class__.__name__.lower()
+    if slug not in slugs:
+        log.error("Not a valid game: %s", repr(game))
+        return
+    i = (slugs.index(slug) + 1) % len(slugs)
+    return slugs[i]
+
+
 def get_games():
+    if _games:
+        return _games
+
     def list_classes(base):
         for cls in base.__subclasses__():
             _games[cls.__name__.lower()] = cls
             list_classes(cls)
-    _games.clear()
-    list_classes(Game)
+    list_classes(Game)  # Root Base class
     return _games
 
 
