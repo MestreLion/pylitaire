@@ -84,6 +84,7 @@ def datadirs(dirname):
     return [os.path.join(CONFIGDIR, dirname),
             os.path.join(DATADIR, dirname)]
 
+
 def load_options(args):
     """Load all global options from config file and command line arguments."""
     global window_size, full_screen, debug, profile
@@ -106,7 +107,8 @@ def load_options(args):
             window_size = (int(width),
                            int(height))
     except (IOError, ValueError) as e:
-        log.warn("Error reading window size, using factory default: %s", e)
+        log.warning("Error reading window size, using factory default: %s", e)
+
 
 def save_options():
     try:
@@ -114,4 +116,4 @@ def save_options():
         with open(WINDOWFILE, 'w') as fp:
             json.dump(window_size, fp)
     except IOError as e:
-        log.warn("Could not write window size: %s", e)
+        log.warning("Could not write window size: %s", e)
