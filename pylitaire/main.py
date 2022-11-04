@@ -46,6 +46,10 @@ def main(args=None):
     )
 
     g.load_options(args)
+    log.debug("Python %s, Pygame %s, SDL %s",
+              sys.version.replace('\n', ' '),
+              pygame.ver,
+              '.'.join(str(_) for _ in pygame.get_sdl_version()))
     pygame.display.init()
     pygame.font.init()
 
