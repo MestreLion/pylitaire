@@ -629,3 +629,94 @@ class Test(Game):
 
     def win(self):
         return not self.slots[-1].is_empty
+
+
+class Exapunks(Game):
+    def __init__(self):
+        super(Exapunks, self).__init__()
+        self._score = 0
+        self.grid = (9, 3.2)
+        self.pocket = self.create_slot((self.grid[0] - 1.5, 0), name="Pocket")
+        self.tableau = []
+        for i in range(self.grid[0]):
+            self.tableau.append(self.create_slot((i, 1),
+                                                 cards.ORIENTATION.DOWN,
+                                                 name="Tableau %s" % (i+1)))
+
+        def cardfilter(card):
+            return card.rank == cards.RANK.ACE or card.rank >= 6
+        self.deck.create_cards(cardfilter=cardfilter)
+
+    def setup(self):
+        self._score = 0
+        for card in self.deck.cards:
+            self.pocket.stack(card)
+            card.flip(cards.TURN.FACEUP)
+
+        for _ in range(4):
+            self.pocket.deal(self.tableau)
+
+    def click(self, item):
+        # intentionally do nothing
+        pass
+
+    def doubleclick(self, item):
+        return self.double_click_to_foundations(item, [self.pocket])
+
+    @staticmethod
+    def is_face(card):
+        return card.rank == cards.RANK.ACE or card.rank >= cards.RANK.JACK
+
+    def is_match(self, card, target):
+        return (
+            # Face cards (Ace, Jack, Queen, King): same suit
+            (self.is_face(target) and self.is_face(card)
+             and target.suit == card.suit)
+            or
+            # numeric cards (6-10): sequential decreasing rank, alternate color
+            (not self.is_face(target) and not self.is_face(card)
+             and target.color != card.color
+             and target.rank == card.rank + 1)
+        )
+
+    def droppable(self, card, targets):
+        targets = super(Exapunks, self).droppable(card, targets)
+        droplist = []
+        for target in targets:
+            # dropping to pocket
+            if target is self.pocket and card.is_tail:
+                droplist.append(target)
+
+            # dropping to tableau
+            elif target in self.tableau:
+                droplist.append(target)
+
+            # dropping to card in tableau
+            elif target.slot in self.tableau and self.is_match(card, target):
+                droplist.append(target)
+
+        return droplist
+
+    def draggable(self, card):
+        # return card.is_tail
+        def is_stack(c):
+            return c.is_tail or (self.is_match(c.child, c) and is_stack(c.child))
+        return is_stack(card)
+
+    def win(self):
+        completed = 0
+        for slot in self.tableau:
+            card = slot.child
+            if card is None:
+                continue
+            if (len(card.children) == (3 if self.is_face(card) else 4)
+                    and self.draggable(card)):
+                completed += 1
+        self._score = 10 * completed
+        return completed == 8
+
+    def score(self):
+        return self._score
+
+    def status(self):
+        return ""
