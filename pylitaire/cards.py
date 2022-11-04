@@ -135,7 +135,7 @@ class Deck(pygame.sprite.LayeredDirty):
             return cards[-1]  # last card is top card
 
     # noinspection PyUnusedLocal
-    def create_cards(self, doubledeck=False, jokers=0, **cardkwargs):
+    def create_cards(self, doubledeck=False, jokers=0, cardfilter=None, **cardkwargs):
         self.remove(*self)
         self.cardsdict.clear()
         del self.cards[:]
@@ -147,6 +147,8 @@ class Deck(pygame.sprite.LayeredDirty):
             for suit in SUIT:
                 for rank in RANK:
                     card = Card(rank=rank, suit=suit, deck=self, **cardkwargs)
+                    if cardfilter and not cardfilter(card):
+                        continue
                     self.add(card)
                     self.cards.append(card)
                     self.cardsdict[(rank, suit)] = card
@@ -558,7 +560,7 @@ class Slot(pygame.sprite.DirtySprite):
         self.board = None
 
         self.child = None  # Card instance, set by card on place()
-        self.rect = pygame.sprite.Rect(position, size)
+        self.rect = pygame.Rect(position, size)
         self.image = image
         self.blockedby = None
 
