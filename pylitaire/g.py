@@ -30,9 +30,11 @@ Globals are basically divided in 4 groups:
 This module can be renamed as 'options' if the word 'Global' is so frowned upon.
 """
 
+import configparser
 import json
 import logging
 import os.path
+import shutil
 import sys
 
 import xdg.BaseDirectory
@@ -48,6 +50,7 @@ GAMEDIR = os.path.abspath(os.path.dirname(__file__) or '.')
 DATADIR = os.path.join(GAMEDIR, 'data')
 CONFIGDIR = xdg.BaseDirectory.save_config_path(APPNAME)
 WINDOWFILE = os.path.join(CONFIGDIR, 'window.json')
+CONFIGFILE = os.path.join(CONFIGDIR, '{}.conf'.format(APPNAME))
 
 # Graphics
 FPS = 30
@@ -73,7 +76,7 @@ baize = "baize-ubuntu"
 theme = "anglo"  # "life_and_smooth"
 slotname = "slot-gnome"
 doubleclicklimit = 400
-gamename = "backbone"  # "pylitaire"
+gamename = "exapunks"  # "backbone"  # "pylitaire"
 
 
 def datadirs(dirname):
@@ -88,16 +91,45 @@ def datadirs(dirname):
 def load_options(args):
     """Load all global options from config file and command line arguments."""
     global window_size, full_screen, debug, profile
+    global baize, theme, slotname, gamename, doubleclicklimit
 
     # Too lazy for argparse right now
     if args is None:
         args = sys.argv[1:]
+    # pre-read debug to configure logging sooner
+    if "--debug" in args:
+        logging.getLogger(__package__).setLevel(logging.DEBUG)
+    log.debug(args)
+
+    options = {'options': dict(
+        full_screen=full_screen,
+        window_size=window_size,
+        debug=debug,
+        profile=profile,
+        baize=baize,
+        theme=theme,
+        slotname=slotname,
+        doubleclicklimit=doubleclicklimit,
+        gamename=gamename,
+    )}
+    try:
+        read_config(CONFIGFILE, options)
+    except (IOError, ValueError) as e:
+        log.warning("Error reading config: %s", e)
+
+    # Override options with command-line arguments
     if "--fullscreen" in args: full_screen = True
     if "--debug"      in args: debug       = True
     if "--profile"    in args: profile     = True
-
     if debug:
         logging.getLogger(__package__).setLevel(logging.DEBUG)
+
+    log.debug(options)
+    baize            = options["options"]["baize"]
+    theme            = options["options"]["theme"]
+    slotname         = options["options"]["slotname"]
+    doubleclicklimit = options["options"]["doubleclicklimit"]
+    gamename         = options["options"]["gamename"]
 
     try:
         log.debug("Loading window size from: %s", WINDOWFILE)
@@ -117,3 +149,47 @@ def save_options():
             json.dump(window_size, fp)
     except IOError as e:
         log.warning("Could not write window size: %s", e)
+
+
+def read_config(path, options):
+    cp = configparser.ConfigParser()
+
+    log.debug("Loading config from: %s", CONFIGFILE)
+    if not cp.read(path, encoding='utf-8'):
+        # Config file does not exist, create one from template and read again
+        log.info("Config not found, creating one and using default values: %s", path)
+        shutil.copyfile(os.path.join(DATADIR, 'config', 'config.template.ini'), path)
+        cp.read(path, encoding='utf-8')
+
+    def get_iter(s, o):
+        return (_.strip() for _ in cp.get(s, o).split(','))
+
+    def get_list(s, o):
+        return list(get_iter(s, o))
+
+    def get_tuple(s, o):
+        return tuple(get_iter(s, o))
+
+    # .keys() to avoid 'RuntimeError: dictionary changed size during iteration'
+    for section in options.keys():
+        if not cp.has_section(section):
+            log.warning("Section [%s] not found in %s", section, path)
+            continue
+
+        # For other sections options list is taken from options dict
+        for opt in options[section]:
+            if   isinstance(options[section][opt], bool):  get = cp.getboolean
+            elif isinstance(options[section][opt], int):   get = cp.getint
+            elif isinstance(options[section][opt], float): get = cp.getfloat
+            elif isinstance(options[section][opt], list):  get = get_list
+            elif isinstance(options[section][opt], tuple): get = get_tuple
+            else:                                          get = cp.get
+
+            try:
+                options[section][opt] = get(section, opt)
+
+            except configparser.NoOptionError as e:
+                log.warning("%s in %s", e, path)
+
+            except ValueError as e:
+                log.warning("%s in '%s' option of %s", e, opt, path)
