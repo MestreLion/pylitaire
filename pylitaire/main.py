@@ -50,11 +50,15 @@ def main(args=None):
               sys.version.replace('\n', ' '),
               pygame.ver,
               '.'.join(str(_) for _ in pygame.get_sdl_version()))
+    # Window position is done by the Window Manager, not Pygame or SDL, but SDL
+    # can request a centered window. Must be set before pygame.display.init()
+    # Could also use SDL_VIDEO_WINDOW_POS = "x,y"
+    os.environ['SDL_VIDEO_CENTERED'] = '1'
     pygame.display.init()
     pygame.font.init()
 
-    themes.init_themes(g.datadirs('themes') + ['/usr/share/aisleriot/cards'])
     graphics.init_graphics()
+    themes.init_themes(g.datadirs('themes') + ['/usr/share/aisleriot/cards'])
 
     gui = ui.Gui()
     gui.run(g.window_size, g.full_screen, g.gamename)
