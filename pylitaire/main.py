@@ -18,13 +18,7 @@
 """Main module and entry point."""
 
 import logging
-import os
 import sys
-
-# Disable Pygame advertisement
-# https://github.com/pygame/pygame/commit/18a31449de93866b369893057f1e60330b53da95
-os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = ""  # the key just need to exist
-import pygame
 
 from . import g
 from . import graphics
@@ -46,24 +40,12 @@ def main(args=None):
     )
 
     g.load_options(args)
-    log.debug("Python %s, Pygame %s, SDL %s",
-              sys.version.replace('\n', ' '),
-              pygame.ver,
-              '.'.join(str(_) for _ in pygame.get_sdl_version()))
-    # Window position is done by the Window Manager, not Pygame or SDL, but SDL
-    # can request a centered window. Must be set before pygame.display.init()
-    # Could also use SDL_VIDEO_WINDOW_POS = "x,y"
-    os.environ['SDL_VIDEO_CENTERED'] = '1'
-    pygame.display.init()
-    pygame.font.init()
-
     graphics.init_graphics()
     themes.init_themes(g.datadirs('themes') + ['/usr/share/aisleriot/cards'])
 
     gui = ui.Gui()
     gui.run(g.window_size, g.full_screen, g.gamename)
 
-    pygame.quit()
     g.save_options()
 
 

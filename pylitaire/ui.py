@@ -88,20 +88,23 @@ class Gui(object):
         self.load_game(gamename)
 
         clock = pygame.time.Clock()
-        while True:
-            try:
-                self.handle_events()
-            except Quit:
-                break
-            self.update()
-            updated = self.draw()
-            pygame.display.update(updated)
-
-            if g.profile:
-                if pygame.time.get_ticks() > 10000:
+        try:
+            while True:
+                try:
+                    self.handle_events()
+                except Quit:
                     break
+                self.update()
+                updated = self.draw()
+                pygame.display.update(updated)
 
-            clock.tick(g.FPS * (3 if self.win else 1))
+                if g.profile:
+                    if pygame.time.get_ticks() > 10000:
+                        break
+
+                clock.tick(g.FPS * (3 if self.win else 1))
+        finally:
+            pygame.quit()
 
     def load_game(self, gamename):
         self.card = None
