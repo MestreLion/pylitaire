@@ -2634,7 +2634,7 @@
        gradientTransform="matrix(0,0.133007,-0.1438379,0,262.71938,475.96995)" />
   </defs>
   <g
-     id="10_diamond"
+     id="diamond_10"
      style="display:inline">
     <use
        id="use9749"
@@ -2770,7 +2770,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="2_spade">
+     id="spade_2">
     <use
        id="use9685"
        style="fill:none"
@@ -2837,7 +2837,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="8_club">
+     id="club_8">
     <use
        id="use9731"
        x="553"
@@ -2962,7 +2962,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="7_club">
+     id="club_7">
     <use
        id="use9723"
        x="474"
@@ -3059,7 +3059,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="6_club">
+     id="club_6">
     <use
        id="use9715"
        x="395"
@@ -3162,7 +3162,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="5_club">
+     id="club_5">
     <use
        id="use9707"
        x="316"
@@ -3243,7 +3243,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="4_club">
+     id="club_4">
     <use
        id="use9699"
        x="237"
@@ -3332,7 +3332,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="3_club">
+     id="club_3">
     <use
        id="use9689"
        x="158"
@@ -3397,7 +3397,7 @@
        style="fill:none;stroke:#000000;stroke-width:1.5" />
   </g>
   <g
-     id="2_club">
+     id="club_2">
     <use
        id="use9679"
        x="79"
@@ -3454,7 +3454,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="1_club">
+     id="club_1">
     <use
        id="use9669"
        x="0"
@@ -3855,7 +3855,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="9_club">
+     id="club_9">
     <use
        id="use9739"
        x="632"
@@ -3982,7 +3982,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="10_club">
+     id="club_10">
     <use
        id="use9747"
        x="711"
@@ -4117,7 +4117,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="jack_club">
+     id="club_jack">
     <use
        id="use9755"
        x="790"
@@ -4180,7 +4180,7 @@
        xlink:href="#cs" />
   </g>
   <g
-     id="king_club">
+     id="club_king">
     <use
        id="use9771"
        x="948"
@@ -4319,7 +4319,7 @@
        xlink:href="#cs" />
   </g>
   <g
-     id="queen_club">
+     id="club_queen">
     <use
        id="use9763"
        x="869"
@@ -4376,7 +4376,7 @@
        xlink:href="#cs" />
   </g>
   <g
-     id="2_diamond"
+     id="diamond_2"
      style="display:inline">
     <use
        id="use9681"
@@ -4434,7 +4434,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="1_diamond"
+     id="diamond_1"
      style="display:inline">
     <use
        id="use9671"
@@ -4528,7 +4528,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="3_diamond"
+     id="diamond_3"
      style="display:inline">
     <use
        id="use9691"
@@ -4594,7 +4594,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="4_diamond"
+     id="diamond_4"
      style="display:inline">
     <use
        id="use9701"
@@ -4684,7 +4684,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="5_diamond"
+     id="diamond_5"
      style="display:inline">
     <use
        id="use9709"
@@ -4766,7 +4766,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="6_diamond"
+     id="diamond_6"
      style="display:inline">
     <use
        id="use9717"
@@ -4870,7 +4870,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="7_diamond"
+     id="diamond_7"
      style="display:inline">
     <use
        id="use9725"
@@ -4968,7 +4968,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="8_diamond"
+     id="diamond_8"
      style="display:inline">
     <use
        id="use9733"
@@ -5094,7 +5094,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="9_diamond"
+     id="diamond_9"
      style="display:inline">
     <use
        id="use9741"
@@ -5222,7 +5222,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="jack_diamond"
+     id="diamond_jack"
      style="display:inline">
     <use
        id="use9757"
@@ -5286,7 +5286,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="queen_diamond"
+     id="diamond_queen"
      style="display:inline">
     <use
        id="use9765"
@@ -5344,7 +5344,7 @@
        xlink:href="#ds" />
   </g>
   <g
-     id="king_diamond"
+     id="diamond_king"
      style="display:inline">
     <use
        id="use9773"
@@ -5534,7 +5534,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="red_joker"
+     id="joker_red"
      style="display:inline">
     <use
        id="use9687"
@@ -5577,7 +5577,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="black_joker"
+     id="joker_black"
      style="display:inline">
     <use
        id="use9677"
@@ -5619,7 +5619,7 @@
        xlink:href="#jokerpip_black" />
   </g>
   <g
-     id="1_heart"
+     id="heart_1"
      style="display:inline">
     <use
        id="use9673"
@@ -5713,7 +5713,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="2_heart"
+     id="heart_2"
      style="display:inline">
     <use
        id="use9683"
@@ -5771,7 +5771,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="3_heart"
+     id="heart_3"
      style="display:inline">
     <use
        id="use9693"
@@ -5837,7 +5837,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="4_heart"
+     id="heart_4"
      style="display:inline">
     <use
        id="use9703"
@@ -5927,7 +5927,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="5_heart"
+     id="heart_5"
      style="display:inline">
     <use
        id="use9711"
@@ -6009,7 +6009,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="6_heart"
+     id="heart_6"
      style="display:inline">
     <use
        id="use9719"
@@ -6113,7 +6113,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="7_heart"
+     id="heart_7"
      style="display:inline">
     <use
        id="use9727"
@@ -6211,7 +6211,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="8_heart"
+     id="heart_8"
      style="display:inline">
     <use
        id="use9735"
@@ -6337,7 +6337,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="9_heart"
+     id="heart_9"
      style="display:inline">
     <use
        id="use9743"
@@ -6465,7 +6465,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="10_heart"
+     id="heart_10"
      style="display:inline">
     <use
        id="use9751"
@@ -6601,7 +6601,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="jack_heart"
+     id="heart_jack"
      style="display:inline">
     <use
        id="use9759"
@@ -6665,7 +6665,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="queen_heart"
+     id="heart_queen"
      style="display:inline">
     <use
        id="use9767"
@@ -6723,7 +6723,7 @@
        xlink:href="#hs" />
   </g>
   <g
-     id="king_heart"
+     id="heart_king"
      style="display:inline">
     <use
        id="use9775"
@@ -6863,7 +6863,7 @@
        id="line7830" />
   </g>
   <g
-     id="king_spade"
+     id="spade_king"
      style="display:inline">
     <use
        id="use9777"
@@ -7007,7 +7007,7 @@
        id="line7920" />
   </g>
   <g
-     id="queen_spade"
+     id="spade_queen"
      style="display:inline">
     <use
        id="use9769"
@@ -7083,7 +7083,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="jack_spade"
+     id="spade_jack"
      style="display:inline">
     <use
        id="use9761"
@@ -7147,7 +7147,7 @@
        id="line7881" />
   </g>
   <g
-     id="10_spade"
+     id="spade_10"
      style="display:inline">
     <use
        id="use9753"
@@ -7283,7 +7283,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="9_spade"
+     id="spade_9"
      style="display:inline">
     <use
        id="use9745"
@@ -7411,7 +7411,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="8_spade"
+     id="spade_8"
      style="display:inline">
     <use
        id="use9737"
@@ -7537,7 +7537,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="7_spade"
+     id="spade_7"
      style="display:inline">
     <use
        id="use9729"
@@ -7637,7 +7637,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="6_spade"
+     id="spade_6"
      style="display:inline">
     <use
        id="use9721"
@@ -7741,7 +7741,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="5_spade"
+     id="spade_5"
      style="display:inline">
     <use
        id="use4840"
@@ -7823,7 +7823,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="4_spade"
+     id="spade_4"
      style="display:inline">
     <use
        id="use9705"
@@ -7913,7 +7913,7 @@
        id="line7905" />
   </g>
   <g
-     id="3_spade"
+     id="spade_3"
      style="display:inline">
     <use
        id="use9695"
@@ -7979,7 +7979,7 @@
        xlink:href="#cfo" />
   </g>
   <g
-     id="1_spade"
+     id="spade_1"
      style="display:inline">
     <use
        id="use9675"
