@@ -1,5 +1,23 @@
 Brainstorm of new features and code ideas, in no particular order:
 
+- add and document ubuntu_bonded.svg
+
+- add more themes and optimize existing ones (fix_ids, svgcrush, xmllint, scour)
+
+- Improve default config.ini
+
+- Write last game, theme, fullscreen and window size to config.ini, preserving comments
+
+- Add min window size to fix resize crash
+
+- Fix final score not updating on winning
+
+- Finish Exapunks: completed face cards stacks must be face down and immovable
+
+- Bump PyGame to 2.0:
+    - Freetype fonts
+    - display / fullscreen switch improvements
+
 - Use Calendar Versioning. v1.0 was just to indicate first public release. v20YY-MM from now on
 
 - Drop Python 2 support, to add Python 3-exclusive syntax:
