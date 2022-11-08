@@ -9,6 +9,7 @@
 #   save cairo context/surface in Theme and split load_svg() in 2 functions
 
 import os
+import re
 import sys
 import logging
 
@@ -24,6 +25,7 @@ themes = {}
 
 class Theme(object):
     """Each cards theme."""
+    _re_id = re.compile(r'''[- '"]''')
 
     def __init__(self, themeid, path, name=""):
         self.id = themeid
@@ -52,6 +54,10 @@ class Theme(object):
                              cardsize[1] *  5)
         return graphics.render_vector(self.image, size, proportional, multiple=(13, 5))
 
+    @classmethod
+    def name_to_id(cls, name):
+        return re.sub(cls._re_id, "_", name.lower())
+
 
 def init_themes(paths):
     """Load all themes found in <paths> and populate the global `themes` dictionary."""
@@ -59,20 +65,21 @@ def init_themes(paths):
     for path in paths:
         log.debug("Looking for card themes in: %s", path)
         try:
-            for basename in os.listdir(path):
+            for basename in sorted(os.listdir(path)):
 
                 # Check if it's an SVG or SVGZ
                 if os.path.splitext(basename)[1].lower() not in ('.svg', '.svgz'):
                     continue
 
                 # Check if it's already added (same basename)
-                themeid = os.path.splitext(basename)[0]
+                themeid = Theme.name_to_id(os.path.splitext(basename)[0])
                 if themeid in themes:
                     continue
 
                 # Create the theme and add it to the dict
-                log.debug("New card theme found: %s", themeid)
-                themes[themeid] = Theme(themeid, os.path.join(path, basename), name="")
+                themepath = os.path.join(path, basename)
+                log.debug("New card theme '%s': %s", themeid, themepath)
+                themes[themeid] = Theme(themeid, themepath, name="")
 
         except OSError as e:
             # path not found

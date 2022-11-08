@@ -106,7 +106,7 @@ class Deck(pygame.sprite.LayeredDirty):
         if isinstance(theme, themes.Theme):
             self.theme = theme
         else:
-            self.theme = themes.themes.get(theme, None)
+            self.theme = themes.themes.get(themes.Theme.name_to_id(theme), None)
 
         if not self.theme:
             log.warning("Theme '%s' not found. Cards will not be drawn", theme)
