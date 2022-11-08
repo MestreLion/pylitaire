@@ -26,11 +26,11 @@ crush: svgcrush
 	for theme in $(THEMES); do ./svgcrush "$$theme" "$$theme".tmp; mv "$$theme".tmp "$$theme"; done
 
 # Adapted from Debian/Ubuntu Aisleriot package
-# Adding --enable-id-stripping, running twice for idempotency
+# Run it twice for idempotency
 scour:
 	if ! type scour >/dev/null 2>&1; then sudo apt install scour; fi
 	for theme in $(THEMES); do \
-		scour --enable-id-stripping "$$theme" "$$theme".tmp; \
+		scour "$$theme" "$$theme".tmp; \
 		scour "$$theme".tmp "$$theme"; \
 		rm -- "$$theme".tmp; \
 	done
