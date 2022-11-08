@@ -13,12 +13,12 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: pygame",
     "Natural Language :: English",
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 2.7",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     # Remove License classifier when PEP 639 lands
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
 ]
@@ -30,8 +30,8 @@ license.text = "GPL-3.0-or-later"  # Free text, so using SPDX
 #license = "GPL-3.0-or-later"
 #license-files.paths = ["LICENSE"]  # already covered by the default .globs
 
-# Not enabled yet, as it still works with Python 2 (good luck with dependencies!)
-#requires-python = ">=3.6"
+# Due to setuptools >= 59.3
+requires-python = ">=3.7"
 
 # PyGObject and Pycairo via pip require system packages not installable by pip:
 # On Debian/Ubuntu: libgirepository1.0-dev gcc libcairo2-dev python3-dev pkg-config
@@ -45,7 +45,7 @@ license.text = "GPL-3.0-or-later"  # Free text, so using SPDX
 dependencies = [
     "Pillow",
     "pycairo",
-    "pygame",
+    "pygame>=2.1.2",  # available in Ubuntu 22.04 repo and pip-installable in Python 3.6
     "PyGObject",
     "pyxdg",
 ]
@@ -68,21 +68,6 @@ exclude = ["refs*"]
 # Syntax and semantics for current recommended practices taken from:
 # https://packaging.python.org/en/latest/tutorials/packaging-projects/
 # Adhering to PEP 621 landed in Setuptools 61.
-
-# Most or all of the settings below are already the default for pyproject.toml
-
-#[project.readme]
-#file = "README.md"
-#content-type = "text/markdown; charset=UTF-8"
-
-#[tool.distutils.bdist_wheel]
-#universal = 1
-
-#[tool.setuptools]
-#zip-safe = false
-#platforms = "any"
-#include-package-data = true
-#license-files = ["LICENSE"]
 
 [build-system]
 requires = ["setuptools>=61.0"]  # March 2022, but not in Ubuntu 22.04 LTS
