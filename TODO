@@ -1,8 +1,8 @@
 Brainstorm of new features and code ideas, in no particular order:
 
-- add and document ubuntu_bonded.svg
-
-- add more themes and optimize existing ones (fix_ids, svgcrush, xmllint, scour)
+- SDL 2.0.2 supports SVG, and so does Pygame 2.0.1: surface = pygame.image.load('my.svg')
+  Remove all cairo and librsvg code, immensely simplifying code and improving performance
+  https://stackoverflow.com/a/64598021/624066
 
 - Improve default config.ini
 

@@ -7,11 +7,20 @@
 import sys
 import math
 import json
+import typing as t
 
 import pygame
 
+Cursor: 't.TypeAlias' = t.Union[
+    pygame.cursors.Cursor,
+    t.Tuple[t.Sequence[int],
+            t.Sequence[int],
+            t.Sequence[int],
+            t.Sequence[int]]
+]
 
-def invert_cursor(cursor):
+
+def invert_cursor(cursor: Cursor) -> Cursor:
     """Invert the colors of a cursor, ie, swap black and white bits."""
     size, hot, data, mask = cursor
     inv = []
@@ -31,6 +40,7 @@ def compile(strings, black="X", white=".", xor="o"):  # @ReservedAssignment
 
 
 def layerlines(bytelist, width=0, char0=".", char1="X"):
+    # noinspection PyUnresolvedReferences
     """Read the byte list of an icon "layer" and return a sequence of strings.
 
     An icon layer is the data or its mask, icon index 2 or 3. Return one for
@@ -102,6 +112,7 @@ def cursorstrings(
 
 
 def cursorcode(cursor, indent=4, tuples=True, singlequotes=True, json=False):
+    # noinspection PyUnresolvedReferences,PyShadowingNames,PyTypeChecker,PyRedeclaration,GrazieInspection
     """Return a textual representation of all information in a cursor as 3-tuple.
 
     Items are size, hotspot and image strings. If <tuples> is falsy, return a list instead.
@@ -110,7 +121,7 @@ def cursorcode(cursor, indent=4, tuples=True, singlequotes=True, json=False):
     a json file. The image strings tuple is compatible with pygame.cursors.compile(),
     so the cursor can be easily re-created.
 
-    By default output delimiters are single quotes `'` and parenthesis `()`, as would the
+    By default, output delimiters are single quotes `'` and parenthesis `()`, as would the
     repr() of a tuple of strings be. Delimiter format is set by <tuples> and <singlequotes>.
 
     If <json> is True, delimiters are forced to double quotes `"` and brackets `[]`
@@ -124,8 +135,8 @@ def cursorcode(cursor, indent=4, tuples=True, singlequotes=True, json=False):
     >>> data, mask = pygame.cursors.compile(strings, black="X", white=".")
     >>> pygame.mouse.set_cursor(size, hot, data, mask)
 
-    Note: On Python 2 / Pygame 1.91, swap black and white values to  workaround a bug in
-    pygame.cursors.compile(), or use compile() wrapper:
+    Note: On Python 2 / Pygame 1.91, swap black and white values to work around
+    a bug in pygame.cursors.compile(), or use compile() wrapper:
     >>> data, mask = pygame.cursors.compile(strings, black=".", white="X")
     >>> data, mask =                compile(strings, black="X", white=".")
     Or use invert_cursor() on strings:
@@ -134,7 +145,7 @@ def cursorcode(cursor, indent=4, tuples=True, singlequotes=True, json=False):
     """
     if json:
         tuples = False
-        singlequotes=False
+        singlequotes = False
 
     size, hot, _, _ = cursor
 
@@ -196,8 +207,6 @@ def load_json(path):
         return load_cursor(json.load(fp))
 
 
-
-
 if __name__ == "__main__":
     if sys.argv[1:]:
         if len(sys.argv) < 3:
@@ -236,7 +245,7 @@ if __name__ == "__main__":
         print(stringline)
 
     print("\nImage (as JSON)")
-    # The is actualy the REAL test for this module:
+    # The is actually the REAL test for this module:
     jsoncode = cursorcode(cursor, json=True)
     triplet = json.loads(jsoncode)  # No exceptions raised, so we have valid JSON :)
     pygame.mouse.set_cursor(*load_cursor(triplet))  # No exceptions either, hooray! :D
@@ -249,7 +258,8 @@ if __name__ == "__main__":
     print(cursorcode(pygame.mouse.get_cursor()))
 
     print("\nRoundtrip: get_cursor(set_cursor(get_cursor())) works fine, as expected")
-    print(cursorcode(pygame.mouse.get_cursor(pygame.mouse.set_cursor(*pygame.mouse.get_cursor()))))
+    pygame.mouse.set_cursor(*pygame.mouse.get_cursor())
+    print(cursorcode(pygame.mouse.get_cursor()))
 
     if pygame.version.vernum < (1, 9, 2):
         print("\npygame.cursors.compile() is buggy on 1.91 / Python 2, swapping black and white")

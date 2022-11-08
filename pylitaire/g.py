@@ -36,8 +36,13 @@ import logging
 import os.path
 import shutil
 import sys
+import typing as t
 
 import xdg.BaseDirectory
+
+if t.TYPE_CHECKING:
+    from . import graphics
+    from . import cursors as cursors_
 
 log = logging.getLogger(__name__)
 
@@ -59,9 +64,9 @@ MARGIN = (20, 10)  # Board margin and minimum card padding
 SBHEIGHT = 25  # status bar height
 SBCOLOR = (242, 241, 240)  # status bar background color
 
-background = None  # graphics.Background
-slot = None  # graphics.Slot
-cursors = {
+background: t.Optional['graphics.Background'] = None
+slot:       t.Optional['graphics.Slot']       = None
+cursors:    t.Dict[str, t.Optional['cursors_.Cursor']] = {
     'default': None,
     'drag': None,
     'draggable': None,
@@ -102,7 +107,7 @@ def load_options(args):
         logging.getLogger(__package__).setLevel(logging.DEBUG)
     log.debug(args)
 
-    options = {'options': dict(
+    options: t.Dict[str, t.Dict[str, t.Any]] = {'options': dict(
         full_screen=full_screen,
         window_size=window_size,
         debug=debug,

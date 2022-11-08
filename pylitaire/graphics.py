@@ -164,12 +164,16 @@ def resize(window_size=None, full_screen=None):
     flags = 0
     if full_screen:
         log.debug("Setting full-screen, desktop resolution %r", _desktop_size)
-        flags |= pygame.FULLSCREEN | pygame.HWSURFACE
+        flags |= pygame.FULLSCREEN
         window_size = _desktop_size
     else:
         log.debug("Setting window size %s", window_size)
-        flags |= pygame.RESIZABLE  # FIXME: mysterious thin black bar
+        flags |= pygame.RESIZABLE
 
+    # FIXME: avoid calling set_mode() on resize.
+    # See https://www.pygame.org/wiki/WindowResizing
+    # FIXME: Use pygame.display.toggle_fullscreen() instead of flags on resize
+    # http://www.pygame.org/docs/ref/display.html#pygame.display.toggle_fullscreen
     window = pygame.display.set_mode(window_size, flags)
     size = window.get_size()  # actual window size, regardless of mode
 
