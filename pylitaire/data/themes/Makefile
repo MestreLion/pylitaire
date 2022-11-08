@@ -14,7 +14,7 @@ all: themes fix-ids crush scour
 clean:
 	rm -f -- fix-card-ids.ed svgcrush* *.tmp
 
-themes: anglo_bitmap.svg ubuntu_bonded.svg
+themes: anglo_bitmap.svg gnome_bonded.svg ubuntu_bonded.svg
 
 # https://gitlab.gnome.org/GNOME/aisleriot/-/commit/950318551392b42967841b63cb7d01cc15495a40
 fix-ids: fix-card-ids.ed
@@ -37,10 +37,13 @@ scour:
 
 # -----------------------------------------------------------------------------
 
+gnome_bonded.svg: bonded.svg
+	mv -- $< $@
+
 ubuntu_bonded.svg:
 	wget -O $@ -- $(UBUNTU)
 
-anglo_bitmap.svg fix-card-ids.ed svgcrush.c:
+anglo_bitmap.svg bonded.svg fix-card-ids.ed svgcrush.c:
 	wget -- $(REPOSITORY)/$@
 
 # Build commands for adapted from:

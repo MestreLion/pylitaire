@@ -68,15 +68,16 @@ cursors = {
 }
 
 # Options
+# Actual defaults are at config/config.template.ini
 full_screen = False
 window_size = (960, 640)
 debug = False
 profile = False
 baize = "baize-ubuntu"
-theme = "anglo"  # "life_and_smooth"
+theme = "life_and_smooth"
 slotname = "slot-gnome"
 doubleclicklimit = 400
-gamename = "exapunks"  # "backbone"  # "pylitaire"
+gamename = "klondike"
 
 
 def datadirs(dirname):

@@ -1,17 +1,18 @@
 Themes for Pylitaire
 =====================
 
-Anglo
-------
+Anglo Bitmap
+------------
 
-Made by Aike Reyer, taken from Gnome Games' Aisleriot package, version 3.12.1
+A simple, familiar and fast-loading theme, great as Pylitaire's factory default.
+Made by Aike Reyer, taken from Gnome Games' Aisleriot upstream package, version 3.20.0
 
 Files:
-	anglo.svg
+	anglo_bitmap.svg
 
 Source:
-	https://git.gnome.org/browse/aisleriot/snapshot/aisleriot-3.12.1.zip
-	https://git.gnome.org/browse/aisleriot/plain/cards/anglo.svg
+	https://gitlab.gnome.org/GNOME/aisleriot/-/archive/3.20.0/aisleriot-3.20.0.zip
+	https://gitlab.gnome.org/GNOME/aisleriot/-/blob/gnome-3-20/cards/anglo_bitmap.svg
 
 Copyright:
 	2007, 2008  Aike Reyer <aike@users.sourceforge.net>
@@ -21,18 +22,45 @@ License:
 	Originally GPL2+, see https://bugzilla.gnome.org/show_bug.cgi?id=461267#c8
 
 
-Ubuntu Gnomangelo
------------------
+Gnome Bonded
+------------
 
-From branding-ubuntu package, version 0.8, as a replacement for Gnome Aisleriot's
-Gnomangelo Bitmap theme. Originally named 'gnomangelo_bitmap.svg'
+Aisleriot default, very simple and perhaps the fastest theme. Included here as
+it might not be available to Ubuntu users due to branding (see Ubuntu Bonded)
 
 Files:
-	ubuntu_gnomangelo.svg
+	gnome_bonded.svg
+
+Source:
+	https://gitlab.gnome.org/GNOME/aisleriot/-/archive/3.20.0/aisleriot-3.20.0.zip
+	https://gitlab.gnome.org/GNOME/aisleriot/-/blob/gnome-3-20/cards/bonded.svg
+
+Copyright:
+	Even Aisleriot devs are unsure: /* FIXMEchpe: who did the Bonded cards? */
+	https://gitlab.gnome.org/GNOME/aisleriot/-/blob/gnome-3-20/src/window.c#L383
+
+License:
+	GPL-3+ <http://www.gnu.org/licenses/gpl.html>, as Aisleriot
+
+
+Ubuntu Bonded
+-------------
+
+Great-looking but slow Ubuntu-branded theme.
+
+From branding-ubuntu source package, version 0.8, as a replacement for Gnome
+Aisleriot's Bonded theme. Originally named 'gnomangelo_bitmap.svg' before 2011.
+
+Due to a bug in branding-ubuntu package it is currently not available in
+Aisleriot and might not be accessible by Pylitaire, so it is included here.
+See https://bugs.launchpad.net/ubuntu/+source/branding-ubuntu/+bug/1722096
+
+Files:
+	ubuntu_bonded.svg
 
 Source:
 	http://archive.ubuntu.com/ubuntu/pool/main/b/branding-ubuntu/branding-ubuntu_0.8.tar.gz
-	http://packages.ubuntu.com/trusty/branding-ubuntu
+	https://git.launchpad.net/ubuntu/+source/branding-ubuntu/tree/branding/aisleriot/cards/bonded.svg
 
 Copyright:
 	Mads Rosendahl Hansen <madsrh@gmail.com>
@@ -44,20 +72,21 @@ License:
 Life and Smooth
 ---------------
 
-Found on Gnome Look website, based on Ubuntu Gnomangelo theme. Author claims
-work is a composition of several other work available at http://gnome-look.org
+Gorgeous but very slow theme.
+
+Found on Gnome Look website, based on Ubuntu Bonded theme. Author claims
+work is a composition of several other work available at https://www.gnome-look.org
 
 Files:
 	life_and_smooth.svg
 
 Source:
-	http://gnome-look.org/content/show.php?content=109140
-	http://gnome-look.org/content/download.php?content=109140&id=1&tan=6890900
+	https://www.gnome-look.org/p/1112498
 
 Copyright:
 	jess96 ("Jess from Brussels")
-	http://gnome-look.org/usermanager/search.php?username=jess96
+	https://www.gnome-look.org/u/jess96
 	Derived work, see source website for details
 
 License:
-	GPL-3+ (GPL in source, version not specified)
+	GPL-3 (per COPYING file in downloaded tarball)
