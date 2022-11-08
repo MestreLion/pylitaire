@@ -7,12 +7,13 @@
 
 REPOSITORY = https://gitlab.gnome.org/GNOME/aisleriot/-/raw/gnome-3-20/cards
 UBUNTU = https://git.launchpad.net/ubuntu/+source/branding-ubuntu/plain/branding/aisleriot/cards/bonded.svg?h=ubuntu/raring
+AISLERIOT = /usr/share/aisleriot/cards
 THEMES = *.svg
 
 all: themes fix-ids crush scour
 
 clean:
-	rm -f -- fix-card-ids.ed svgcrush* *.tmp
+	rm -f -- fix-card-ids.ed svgcrush* *.tmp *.svg.gz *.svgz
 
 themes: anglo_bitmap.svg gnome_bonded.svg ubuntu_bonded.svg
 
@@ -35,6 +36,13 @@ scour:
 		rm -- "$$theme".tmp; \
 	done
 
+# Export to Aisleriot, converting to SVGZ
+export:
+		gzip -9 -n --keep $(THEMES)
+		rename 's/\.svg\.gz$$/.svgz/' *.svg.gz
+		sudo mv --no-clobber --target-directory $(AISLERIOT) *.svgz
+		rm -f *.svgz
+
 # -----------------------------------------------------------------------------
 
 gnome_bonded.svg: bonded.svg
@@ -56,4 +64,4 @@ svgcrush: svgcrush.c install-pkg-config
 install-pkg-config:
 	if ! type pkg-config >/dev/null 2>&1; then sudo apt install pkgconf; fi
 
-.PHONY: all clean themes fix-ids crush scour install-pkg-config
+.PHONY: all clean themes fix-ids crush scour export install-pkg-config
