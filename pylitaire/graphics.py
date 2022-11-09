@@ -216,7 +216,7 @@ def scale_size(original, size=(), proportional=True, multiple=(1, 1)):
     return round_to_multiple((result.width, result.height), multiple)
 
 
-def load_image(path, size=(), proportional=True, multiple=(1, 1)):
+def load_image(path, size=(), proportional=True, multiple=(1, 1)) -> pygame.Surface:
     """Wrapper for pygame.image.load, adding support for SVG images.
 
     See scale_size() for documentation on arguments.
@@ -240,25 +240,26 @@ def load_image(path, size=(), proportional=True, multiple=(1, 1)):
     return pygame.transform.smoothscale(image, size)
 
 
-def load_svg(path, *scaleargs, **scalekwargs):
-    """Load an SVG file and return a pygame.image surface.
+def load_svg(path, *scaleargs, **scalekwargs) -> pygame.Surface:
+    """Load an SVG file and return a pygame surface.
 
     See scale_size() for documentation on scale arguments.
     """
     # noinspection PyArgumentList
-    return render_vector(Rsvg.Handle.new_from_file(path), *scaleargs, **scalekwargs)
+    return render_vector(load_vector(path), *scaleargs, **scalekwargs)
 
 
-def load_vector(path):
-    """Load an SVG file from <path> and return a RsvgHandle instance."""
+def load_vector(path) -> Rsvg.Handle:
+    """Load an SVG file from <path> and return a vector object."""
     # noinspection PyArgumentList
     return Rsvg.Handle.new_from_file(path)
 
 
-def render_vector(svg, *scaleargs, **scalekwargs):
-    """Render a vector surface to a pygame surface and return it.
+def render_vector(svg: Rsvg.Handle, *scaleargs, **scalekwargs) -> pygame.Surface:
+    """Render a vector object to a pygame surface and return it.
 
-    Vector surfaces are such as the one returned from load_vector().
+    Vector objects are such as the one returned from load_vector(),
+    currently an Rsvg.Handle.
     """
 
     def bgra_to_rgba(s):
