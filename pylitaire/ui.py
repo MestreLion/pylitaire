@@ -11,8 +11,8 @@ Design notes:
 - Resizing IS game rule dependent, as each game sets its own grid
 """
 
-import logging
 import datetime
+import logging
 
 import pygame
 
@@ -86,6 +86,8 @@ class Gui(object):
     def run(self, window_size, full_screen, gamename):
         self.resize(window_size, full_screen)
         self.load_game(gamename)
+        if g.profile:
+            log.info("Loaded in %s ms", g.runtime())
 
         clock = pygame.time.Clock()
         try:
@@ -99,8 +101,9 @@ class Gui(object):
                 pygame.display.update(updated)
 
                 if g.profile:
-                    if pygame.time.get_ticks() > 10000:
-                        break
+                    log.info("Completed in %s ms (%s ms to draw)",
+                             g.runtime(), pygame.time.get_ticks())
+                    break
 
                 clock.tick(g.FPS * (3 if self.win else 1))
         finally:

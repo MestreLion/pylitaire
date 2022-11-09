@@ -47,6 +47,8 @@ def main(args=None):
     gui.run(g.window_size, g.full_screen, g.gamename)
 
     g.save_options()
+    if g.profile:
+        log.info("Exiting after %s ms", g.runtime())
 
 
 def run():

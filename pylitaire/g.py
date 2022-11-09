@@ -36,6 +36,7 @@ import logging
 import os.path
 import shutil
 import sys
+import time
 import typing as t
 
 import xdg.BaseDirectory
@@ -45,6 +46,7 @@ if t.TYPE_CHECKING:
     from . import cursors as cursors_
 
 log = logging.getLogger(__name__)
+start_time = time.time()  # for profiling
 
 # General
 VERSION = "1.0"
@@ -127,8 +129,13 @@ def load_options(args):
     if "--fullscreen" in args: full_screen = True
     if "--debug"      in args: debug       = True
     if "--profile"    in args: profile     = True
-    if debug:
-        logging.getLogger(__package__).setLevel(logging.DEBUG)
+
+    # Set the log level
+    loglevel = None
+    if profile: loglevel = logging.INFO
+    if debug:   loglevel = logging.DEBUG
+    if loglevel:
+        logging.getLogger(__package__).setLevel(loglevel)
 
     log.debug(options)
     baize            = options["options"]["baize"]
@@ -199,3 +206,9 @@ def read_config(path, options):
 
             except ValueError as e:
                 log.warning("%s in '%s' option of %s", e, opt, path)
+
+
+def runtime(start=0):
+    if not start:
+        start = start_time
+    return "{:.0f}".format(1000 * (time.time() - start))
