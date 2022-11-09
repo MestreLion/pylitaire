@@ -10,12 +10,12 @@ import random
 import pygame
 
 from . import themes
-from . import enum
+from . import enum23
 
 log = logging.getLogger(__name__)
 
 
-class RANK(enum.Enum):
+class RANK(enum23.Enum):
     """Cards rank."""
     ACE   =  1
     TWO   =  2
@@ -32,7 +32,7 @@ class RANK(enum.Enum):
     KING  = 13
 
 
-class SUIT(enum.Enum):
+class SUIT(enum23.Enum):
     """Cards suit."""
     CLUBS    = 1
     DIAMONDS = 2
@@ -40,7 +40,7 @@ class SUIT(enum.Enum):
     SPADES   = 4
 
 
-class COLORS(enum.Enum):
+class COLORS(enum23.Enum):
     """Cards color.
 
     Black for Clubs and Spades, Red for Diamonds and Hearts.
@@ -49,7 +49,7 @@ class COLORS(enum.Enum):
     RED   = 2
 
 
-class ORIENTATION(enum.Enum):
+class ORIENTATION(enum23.Enum):
     """Stack orientation of a card relative to its parent."""
     NONE  = None    # Do not snap
     KEEP  = ()      # Keep the same orientation of the parent
@@ -60,7 +60,7 @@ class ORIENTATION(enum.Enum):
     PILE  = ( 0,  0)  # No orientation, place on top of card
 
 
-class TURN(enum.Enum):
+class TURN(enum23.Enum):
     """Cards facing."""
     # TODO: Should be FACING
     SAME     = None  # Used as default no-op card.flip() in Slot.deal()

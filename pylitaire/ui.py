@@ -19,12 +19,12 @@ import pygame
 from . import g
 from . import graphics
 from . import gamerules
-from . import enum
+from . import enum23
 
 log = logging.getLogger(__name__)
 
 
-class MOUSEBUTTONS(enum.Enum):
+class MOUSEBUTTONS(enum23.Enum):
     """Pygame mouse buttons."""
     NONE          = None
     LEFT          = 1
@@ -38,7 +38,7 @@ class MOUSEBUTTONS(enum.Enum):
     THUMB_FORWARD = 9  # Possibly bound to XF86Forward key
 
 
-class COLORS(enum.Enum):
+class COLORS(enum23.Enum):
     RED        = (255,   0,   0)
     GREEN      = (  0, 255,   0)
     BLUE       = (  0,   0, 255)
