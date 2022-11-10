@@ -4,11 +4,10 @@
 
 """Graphics-related functions."""
 
-
+import math
+import logging
 import os
 import sys
-import logging
-import math
 import array
 
 # Disable Pygame advertisement. Must be done before importing pygame
@@ -112,10 +111,13 @@ def init_graphics(window_size=None, full_screen=None):
     global _desktop_size
 
     log.info("Initializing graphics")
-    log.debug("Python %s, Pygame %s, SDL %s",
-              sys.version.replace('\n', ' '),
-              pygame.ver,
-              '.'.join(str(_) for _ in pygame.get_sdl_version()))
+    log.debug(
+        "Python %s, Pygame %s, SDL %s, SDL_Image %s",
+        sys.version.replace('\n', ' '),
+        pygame.ver,
+        '.'.join(str(_) for _ in pygame.get_sdl_version()),
+        '.'.join(str(_) for _ in pygame.image.get_sdl_image_version()),
+    )
     # Window position is done by the Window Manager, not Pygame or SDL, but SDL
     # can request a centered window. Must be set before pygame.display.init()
     # Could also use SDL_VIDEO_WINDOW_POS = "x,y"
