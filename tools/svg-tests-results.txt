@@ -1,0 +1,277 @@
+Pygame (no SVGZ, no native resize, visual errors on all)
+[INFO    ] 2022-11-10 09:20:57   229: Loading
+[INFO    ] 2022-11-10 09:20:57   197: anglo.svg
+[INFO    ] 2022-11-10 09:20:58    50: anglo_bitmap.svg
+[INFO    ] 2022-11-10 09:20:58    87: bellot.svg
+[INFO    ] 2022-11-10 09:20:58     9: bonded.svg
+[INFO    ] 2022-11-10 09:20:58    12: dondorf.svg
+[INFO    ] 2022-11-10 09:20:58   176: gnomangelo.svg
+[INFO    ] 2022-11-10 09:20:58   163: gnomangelo_bitmap.svg
+[INFO    ] 2022-11-10 09:20:58    13: gnome_bonded.svg
+[INFO    ] 2022-11-10 09:20:58   201: guyenne-classic.svg
+[INFO    ] 2022-11-10 09:20:58    24: life_and_smooth.svg
+[INFO    ] 2022-11-10 09:20:59    44: ornamental.svg
+[INFO    ] 2022-11-10 09:20:59    10: paris.svg
+[INFO    ] 2022-11-10 09:20:59    10: swiss-xvii.svg
+[INFO    ] 2022-11-10 09:20:59    35: tango.svg
+[INFO    ] 2022-11-10 09:20:59    57: ubuntu_bonded.svg
+
+real	0m1.997s
+user	0m1.808s
+sys	0m0.280s
+
+
+svgcairo (visual error on tango face cards)
+[INFO    ] 2022-11-10 09:43:11   249: Loading
+[INFO    ] 2022-11-10 09:43:13  1868: anglo.svg
+[INFO    ] 2022-11-10 09:43:14   701: anglo_bitmap.svg
+[INFO    ] 2022-11-10 09:43:16  2225: bellot.svg
+[INFO    ] 2022-11-10 09:43:17   561: bonded.svg
+[INFO    ] 2022-11-10 09:43:17   563: dondorf.svg
+[INFO    ] 2022-11-10 09:43:19  1835: gnomangelo.svg
+[INFO    ] 2022-11-10 09:43:20  1220: gnomangelo_bitmap.svg
+[INFO    ] 2022-11-10 09:43:21   587: gnome_bonded.svg
+[INFO    ] 2022-11-10 09:43:23  2022: guyenne-classic.svg
+[INFO    ] 2022-11-10 09:43:25  1512: life_and_smooth.svg
+[INFO    ] 2022-11-10 09:43:27  2097: ornamental.svg
+[INFO    ] 2022-11-10 09:43:29  1714: paris.svg
+[INFO    ] 2022-11-10 09:43:32  2945: swiss-xvii.svg
+[INFO    ] 2022-11-10 09:43:34  2563: tango.svg
+[INFO    ] 2022-11-10 09:43:37  2795: ubuntu_bonded.svg
+
+real	0m26.216s
+user	0m26.102s
+sys	0m0.421s
+
+
+pylitaire (Rsvg+Cairo+PIL)
+[INFO    ] 2022-11-10 10:04:22   225: Loading
+[INFO    ] 2022-11-10 10:04:22   143: anglo.svg
+[INFO    ] 2022-11-10 10:04:22    48: anglo_bitmap.svg
+[INFO    ] 2022-11-10 10:04:22   135: bellot.svg
+[INFO    ] 2022-11-10 10:04:22    57: bonded.svg
+[INFO    ] 2022-11-10 10:04:22    51: dondorf.svg
+[INFO    ] 2022-11-10 10:04:22   109: gnomangelo.svg
+[INFO    ] 2022-11-10 10:04:22    79: gnomangelo_bitmap.svg
+[INFO    ] 2022-11-10 10:04:22    50: gnome_bonded.svg
+[INFO    ] 2022-11-10 10:04:23   126: guyenne-classic.svg
+[INFO    ] 2022-11-10 10:04:25  2006: life_and_smooth.svg
+[INFO    ] 2022-11-10 10:04:25    86: ornamental.svg
+[INFO    ] 2022-11-10 10:04:25   118: paris.svg
+[INFO    ] 2022-11-10 10:04:25   168: swiss-xvii.svg
+[INFO    ] 2022-11-10 10:04:25   172: tango.svg
+[INFO    ] 2022-11-10 10:04:26   473: ubuntu_bonded.svg
+
+real	0m4.326s
+user	0m4.008s
+sys	0m0.464s
+
+
+(venv) $ python svg-tests.py --profile
+pygame 2.1.2 (SDL 2.0.16, Python 3.8.0)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[INFO    ] __main__: [<function load_svg_pygame at 0x7f697f765d30>, <function load_svg_cairosvg at 0x7f6976758ca0>, <function load_svg_pylitaire at 0x7f6976758d30>]
+[INFO    ] __main__:   230: Loading
+[INFO    ] __main__: Renderer: load_svg_pygame
+[INFO    ] __main__:    55: anglo_bitmap.svg
+[INFO    ] __main__:    14: gnome_bonded.svg
+[INFO    ] __main__:    18: life_and_smooth.svg
+[INFO    ] __main__:    63: ubuntu_bonded.svg
+[ERROR   ] __main__: FAIL: anglo.svgz [Unsupported image format]
+[ERROR   ] __main__: FAIL: anglo_bitmap.svgz [Unsupported image format]
+[ERROR   ] __main__: FAIL: bellot.svgz [Unsupported image format]
+[INFO    ] __main__:    59: bonded.svg
+[ERROR   ] __main__: FAIL: bonded.svgz [Unsupported image format]
+[ERROR   ] __main__: FAIL: dondorf.svgz [Unsupported image format]
+[ERROR   ] __main__: FAIL: gnomangelo.svgz [Unsupported image format]
+[ERROR   ] __main__: FAIL: gnomangelo_bitmap.svgz [Unsupported image format]
+[ERROR   ] __main__: FAIL: gnome_bonded.svgz [Unsupported image format]
+[ERROR   ] __main__: FAIL: guyenne-classic.svgz [Unsupported image format]
+[ERROR   ] __main__: FAIL: life_and_smooth.svgz [Unsupported image format]
+[ERROR   ] __main__: FAIL: ornamental.svgz [Unsupported image format]
+[ERROR   ] __main__: FAIL: paris.svgz [Unsupported image format]
+[ERROR   ] __main__: FAIL: swiss-xvii.svgz [Unsupported image format]
+[ERROR   ] __main__: FAIL: tango.svgz [Unsupported image format]
+[ERROR   ] __main__: FAIL: ubuntu_bonded.svgz [Unsupported image format]
+[INFO    ] __main__: Total: 436
+[INFO    ] __main__: Renderer: load_svg_cairosvg
+[INFO    ] __main__:   697: gnome_bonded.svg
+[INFO    ] __main__:  1505: life_and_smooth.svg
+[INFO    ] __main__:  2761: ubuntu_bonded.svg
+[INFO    ] __main__:  1828: anglo.svgz
+[INFO    ] __main__:   703: anglo_bitmap.svgz
+[INFO    ] __main__:  2275: bellot.svgz
+[INFO    ] __main__:  2855: bonded.svg
+[INFO    ] __main__:   601: bonded.svgz
+[INFO    ] __main__:   589: dondorf.svgz
+[INFO    ] __main__:  1998: gnomangelo.svgz
+[INFO    ] __main__:  1303: gnomangelo_bitmap.svgz
+[INFO    ] __main__:   566: gnome_bonded.svgz
+[INFO    ] __main__:  2114: guyenne-classic.svgz
+[INFO    ] __main__:  1600: life_and_smooth.svgz
+[INFO    ] __main__:  2371: ornamental.svgz
+[INFO    ] __main__:  1745: paris.svgz
+[INFO    ] __main__:  2921: swiss-xvii.svgz
+[INFO    ] __main__:  2636: tango.svgz
+[INFO    ] __main__:  2867: ubuntu_bonded.svgz
+[INFO    ] __main__: Total: 34650
+[INFO    ] __main__: Renderer: load_svg_pylitaire
+[INFO    ] __main__:    80: gnome_bonded.svg
+[INFO    ] __main__:  2182: life_and_smooth.svg
+[INFO    ] __main__:   535: ubuntu_bonded.svg
+[INFO    ] __main__:   105: anglo.svgz
+[INFO    ] __main__:    55: anglo_bitmap.svgz
+[INFO    ] __main__:   141: bellot.svgz
+[INFO    ] __main__:   527: bonded.svg
+[INFO    ] __main__:    45: bonded.svgz
+[INFO    ] __main__:    48: dondorf.svgz
+[INFO    ] __main__:   105: gnomangelo.svgz
+[INFO    ] __main__:    73: gnomangelo_bitmap.svgz
+[INFO    ] __main__:    42: gnome_bonded.svgz
+[INFO    ] __main__:   150: guyenne-classic.svgz
+[INFO    ] __main__:  2068: life_and_smooth.svgz
+[INFO    ] __main__:    88: ornamental.svgz
+[INFO    ] __main__:   115: paris.svgz
+[INFO    ] __main__:   181: swiss-xvii.svgz
+[INFO    ] __main__:   183: tango.svgz
+[INFO    ] __main__:   515: ubuntu_bonded.svgz
+[INFO    ] __main__: Total: 7358
+
+
+(venv) $ python svg-tests.py --profile
+pygame 2.1.2 (SDL 2.0.16, Python 3.8.0)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[INFO    ]   233: Loading
+[INFO    ] Renderer: PYGAME
+[INFO    ]    51: anglo_bitmap.svg
+[INFO    ]    10: gnome_bonded.svg
+[INFO    ]    21: life_and_smooth.svg
+[INFO    ]    56: ubuntu_bonded.svg
+[ERROR   ] FAIL: anglo.svgz [Unsupported image format]
+[ERROR   ] FAIL: anglo_bitmap.svgz [Unsupported image format]
+[ERROR   ] FAIL: bellot.svgz [Unsupported image format]
+[INFO    ]    59: bonded.svg
+[ERROR   ] FAIL: bonded.svgz [Unsupported image format]
+[ERROR   ] FAIL: dondorf.svgz [Unsupported image format]
+[ERROR   ] FAIL: gnomangelo.svgz [Unsupported image format]
+[ERROR   ] FAIL: gnomangelo_bitmap.svgz [Unsupported image format]
+[ERROR   ] FAIL: gnome_bonded.svgz [Unsupported image format]
+[ERROR   ] FAIL: guyenne-classic.svgz [Unsupported image format]
+[ERROR   ] FAIL: life_and_smooth.svgz [Unsupported image format]
+[ERROR   ] FAIL: ornamental.svgz [Unsupported image format]
+[ERROR   ] FAIL: paris.svgz [Unsupported image format]
+[ERROR   ] FAIL: swiss-xvii.svgz [Unsupported image format]
+[ERROR   ] FAIL: tango.svgz [Unsupported image format]
+[ERROR   ] FAIL: ubuntu_bonded.svgz [Unsupported image format]
+[INFO    ] 403: PYGAME total
+[INFO    ] Renderer: CAIROSVG
+[INFO    ]   685: gnome_bonded.svg
+[INFO    ]  1503: life_and_smooth.svg
+[INFO    ]  2788: ubuntu_bonded.svg
+[INFO    ]  1863: anglo.svgz
+[INFO    ]   711: anglo_bitmap.svgz
+[INFO    ]  2219: bellot.svgz
+[INFO    ]  2890: bonded.svg
+[INFO    ]   569: bonded.svgz
+[INFO    ]   563: dondorf.svgz
+[INFO    ]  1849: gnomangelo.svgz
+[INFO    ]  1318: gnomangelo_bitmap.svgz
+[INFO    ]   565: gnome_bonded.svgz
+[INFO    ]  2075: guyenne-classic.svgz
+[INFO    ]  1485: life_and_smooth.svgz
+[INFO    ]  2378: ornamental.svgz
+[INFO    ]  1743: paris.svgz
+[INFO    ]  2971: swiss-xvii.svgz
+[INFO    ]  2588: tango.svgz
+[INFO    ]  2820: ubuntu_bonded.svgz
+[INFO    ] 34212: CAIROSVG total
+[INFO    ] Renderer: PYLITAIRE
+[INFO    ]    73: gnome_bonded.svg
+[INFO    ]  2045: life_and_smooth.svg
+[INFO    ]   470: ubuntu_bonded.svg
+[INFO    ]    97: anglo.svgz
+[INFO    ]    47: anglo_bitmap.svgz
+[INFO    ]   126: bellot.svgz
+[INFO    ]   487: bonded.svg
+[INFO    ]    41: bonded.svgz
+[INFO    ]    43: dondorf.svgz
+[INFO    ]   115: gnomangelo.svgz
+[INFO    ]    80: gnomangelo_bitmap.svgz
+[INFO    ]    43: gnome_bonded.svgz
+[INFO    ]   158: guyenne-classic.svgz
+[INFO    ]  2067: life_and_smooth.svgz
+[INFO    ]    85: ornamental.svgz
+[INFO    ]   122: paris.svgz
+[INFO    ]   192: swiss-xvii.svgz
+[INFO    ]   182: tango.svgz
+[INFO    ]   541: ubuntu_bonded.svgz
+[INFO    ] 7124: PYLITAIRE total
+
+(venv) $ python svg-tests.py --profile
+pygame 2.1.2 (SDL 2.0.16, Python 3.8.0)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+[INFO    ]   228: Loading
+[INFO    ] Renderer: PYGAME
+[INFO    ]    49: anglo_bitmap.svg
+[INFO    ]    11: gnome_bonded.svg
+[INFO    ]    21: life_and_smooth.svg
+[INFO    ]    56: ubuntu_bonded.svg
+[ERROR   ] FAIL: anglo.svgz [Unsupported image format]
+[ERROR   ] FAIL: anglo_bitmap.svgz [Unsupported image format]
+[ERROR   ] FAIL: bellot.svgz [Unsupported image format]
+[INFO    ]    59: bonded.svg
+[ERROR   ] FAIL: bonded.svgz [Unsupported image format]
+[ERROR   ] FAIL: dondorf.svgz [Unsupported image format]
+[ERROR   ] FAIL: gnomangelo.svgz [Unsupported image format]
+[ERROR   ] FAIL: gnomangelo_bitmap.svgz [Unsupported image format]
+[ERROR   ] FAIL: gnome_bonded.svgz [Unsupported image format]
+[ERROR   ] FAIL: guyenne-classic.svgz [Unsupported image format]
+[ERROR   ] FAIL: life_and_smooth.svgz [Unsupported image format]
+[ERROR   ] FAIL: ornamental.svgz [Unsupported image format]
+[ERROR   ] FAIL: paris.svgz [Unsupported image format]
+[ERROR   ] FAIL: swiss-xvii.svgz [Unsupported image format]
+[ERROR   ] FAIL: tango.svgz [Unsupported image format]
+[ERROR   ] FAIL: ubuntu_bonded.svgz [Unsupported image format]
+[INFO    ]   405: PYGAME total
+[INFO    ] Renderer: CAIROSVG
+[INFO    ]   699: gnome_bonded.svg
+[INFO    ]  1499: life_and_smooth.svg
+[INFO    ]  2754: ubuntu_bonded.svg
+[INFO    ]  1857: anglo.svgz
+[INFO    ]   713: anglo_bitmap.svgz
+[INFO    ]  2204: bellot.svgz
+[INFO    ]  2834: bonded.svg
+[INFO    ]   572: bonded.svgz
+[INFO    ]   578: dondorf.svgz
+[INFO    ]  1839: gnomangelo.svgz
+[INFO    ]  1301: gnomangelo_bitmap.svgz
+[INFO    ]   561: gnome_bonded.svgz
+[INFO    ]  2065: guyenne-classic.svgz
+[INFO    ]  1486: life_and_smooth.svgz
+[INFO    ]  2119: ornamental.svgz
+[INFO    ]  1714: paris.svgz
+[INFO    ]  2910: swiss-xvii.svgz
+[INFO    ]  2532: tango.svgz
+[INFO    ]  2768: ubuntu_bonded.svgz
+[INFO    ] 33641: CAIROSVG total
+[INFO    ] Renderer: LIBRSVG
+[INFO    ]    82: gnome_bonded.svg
+[INFO    ]  2093: life_and_smooth.svg
+[INFO    ]   492: ubuntu_bonded.svg
+[INFO    ]    98: anglo.svgz
+[INFO    ]    47: anglo_bitmap.svgz
+[INFO    ]   134: bellot.svgz
+[INFO    ]   508: bonded.svg
+[INFO    ]    44: bonded.svgz
+[INFO    ]    42: dondorf.svgz
+[INFO    ]   106: gnomangelo.svgz
+[INFO    ]    76: gnomangelo_bitmap.svgz
+[INFO    ]    41: gnome_bonded.svgz
+[INFO    ]   150: guyenne-classic.svgz
+[INFO    ]  2043: life_and_smooth.svgz
+[INFO    ]    80: ornamental.svgz
+[INFO    ]   117: paris.svgz
+[INFO    ]   180: swiss-xvii.svgz
+[INFO    ]   164: tango.svgz
+[INFO    ]   487: ubuntu_bonded.svgz
+[INFO    ]  7094: LIBRSVG total
