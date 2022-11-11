@@ -223,7 +223,7 @@ def load_image(path, size=(), proportional=True, multiple=(1, 1)) -> pygame.Surf
     As of SDL_image 2.0.2, Pygame 2.0.1 supports SVG on pygame.image.load(), but:
     - No way to specify rendering size. It only renders at SVG nominal size.
     - Supported SVG features are laughable, all card themes render very poorly
-    - No support for compressed SGVZ files
+    - No support for compressed SVGZ files
 
     See scale_size() for documentation on arguments.
 
@@ -247,7 +247,7 @@ def load_image(path, size=(), proportional=True, multiple=(1, 1)) -> pygame.Surf
 
 
 def load_svg(path, *scaleargs, **scalekwargs) -> pygame.Surface:
-    """Load an SVG file and return a pygame surface.
+    """Load an SVG file, render to a new pygame surface and return the surface.
 
     See scale_size() for documentation on scale arguments.
     """
@@ -256,37 +256,37 @@ def load_svg(path, *scaleargs, **scalekwargs) -> pygame.Surface:
 
 
 def load_vector(path) -> Rsvg.Handle:
-    """Load an SVG file from <path> and return a vector object."""
+    """Load an SVG file from <path> and return a vector image object."""
     # noinspection PyArgumentList
     return Rsvg.Handle.new_from_file(path)
 
 
 def get_vector_size(svg: Rsvg.Handle) -> tuple:
-    """Return the nominal (width, height) of a vector object;"""
+    """Return the nominal (width, height) of a vector image object."""
     return svg.props.width, svg.props.height
 
 
 def render_vector(svg: Rsvg.Handle, *scaleargs, **scalekwargs) -> pygame.Surface:
-    """Render a vector object to a pygame surface and return it.
+    """Render a vector image to a new pygame surface and return that surface.
 
-    Vector objects are such as the one returned from load_vector(),
+    Vector image objects are such as the one returned from load_vector(),
     currently an Rsvg.Handle.
     """
     # Calculate size
     svgsize = get_vector_size(svg)
-    width, height = scale_size(svgsize, *scaleargs, **scalekwargs)
+    size = scale_size(svgsize, *scaleargs, **scalekwargs)
 
     # If new size is different from original, calculate the scale factor
     scale = (1, 1)
-    if not (width, height) == svgsize:
-        scale = (float(width)/svgsize[0], float(height)/svgsize[1])
+    if not size == svgsize:
+        scale = (float(size[0])/svgsize[0], float(size[1])/svgsize[1])
 
     log.debug("Rendering SVG size (%4g,%4g)->(%4g,%4g): %s",
-              *svgsize, width, height, svg.props.base_uri)
+              *svgsize, *size, svg.props.base_uri)
 
-    # Create a Cairo surface. Architecture endianess determines if cairo surface
-    # pixel format will be RGBA or BGRA
-    surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
+    # Create a Cairo surface.
+    # Nominally ARGB, but in little-endian architectures it is effectively BGRA
+    surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, *size)
 
     # Create a context and scale it
     context = cairo.Context(surface)
@@ -299,23 +299,13 @@ def render_vector(svg: Rsvg.Handle, *scaleargs, **scalekwargs) -> pygame.Surface
     svg.render_cairo(context)
 
     # Get image data buffer
-    data = bgra_to_rgba(surface.get_data(), (width, height))
+    data = surface.get_data()
+    if sys.byteorder == 'little':
+        # Convert from effective BGRA to actual RGBA.
+        data = PIL.Image.frombuffer('RGBA', size, data.tobytes(),
+                                    'raw', 'BGRA', 0, 1).tobytes()
 
-    return pygame.image.frombuffer(data, (width, height), "RGBA").convert_alpha()
-
-
-if sys.byteorder == 'little':
-    def bgra_to_rgba(buf: memoryview, size) -> bytes:
-        """Convert a memoryview buffer in BGRA format to a RBGA buffer."""
-        # PIL requires bytes, and in Python 3 generates a memoryview,
-        # so we convert both input and output to bytes
-        img = PIL.Image.frombuffer('RGBA', size, buf.tobytes(), 'raw', 'BGRA', 0, 1)
-        return img.tobytes()
-else:
-    # noinspection PyUnusedLocal
-    def bgra_to_rgba(buf: memoryview, size) -> memoryview:
-        """Nothing needs to be done in big-endian"""
-        return buf
+    return pygame.image.frombuffer(data, size, "RGBA").convert_alpha()
 
 
 def find_image(dirs, title="", exts=()):
