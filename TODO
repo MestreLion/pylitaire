@@ -4,10 +4,6 @@ Brainstorm of new features and code ideas, in no particular order:
 
 - Write last game, theme, fullscreen and window size to config.ini, preserving comments
 
-- Add min window size to fix resize crash
-
-- Fix final score not updating on winning
-
 - Finish Exapunks: completed face cards stacks must be face down and immovable
 
 - Drop PyXDG for a platform-independent alternative, such as appdirs or similar
@@ -15,6 +11,10 @@ Brainstorm of new features and code ideas, in no particular order:
 - Revert from pyproject.toml to setup.cfg to lower setuptools requirement back to Python 3.6
 
 - Use setuptools to install desktop integration. See https://stackoverflow.com/a/44462146/624066
+
+- Create a debian/ dir, `.deb` packaging script and a PPA
+
+- Upload to PyPi!
 
 - Use more PyGame 2 features:
     - Freetype fonts
@@ -70,10 +70,8 @@ Brainstorm of new features and code ideas, in no particular order:
 
 - Change iconset due to conflicting licensing
 
-- Config file
-	have a template at data/, use  it for factory defaults, copy to CONFIGDIR if not there
-	window_size should be a separate file, so INI is never written (preserve comments)
-
+- Config file sections suggestion:
+  (maybe leave all in a big [options] or [pylitaire] section)
 	[background]
 	basename (no extension. 'baize' in g)
 	fillcolor (fillcolor. BGCOLOR in g)
@@ -113,8 +111,7 @@ Brainstorm of new features and code ideas, in no particular order:
 - Be smarter about click and drag: drop targets should not include current slot/parent ("own drop" should be considered
   a drag abort), and a (successful) drop should abort click (and perhaps doubleclick too).
 
-
-
+- Keep an eye on possible replacements for LibRsvg to be more pip-friendly: cairosvg, wand, PySDL2, etc
 
 Known bugs and glitches:
 
@@ -130,4 +127,7 @@ Known bugs and glitches:
 
 - Win animation has some flaws, fixing would perhaps require its own custom event/update/draw loop:
 	- Last card movement is not drawn, since win condition is checked on update() which runs before draw()
+	- Also affects score not updating after final move
 	- Animated bouncing is drawn behind still cards
+
+- Improve window resizing, possibly using https://github.com/pygame/pygame/issues/1624#issuecomment-610604718
