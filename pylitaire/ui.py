@@ -383,8 +383,12 @@ class Gui(object):
 
     def resize(self, window_size=None, full_screen=None):
         """Resize all widgets according to new window <size>, triggering board resize."""
+
         self.window = graphics.resize(window_size, full_screen)
-        self.size = self.window.get_size()
+        size = self.window.get_size()
+        if size[0] < g.MIN_SIZE[0] or size[1] < g.MIN_SIZE[1]:
+            size = g.MIN_SIZE
+        self.size = size
 
         for widget in self.widgets:
             widget.resize(self.size)

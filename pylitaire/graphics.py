@@ -159,6 +159,9 @@ def resize(window_size=None, full_screen=None):
     if window_size is not None: g.window_size = window_size
     if full_screen is not None: g.full_screen = full_screen
 
+    if g.window_size[0] < g.MIN_SIZE[0] or g.window_size[1] < g.MIN_SIZE[1]:
+        g.window_size = g.MIN_SIZE
+
     full_screen = g.full_screen
     window_size = g.window_size
 

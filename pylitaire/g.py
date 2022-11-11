@@ -65,6 +65,7 @@ BGCOLOR = (0, 80, 16)  # Dark green
 MARGIN = (20, 10)  # Board margin and minimum card padding
 SBHEIGHT = 25  # status bar height
 SBCOLOR = (242, 241, 240)  # status bar background color
+MIN_SIZE = (320, 192)  # Minimum windows size
 
 background: t.Optional['graphics.Background'] = None
 slot:       t.Optional['graphics.Slot']       = None
