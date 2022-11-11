@@ -39,8 +39,7 @@ class Theme(object):
         """Lazy image load."""
         if not self._image:
             self._image = graphics.load_vector(self.path)
-            self.size = (self.image.props.height,
-                         self.image.props.width)
+            self.size = graphics.get_vector_size(self._image)
         return self._image
 
     @property

@@ -8,7 +8,6 @@ import math
 import logging
 import os
 import sys
-import array
 
 # Disable Pygame advertisement. Must be done before importing pygame
 # https://github.com/pygame/pygame/commit/18a31449de93866b369893057f1e60330b53da95
@@ -221,6 +220,11 @@ def scale_size(original, size=(), proportional=True, multiple=(1, 1)):
 def load_image(path, size=(), proportional=True, multiple=(1, 1)) -> pygame.Surface:
     """Wrapper for pygame.image.load, adding support for SVG images.
 
+    As of SDL_image 2.0.2, Pygame 2.0.1 supports SVG on pygame.image.load(), but:
+    - No way to specify rendering size. It only renders at SVG nominal size.
+    - Supported SVG features are laughable, all card themes render very poorly
+    - No support for compressed SGVZ files
+
     See scale_size() for documentation on arguments.
 
     For regular images, requesting a <size> different from the original (after
@@ -257,29 +261,19 @@ def load_vector(path) -> Rsvg.Handle:
     return Rsvg.Handle.new_from_file(path)
 
 
+def get_vector_size(svg: Rsvg.Handle) -> tuple:
+    """Return the nominal (width, height) of a vector object;"""
+    return svg.props.width, svg.props.height
+
+
 def render_vector(svg: Rsvg.Handle, *scaleargs, **scalekwargs) -> pygame.Surface:
     """Render a vector object to a pygame surface and return it.
 
     Vector objects are such as the one returned from load_vector(),
     currently an Rsvg.Handle.
     """
-
-    def bgra_to_rgba(s):
-        """Convert a Cairo surface in BGRA format to a RBGA string.
-
-        Only needed for little-endian architectures.
-        """
-        # PIL generates a memoryview in Python 3+, so we convert to bytes
-        d = s.get_data()
-        if sys.version_info >= (3, 0):
-            d = d.tobytes()
-        img = PIL.Image.frombuffer(
-            'RGBA', (s.get_width(), s.get_height()),
-            d, 'raw', 'BGRA', 0, 1)
-        return img.tobytes('raw', 'RGBA', 0, 1)
-
     # Calculate size
-    svgsize = (svg.props.width, svg.props.height)
+    svgsize = get_vector_size(svg)
     width, height = scale_size(svgsize, *scaleargs, **scalekwargs)
 
     # If new size is different from original, calculate the scale factor
@@ -288,31 +282,40 @@ def render_vector(svg: Rsvg.Handle, *scaleargs, **scalekwargs) -> pygame.Surface
         scale = (float(width)/svgsize[0], float(height)/svgsize[1])
 
     log.debug("Rendering SVG size (%4g,%4g)->(%4g,%4g): %s",
-              svgsize[0], svgsize[1], width, height, svg.props.base_uri)
+              *svgsize, width, height, svg.props.base_uri)
 
     # Create a Cairo surface. Architecture endianess determines if cairo surface
     # pixel format will be RGBA or BGRA
-    if sys.byteorder == 'little':
-        dataarray = None
-        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
-    else:
-        dataarray = array.array('c', chr(0) * width * height * 4)
-        surface = cairo.ImageSurface.create_for_data(
-            dataarray, cairo.FORMAT_ARGB32, width, height, width * 4)
+    surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
 
-    # Create a context, scale it, and render the SVG
+    # Create a context and scale it
     context = cairo.Context(surface)
     if not scale == (1, 1):
         context.scale(*scale)
+
+    # Render the SVG
+    # TODO: in LibRsvg 2.46 onwards, consider using sgv.render_document(),
+    #       as svg.render_cairo() is deprecated since 2.51
     svg.render_cairo(context)
 
-    # Get image data string
-    if sys.byteorder == 'little':
-        data = bgra_to_rgba(surface)
-    else:
-        data = dataarray.tostring()
+    # Get image data buffer
+    data = bgra_to_rgba(surface.get_data(), (width, height))
 
     return pygame.image.frombuffer(data, (width, height), "RGBA").convert_alpha()
+
+
+if sys.byteorder == 'little':
+    def bgra_to_rgba(buf: memoryview, size) -> bytes:
+        """Convert a memoryview buffer in BGRA format to a RBGA buffer."""
+        # PIL requires bytes, and in Python 3 generates a memoryview,
+        # so we convert both input and output to bytes
+        img = PIL.Image.frombuffer('RGBA', size, buf.tobytes(), 'raw', 'BGRA', 0, 1)
+        return img.tobytes()
+else:
+    # noinspection PyUnusedLocal
+    def bgra_to_rgba(buf: memoryview, size) -> memoryview:
+        """Nothing needs to be done in big-endian"""
+        return buf
 
 
 def find_image(dirs, title="", exts=()):
