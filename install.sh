@@ -6,8 +6,9 @@
 # Debian/Ubuntu installer for Pylitaire and its desktop integration
 
 # System packages needed for apt-installing dependencies:
-# PyGObject (gi and cairo): python3-gi python3-gi-cairo gir1.2-gtk-3.0
 # Pillow (PIL): python3-pil
+# Pygame2: python3-pygame  # Only if Ubuntu 22.04: Not available in 18.04, 1.9.6 in 20.04
+# PyGObject (gi and cairo): python3-gi python3-gi-cairo gir1.2-gtk-3.0
 # XDG: python3-xdg
 
 # System packages needed for pip-installing dependencies:
@@ -37,8 +38,8 @@ bin=$bindir/$slug
 sudo='env'
 packages=(
 	python3-pip
-	python3-gi-cairo python3-gi-cairo gir1.2-gtk-3.0  # PyGObject (gi.repository)
-	gir1.2-rsvg-2.0  # Rsvg (bindings for librsvg)
+	python3-gi-cairo gir1.2-gtk-3.0  # PyCairo, pulls python3-gi (PyGObject/gi.repository)
+	gir1.2-rsvg-2.0  # Rsvg (bindings for LibRsvg)
 )
 # Latest setuptools available for Python 3.6 (59.x) can't read config in pyproject.toml,
 # so we duplicate dependencies here and manually pip-install them without actually
@@ -75,14 +76,17 @@ for arg in "$@"; do if [[ "$arg" == '-h' || "$arg" == '--help' ]]; then usage; f
 for arg in "$@"; do if [[ "$arg" == '--system' ]]; then	system=1; else usage 1; fi; done
 
 if ((system)); then
+	bindir=/usr/local/games
+	bin=$bindir/$slug
 	sudo='sudo'
 fi
 
 if ! exists "$slug"; then
 	install_packages "${packages[@]}"
-	python3 -m pip install "${pypackages[@]}"
-	mkdir --parents -- "$bindir"
-	rm -f -- "$bin" && ln -s -- "$exec" "$bin"
+	"$sudo" python3 -m pip install "${pypackages[@]}"
+	"$sudo" mkdir --parents -- "$bindir"
+	# must be symlink as pylitaire.sh requires to be at project root
+	"$sudo" rm -f -- "$bin" && "$sudo" ln -s -- "$exec" "$bin"
 fi
 
 for icon in "$here"/"$slug"/data/icons/icon-*.png ; do

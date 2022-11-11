@@ -10,21 +10,23 @@ Brainstorm of new features and code ideas, in no particular order:
 
 - Finish Exapunks: completed face cards stacks must be face down and immovable
 
-- Bump PyGame to 2.0:
+- Drop PyXDG for a platform-independent alternative, such as appdirs or similar
+
+- Revert from pyproject.toml to setup.cfg to lower setuptools requirement back to Python 3.6
+
+- Use setuptools to install desktop integration. See https://stackoverflow.com/a/44462146/624066
+
+- Use more PyGame 2 features:
     - Freetype fonts
     - display / fullscreen switch improvements
 
 - Use Calendar Versioning. v1.0 was just to indicate first public release. v20YY-MM from now on
 
-- Drop Python 2 support, to add Python 3-exclusive syntax:
-  - Change Launcher shebang to '#!/usr/bin/env python3' to indicate
+- Use more Python 3 features:
   - Enums (3.4)
   - Annotations for Type Hints (3.0), possibly using `typing` module (3.5)
   - Formatted string literals, as in f"{name!r}" (3.6)
   - Dataclasses (3.7)
-
-- Revamp SVG/Z rendering code, it's waaaayyy too slow on default life_and_smooth theme
-  2019 might have a better way to use librsvg/cairo. Drop code for Big-Endian rendering
 
 - Android support: use PNG instead of SVG for Slot and Theme
 
