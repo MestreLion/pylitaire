@@ -1,6 +1,6 @@
 [project]
 name = "pylitaire"
-version = "1.1"
+version = "1.1+dev"
 description = "Solitaire in Python"
 authors = [
     {name = "Rodrigo Silva (MestreLion)", email = "linux@rodrigosilva.com"}
